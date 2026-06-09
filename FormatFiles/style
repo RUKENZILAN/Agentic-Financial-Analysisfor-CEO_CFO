@@ -1,0 +1,383 @@
+:root {
+    --bg-dark: #0f111a;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-blue: #3b82f6;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background Glowing Orbs */
+.background-gradients {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.4;
+    animation: float 20s infinite alternate ease-in-out;
+}
+
+.orb-1 {
+    top: -10%;
+    left: -10%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(0,0,0,0) 70%);
+}
+
+.orb-2 {
+    bottom: -10%;
+    right: -10%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(139,92,246,0.2) 0%, rgba(0,0,0,0) 70%);
+    animation-delay: -10s;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(5%, 5%) scale(1.1); }
+}
+
+/* Layout */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+header {
+    margin-bottom: 3rem;
+    text-align: center;
+    animation: fadeInDown 0.8s ease-out forwards;
+}
+
+.logo {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.logo span {
+    color: var(--accent-blue);
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.two-column-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.layout-col-left, .layout-col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .two-column-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .col-span-2 {
+        grid-column: span 1;
+    }
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.glass-card h2 {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Health Score Circle */
+.metric-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.score-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 1rem;
+}
+
+.progress-ring__circle {
+    transition: stroke-dashoffset 1s ease-in-out;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}
+
+.score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: baseline;
+}
+
+#healthScoreValue {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.out-of {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.status-badge {
+    padding: 0.5rem 1.2rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--accent-green);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Early Warnings */
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.metric-row:last-child {
+    border-bottom: none;
+}
+
+.metric-row .label {
+    color: var(--text-secondary);
+}
+
+.metric-row .value {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Insight & Narrative Cards */
+.insight-card p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #e2e8f0;
+}
+
+/* Lists (Flags & Action Plan) */
+.flags-card ul, .action-card ul {
+    list-style: none;
+}
+
+.flags-card li, .action-card li {
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 4px solid transparent;
+    transition: background 0.2s ease;
+}
+
+.flags-card li:hover, .action-card li:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.action-card li { border-left-color: var(--accent-blue); }
+.green-flags li { border-left-color: var(--accent-green); }
+.red-flags li { border-left-color: var(--accent-red); }
+
+/* Animations */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Markdown Content Styles */
+.markdown-content {
+    color: #e2e8f0;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+.markdown-content h3 {
+    color: var(--text-primary);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 0.3rem;
+}
+.markdown-content p {
+    margin-bottom: 1rem;
+}
+.markdown-content ul, .markdown-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+.markdown-content li {
+    margin-bottom: 0.3rem;
+}
+.markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+.markdown-content th, .markdown-content td {
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 0.75rem;
+    text-align: left;
+}
+.markdown-content th {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+}
+
+/* --- Theme Toggle & Light Mode --- */
+.theme-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.theme-toggle:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-blue);
+}
+
+body[data-theme="light"] {
+    --bg-dark: #f0f4f8;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --card-border: rgba(0, 0, 0, 0.1);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+}
+
+body[data-theme="light"] h1 {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body[data-theme="light"] .glass-card {
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="light"] .progress-ring__circle.bg {
+    stroke: rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="light"] .markdown-content {
+    color: var(--text-primary);
+}
+
+body[data-theme="light"] .markdown-content th {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="light"] .markdown-content th, 
+body[data-theme="light"] .markdown-content td,
+body[data-theme="light"] .markdown-content h3 {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure JS-populated metric grids look good in light mode */
+body[data-theme="light"] .metric-grid > div {
+    background: rgba(0, 0, 0, 0.03) !important;
+    border-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+body[data-theme="light"] .flags-card li, 
+body[data-theme="light"] .action-card li {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+body[data-theme="light"] .flags-card li:hover, 
+body[data-theme="light"] .action-card li:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
