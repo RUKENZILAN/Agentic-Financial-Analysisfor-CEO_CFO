@@ -1,0 +1,52 @@
+import logging
+
+logger = logging.getLogger('OptimizerAgent')
+
+class OptimizerAgent:
+    """
+    Role: Financial Optimizer Agent
+    """
+    SYSTEM_PROMPT = """Context: You are the Optimizer Agent within the Antigravity Multi-Agent system. Your job is to identify cost-saving opportunities and resource allocation improvements based on the financial data provided by the CEO Agent.
+
+Instructions:
+1. Review the structured financial data, particularly expense accounts and resource allocation.
+2. Identify areas of operational inefficiency or bloated expenses.
+3. Propose actionable cost-saving strategies and optimization techniques.
+4. Prepare an optimization report detailing your suggestions.
+5. Return your findings to the Central Memory for the CEO Agent to consolidate.
+"""
+
+    def __init__(self):
+        self.name = "Optimizer Agent"
+
+    def process(self, memory):
+        memory.add_log(f"[{self.name}] Started processing structured data for optimization...")
+        
+        # In a real scenario, the agent would analyze the expenses and allocations
+        # structured_data = memory.get("structured_data")
+        
+        memory.add_log(f"[{self.name}] Identifying cost-saving opportunities and inefficiencies...")
+        
+        # Mocking the findings
+        findings = memory.get("sub_agent_findings", {})
+        findings[self.name] = {
+            "Cost Savings": "Identified 15% potential savings in marketing spend.",
+            "Inefficiencies": "Software subscription redundancies costing $12k annually.",
+            "Resource Allocation": "Recommend shifting budget from legacy IT to cloud infrastructure.",
+            "Optimization Strategy": "Implement zero-based budgeting for Q4."
+        }
+        memory.set("sub_agent_findings", findings)
+        memory.add_log(f"[{self.name}] Completed optimization analysis and updated Central Memory.")
+
+if __name__ == "__main__":
+    from ceo_agent import CentralMemory
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    memory = CentralMemory()
+    memory.set("structured_data", {"mock": "data"})
+    
+    agent = OptimizerAgent()
+    agent.process(memory)
+    
+    print("\nFindings stored in memory:")
+    print(memory.get("sub_agent_findings"))
