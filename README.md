@@ -4,6 +4,7 @@
 This repository contains the architecture and UI components for a financial multi-agent system designed to standardize, analyze, and visualize corporate financial data. The system features a **CEO Agent** acting as the central orchestrator, delegating tasks to specialized sub-agents (Analyst, Auditor, Optimizer, Forecaster, DuPont) and compiling the results into a strategic Executive Summary.
 
 ## Architecture
+ Added features. 
 - `ceo_agent.py`: Central orchestrator managing the workflow, standardizing raw Excel data, and generating the executive markdown summaries.
 - `ui_ux_agent.py`: Handles formatting the JSON payloads into `dashboard_data.js` for local frontend rendering.
 - `index.html`, `app.js`, `style.css`: A dynamic, modern, glassmorphism-styled web dashboard used to visualize financial metrics, charts, and strategic narratives.
