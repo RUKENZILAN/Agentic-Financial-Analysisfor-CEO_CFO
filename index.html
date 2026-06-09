@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity Financial Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="background-gradients">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <header style="position: relative;">
+            <div class="logo">Antigravity <span>AI</span></div>
+            <div class="header-controls" style="position: absolute; top: 0; right: 0; display: flex; gap: 1rem;">
+                <button id="langToggle" class="theme-toggle" style="position: relative;">🇹🇷 TR</button>
+                <button id="themeToggle" class="theme-toggle" style="position: relative;">🌓 Theme</button>
+            </div>
+            <h1 data-i18n="title">Executive Summary Dashboard</h1>
+            <p class="subtitle" data-i18n="subtitle">Real-time consolidated financial insights.</p>
+        </header>
+
+        <main class="two-column-layout">
+            <!-- LEFT COLUMN -->
+            <div class="layout-col-left">
+                <!-- Executive Summary (Markdown Output) -->
+                <section class="glass-card executive-summary-card">
+                    <h2 data-i18n="exec_summary">Executive Summary (CEO & CFO Perspective)</h2>
+                    <div id="markdownContainer" class="markdown-content">
+                        <!-- Populated by JS via marked.js -->
+                    </div>
+                </section>
+
+                <!-- Ratio Analytics & DuPont -->
+                <section class="glass-card ratios-card">
+                    <h2 data-i18n="ratio_dupont">Ratio Analytics & DuPont Pillars</h2>
+                    
+                    <h3 data-i18n="ratio_title" style="color: var(--text-secondary); margin: 1rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">Ratio Analytics</h3>
+                    <div class="metric-grid" id="ratioAnalyticsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <h3 data-i18n="dupont_title" style="color: var(--text-secondary); margin: 1.5rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">DuPont Pillars</h3>
+                    <div class="metric-grid" id="dupontGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- Budget Simulations (Chart) -->
+                <section class="glass-card chart-card">
+                    <h2 data-i18n="budget_sim">Budget Simulations & Forecasts</h2>
+                    <div style="position: relative; height: 300px; width: 100%; margin-bottom: 1.5rem;">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                    <h3 data-i18n="cost_cutting" style="color: var(--text-secondary); margin: 1rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">Cost Cutting Savings Plans</h3>
+                    <div class="metric-grid" id="savingsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- Strategic Narrative: Action Plan -->
+                <section class="glass-card action-card">
+                    <h2>🚀 <span data-i18n="strategic_action">Strategic Action Plan</span></h2>
+                    <ul id="actionPlanList" class="narrative-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </section>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="layout-col-right">
+                <!-- Executive Metrics Card -->
+                <section class="glass-card metric-card">
+                    <h2 data-i18n="financial_health">Financial Health</h2>
+                    <div class="score-container">
+                        <svg class="progress-ring" width="120" height="120">
+                            <circle class="progress-ring__circle bg" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                            <circle id="healthScoreCircle" class="progress-ring__circle" stroke="#4ade80" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                        </svg>
+                        <div class="score-text">
+                            <span id="healthScoreValue">--</span>
+                            <span class="out-of">/10</span>
+                        </div>
+                    </div>
+                    <div class="status-badge" id="healthStatus">Evaluating...</div>
+                    
+                    <div class="metric-row" style="margin-top: 2rem; width: 100%;">
+                        <span class="label" data-i18n="z_score">Altman Z-Score</span>
+                        <span class="value" id="zScoreValue">--</span>
+                    </div>
+                    <div class="metric-row" style="width: 100%;">
+                        <span class="label" data-i18n="cash_runway">Cash Runway</span>
+                        <span class="value" id="cashRunwayValue">--</span>
+                    </div>
+                    <div class="metric-row" style="width: 100%;">
+                        <span class="label" data-i18n="roe">Return on Equity</span>
+                        <span class="value" id="roeValue">--</span>
+                    </div>
+                </section>
+
+                <!-- Red Flags -->
+                <section class="glass-card flags-card red-flags">
+                    <h2><span class="icon">⚠️</span> <span data-i18n="risks">Critical Risks</span></h2>
+                    <ul id="redFlagsList">
+                        <!-- Populated by JS -->
+                    </ul>
+                </section>
+
+                <!-- Green Flags -->
+                <section class="glass-card flags-card green-flags">
+                    <h2><span class="icon">✅</span> <span data-i18n="opportunities">Opportunities & Growth</span></h2>
+                    <ul id="greenFlagsList">
+                        <!-- Populated by JS -->
+                    </ul>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Data generated by Python UI/UX Agent -->
+    <script src="dashboard_data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
