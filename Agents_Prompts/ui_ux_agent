@@ -1,0 +1,66 @@
+import logging
+import json
+
+logger = logging.getLogger('UIUXAgent')
+
+class UIUXAgent:
+    """
+    Role: UI/UX Agent
+    """
+    SYSTEM_PROMPT = """Context: You are the UI/UX Agent within the Antigravity Multi-Agent system. Your job is to receive the fully consolidated Executive Summary from the CEO Agent and format it for presentation on a frontend web application.
+
+Instructions:
+1. Retrieve the consolidated 'Executive Summary & Strategic Action Plan' from the Central Memory.
+2. Transform the numerical and textual data into a structured format optimized for UI rendering (e.g., JSON schema for charts, dashboards, and alert components).
+3. Ensure the Green Flags and Red Flags are formatted for clear visual distinction.
+4. Prepare the final display-ready package.
+"""
+
+    def __init__(self):
+        self.name = "UI/UX Agent"
+
+    def process(self, memory):
+        memory.add_log(f"[{self.name}] Started processing...")
+        
+        memory.add_log(f"[{self.name}] Retrieving consolidated Executive Summary from CEO Agent...")
+        executive_summary = memory.get("executive_summary", {})
+        
+        if not executive_summary:
+            memory.add_log(f"[{self.name}] WARNING: No executive summary found in memory.")
+            return
+            
+        memory.add_log(f"[{self.name}] Formatting data for frontend dashboards and components...")
+        
+        # The CEO Agent now provides a perfectly structured payload
+        ui_package = executive_summary
+        
+        memory.set("ui_display_package", ui_package)
+        
+        # Write to local file so frontend can read it without a server
+        try:
+            with open("dashboard_data.js", "w") as f:
+                f.write("const dashboardData = " + json.dumps(ui_package, indent=2) + ";")
+            memory.add_log(f"[{self.name}] Saved dashboard_data.js to local disk.")
+        except Exception as e:
+            memory.add_log(f"[{self.name}] ERROR writing dashboard_data.js: {e}")
+            
+        memory.add_log(f"[{self.name}] UI/UX presentation package generated successfully.")
+
+if __name__ == "__main__":
+    from ceo_agent import CentralMemory
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    memory = CentralMemory()
+    memory.set("executive_summary", {
+        "Overall Financial Health Score": 8,
+        "Early Warning Signals": {"Altman Z-Score": "Safe", "Cash Runway": "18 Months"},
+        "Profitability Driver": "High profit margins are driving ROE.",
+        "Red Flags": ["High customer acquisition cost"],
+        "Green Flags": ["Expansion into new market"]
+    })
+    
+    agent = UIUXAgent()
+    agent.process(memory)
+    
+    print("\nUI Package stored in memory:")
+    print(json.dumps(memory.get("ui_display_package"), indent=2))
