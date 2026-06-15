@@ -7,8 +7,7 @@ logger = logging.getLogger("Antigravity.UIUXAgent")
 class UIUXAgent(BaseAgent):
     """
     Role: UI/UX Packaging Agent
-    Görevi: Alt ajanların (Analyst, DuPont, Optimizer, Forecaster) ürettiği 
-    gerçek hesaplanmış finansal analizleri front-end'e taşımak.
+    Görevi: Alt ajanların ürettiği gerçek hesaplanmış finansal analizleri front-end'e taşımak.
     """
     def __init__(self):
         super().__init__(
@@ -18,23 +17,19 @@ class UIUXAgent(BaseAgent):
 
     def process(self, memory):
         self.log_start(memory)
-        
+
         executive_summary = memory.get("executive_summary", {})
         sub_agent_findings = memory.get("sub_agent_findings", {})
-        
-        # 🎯 DÖNGÜYÜ KIRAN NOKTA: Gerçek hesaplama yapan ajanların çıktılarını tek tek topluyoruz
+
         analyst_data = sub_agent_findings.get("Analyst Agent", {})
         dupont_data = sub_agent_findings.get("DuPont Agent", {})
         optimizer_data = sub_agent_findings.get("Optimizer Agent", {})
         forecaster_data = sub_agent_findings.get("Forecaster & Risk Agent", {})
-        
-        # Her ajanın kendi ürettiği gerçek finansal maddeleri (narrative) listeliyoruz
-        # Eğer ajanlar boşsa sistemin çökmemesi için varsayılan boş listeler bırakıyoruz
+
         red_flags_list = forecaster_data.get("critical_risks", forecaster_data.get("red_flags", []))
         green_flags_list = optimizer_data.get("opportunities", optimizer_data.get("green_flags", []))
         action_plan_list = analyst_data.get("action_plan", dupont_data.get("strategic_actions", []))
 
-        # Eğer listeler boş kalırsa alternatif anahtarları kontrol et (Garantiye almak için)
         if not red_flags_list:
             red_flags_list = executive_summary.get("STRATEGIC_NARRATIVE", {}).get("red_flags", [])
         if not green_flags_list:
@@ -42,48 +37,49 @@ class UIUXAgent(BaseAgent):
         if not action_plan_list:
             action_plan_list = executive_summary.get("STRATEGIC_NARRATIVE", {}).get("action_plan", [])
 
-        # =====================================================================
-        # 📊 FRONT-END'E BASILACAK GERÇEK HESAPLANMIŞ VERİ PAKETİ
-        # =====================================================================
         ui_data = {
             "markdown_content": executive_summary.get("markdown_content", ""),
             "EXECUTIVE_METRICS": executive_summary.get("EXECUTIVE_METRICS", {}),
             "RATIO_ANALYTICS": executive_summary.get("RATIO_ANALYTICS", {}),
             "DUPONT_PILLARS": executive_summary.get("DUPONT_PILLARS", {}),
             "BUDGET_SIMULATIONS_FORECASTS": executive_summary.get("BUDGET_SIMULATIONS_FORECASTS", {}),
-            
-            # Kod verisi değil, ajanların hesapladığı gerçek verileri buraya bağlıyoruz
+
             "STRATEGIC_NARRATIVE": {
                 "red_flags": red_flags_list if isinstance(red_flags_list, list) else [str(red_flags_list)],
                 "green_flags": green_flags_list if isinstance(green_flags_list, list) else [str(green_flags_list)],
                 "action_plan": action_plan_list if isinstance(action_plan_list, list) else [str(action_plan_list)]
             },
-            
-            # Veri Güvenliği Verileri
+
             "confidentiality_rate_tr": "95% (Çok Gizli - Sadece Yönetim Kurulu / Kurum İçi Finansal Veri)",
             "confidentiality_rate_en": forecaster_data.get("Confidentiality Rate", "N/A"),
-            
+
             "forecast_confidence_rate_tr": "88% (Normal piyasa koşulları altındaki 3 yıllık geçmiş veriye dayalı güven oranı)",
             "forecast_confidence_rate_en": forecaster_data.get("Forecast Confidence Rate", "N/A")
         }
-        # =====================================================================
 
         try:
             with open("dashboard_data.js", "w", encoding="utf-8") as f:
                 f.write(f"const dashboardData = {json.dumps(ui_data, indent=2, ensure_ascii=False)};")
-            self.memory.add_log(f"[{self.name}] dashboard_data.js başarıyla güncellendi.")
+            memory.add_log(f"[{self.name}] dashboard_data.js başarıyla güncellendi.")
         except Exception as e:
+            # FIX: was self.memory.add_log(...) — self.memory is never set; correct reference is the `memory` parameter
             memory.add_log(f"[{self.name}] ⚠️ dashboard_data.js yazılırken hata oluştu: {e}")
-            
+
         self.log_end(memory)
+
 
 if __name__ == "__main__":
     from ceo_agent import CentralMemory
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    
+
     memory = CentralMemory()
     memory.set("executive_summary", {"markdown_content": "### Test"})
-    memory.set("sub_agent_findings", {"Forecaster & Risk Agent": {"Confidentiality Rate": "95%", "Forecast Confidence Rate": "88%"}})
-    
+    memory.set("sub_agent_findings", {
+        "Forecaster & Risk Agent": {
+            "Confidentiality Rate": "95%",
+            "Forecast Confidence Rate": "88%"
+        }
+    })
+
     agent = UIUXAgent()
     agent.process(memory)
