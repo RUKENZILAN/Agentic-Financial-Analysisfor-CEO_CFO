@@ -1,52 +1,67 @@
 import logging
+# Ortak kural setimizi (şablonu) içeri aktarıyoruz
+from base_agent import BaseAgent
 
-logger = logging.getLogger('ForecasterRiskAgent')
-
-class ForecasterRiskAgent:
+class ForecasterRiskAgent(BaseAgent):
     """
     Role: Forecaster & Risk Agent
+    Bu sınıf BaseAgent şablonundan türetilmiştir ve kurallara tam uyar.
     """
-    SYSTEM_PROMPT = """Context: You are the Forecaster & Risk Agent within the Antigravity Multi-Agent system. Your job is to predict future financial performance and identify potential macro and micro-economic risks.
+    def __init__(self):
+        # Üst sınıfa (BaseAgent) ajanın adını ve kalıcı sistem promptunu gönderiyoruz
+        super().__init__(
+            name="Forecaster & Risk Agent",
+            system_prompt="""Context: You are the Forecaster & Risk Agent within the Antigravity Multi-Agent system. Your job is to predict future financial performance, identify potential macro and micro-economic risks, and evaluate the confidentiality and confidence ratings of the generated forecasts.
 
 Instructions:
 1. Review the structured financial data, historical trends, and current market conditions.
 2. Generate financial forecasts (e.g., revenue projections, cash flow analysis) for the next 12-18 months.
 3. Evaluate risk indicators such as the Altman Z-Score or external supply chain vulnerabilities.
-4. Prepare a forecasting and risk assessment report.
-5. Return your findings to the Central Memory for the CEO Agent to consolidate.
+4. Define the Confidentiality Rate (data restriction level) and Confidence Rate (statistical probability of the forecast holding true).
+5. Prepare a forecasting and risk assessment report.
+6. Return your findings to the Central Memory for the CEO Agent to consolidate.
 """
-
-    def __init__(self):
-        self.name = "Forecaster & Risk Agent"
+        )
 
     def process(self, memory):
-        memory.add_log(f"[{self.name}] Started processing structured data for forecasting and risk assessment...")
+        # BaseAgent'tan gelen standart başlangıç logunu tetikliyoruz
+        self.log_start(memory)
         
-        # In a real scenario, the agent would perform projections and risk analysis
+        # Gerçek senaryoda Excel'den gelen yapılandırılmış veri buradan okunabilir:
         # structured_data = memory.get("structured_data")
         
-        memory.add_log(f"[{self.name}] Generating forecasts and evaluating risk indicators...")
-        
-        # Mocking the findings
+        # Hafızadaki mevcut alt ajan bulgularını çekiyoruz
         findings = memory.get("sub_agent_findings", {})
+        
+        # Yapay zekaya veya hesaplama motoruna gönderilecek tahmin bulgularını ekliyoruz
         findings[self.name] = {
             "Revenue Projection": "Expected 8% growth in Q3 based on current sales pipeline.",
             "Cash Flow": "Projected cash runway of 18 months under current burn rate.",
             "Altman Z-Score": "Score of 3.2 (Safe Zone).",
-            "Key Risks": "Potential supply chain disruption in Q4 due to geopolitical tensions."
+            "Key Risks": "Potential supply chain disruption in Q4 due to geopolitical tensions.",
+            
+            # 🔒 YENİ EKLENEN GİZLİLİK VE GÜVENİLİRLİK METRİKLERİ
+            "Confidentiality Rate": "95% (Highly Restricted - Boardroom Only / Internal Financial Data).",
+            "Forecast Confidence Rate": "88% (Based on 3-year historical baseline stability under normal market conditions)."
         }
+        
+        # Güncellenen verileri merkezi hafızaya geri yazıyoruz
         memory.set("sub_agent_findings", findings)
-        memory.add_log(f"[{self.name}] Completed forecasting/risk analysis and updated Central Memory.")
+        
+        # BaseAgent'tan gelen standart bitiş logunu tetikliyoruz
+        self.log_end(memory)
 
 if __name__ == "__main__":
     from ceo_agent import CentralMemory
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     
+    # Yerel test ortamı
     memory = CentralMemory()
     memory.set("structured_data", {"mock": "data"})
     
     agent = ForecasterRiskAgent()
     agent.process(memory)
     
-    print("\nFindings stored in memory:")
-    print(memory.get("sub_agent_findings"))
+    print("\nHafızaya Kaydedilen Güncel Tahmin Bulguları:")
+    import json
+    print(json.dumps(memory.get("sub_agent_findings"), indent=2))
