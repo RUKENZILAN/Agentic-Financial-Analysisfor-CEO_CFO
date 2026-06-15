@@ -1,325 +1,579 @@
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof dashboardData === 'undefined') {
-        console.error("dashboardData bulunamadi! Once CEO Agent calistirin.");
-        return;
+  if (typeof dashboardData === 'undefined') {
+    console.error("dashboardData bulunamadı!");
+    return;
+  }
+
+  let currentLang = 'en';
+
+  // ─── DİL PAKETİ ───────────────────────────────────────────────────────────
+  const i18n = {
+    en: {
+      title: "Executive Summary Dashboard",
+      subtitle: "Real-time consolidated financial insights.",
+      exec_summary: "Executive Summary",
+      ai_narrative: "AI Analysis",
+      mckinsey_section: "Strategic Scenarios",
+      eisenhower_section: "Priority Matrix",
+      financial_health: "Financial Health",
+      z_score: "Altman Z-Score",
+      cash_runway: "Cash Runway",
+      roe: "Return on Equity",
+      ratio_title: "Ratio Analytics",
+      historical_title: "Historical Comparison",
+      dupont_title: "DuPont Pillars",
+      budget_sim: "Budget Simulations & Forecasts",
+      cost_cutting: "Cost Cutting Savings",
+      strategic_action: "Strategic Action Plan",
+      opportunities: "Opportunities & Growth",
+      risks: "Critical Risks",
+      mckinsey_title: "McKinsey 3 Horizons",
+      mckinsey_h1: "Horizon 1 — Core",
+      mckinsey_h2: "Horizon 2 — Emerging",
+      mckinsey_h3: "Horizon 3 — Innovation",
+      mckinsey_best: "✅ Best Case Scenario",
+      mckinsey_worst: "⚠️ Worst Case Scenario",
+      best_action: "Action Plan",
+      worst_action: "Contingency Plan",
+      eisenhower_title: "Eisenhower Priority Matrix",
+      eisenhower_do: "🔴 Do Now",
+      eisenhower_schedule: "🔵 Schedule",
+      eisenhower_delegate: "🟡 Delegate",
+      eisenhower_eliminate: "⚪ Eliminate",
+      eisenhower_urgent: "Urgent",
+      eisenhower_not_urgent: "Not Urgent",
+      eisenhower_important: "Important",
+      eisenhower_not_important: "Not Important",
+      langBtn: "TR",
+      health_healthy: "Healthy",
+      health_critical: "Critical",
+      chart_standard: "Standard Forecast",
+      chart_stress: "Recession Stress-Test",
+      sec_title: "Data Security & Forecast Integrity",
+      sec_conf: "Confidentiality Rate",
+      sec_fore: "Forecast Confidence Rate",
+      months_suffix: " Months",
+      legal_title: "⚖️ Legal Disclaimer",
+      legal_text: "This report is generated automatically and does not constitute investment advice. Consult a licensed professional before making financial decisions. Data is confidential and for internal use only.",
+      no_data: "No data",
+      translating: "Translating analysis…"
+    },
+    tr: {
+      title: "Yönetici Özeti Panosu",
+      subtitle: "Gerçek zamanlı konsolide finansal analizler.",
+      exec_summary: "Yönetici Özeti",
+      ai_narrative: "Yapay Zeka Analizi",
+      mckinsey_section: "Stratejik Senaryolar",
+      eisenhower_section: "Öncelik Matrisi",
+      financial_health: "Finansal Sağlık",
+      z_score: "Altman Z-Skoru",
+      cash_runway: "Nakit Ömrü",
+      roe: "Özsermaye Karlılığı",
+      ratio_title: "Finansal Rasyolar",
+      historical_title: "Tarihsel Karşılaştırma",
+      dupont_title: "DuPont Analizi",
+      budget_sim: "Bütçe Simülasyonları & Tahminler",
+      cost_cutting: "Maliyet Azaltma Planları",
+      strategic_action: "Stratejik Aksiyon Planı",
+      opportunities: "Fırsatlar & Büyüme",
+      risks: "Kritik Riskler",
+      mckinsey_title: "McKinsey 3 Ufuk Modeli",
+      mckinsey_h1: "Ufuk 1 — Mevcut Çekirdek",
+      mckinsey_h2: "Ufuk 2 — Gelişen Fırsatlar",
+      mckinsey_h3: "Ufuk 3 — Gelecek / İnovasyon",
+      mckinsey_best: "✅ En İyi Durum Senaryosu",
+      mckinsey_worst: "⚠️ En Kötü Durum Senaryosu",
+      best_action: "Eylem Planı",
+      worst_action: "Acil Durum Planı",
+      eisenhower_title: "Eisenhower Öncelik Matrisi",
+      eisenhower_do: "🔴 Hemen Yap",
+      eisenhower_schedule: "🔵 Planla",
+      eisenhower_delegate: "🟡 Devret",
+      eisenhower_eliminate: "⚪ Ele / Kaldır",
+      eisenhower_urgent: "Acil",
+      eisenhower_not_urgent: "Acil Değil",
+      eisenhower_important: "Önemli",
+      eisenhower_not_important: "Önemli Değil",
+      langBtn: "EN",
+      health_healthy: "Sağlıklı",
+      health_critical: "Kritik",
+      chart_standard: "Standart Tahmin",
+      chart_stress: "Resesyon Stres Testi",
+      sec_title: "Veri Güvenliği & Tahmin Bütünlüğü",
+      sec_conf: "Gizlilik Oranı",
+      sec_fore: "Tahmin Güven Oranı",
+      months_suffix: " Ay",
+      legal_title: "⚖️ Yasal Uyarı",
+      legal_text: "Bu rapor otomatik üretilmiştir ve yatırım tavsiyesi niteliği taşımaz. Karar almadan önce lisanslı bir uzmana danışın. Veriler gizlidir ve yalnızca kurumsal kullanım içindir.",
+      no_data: "Veri yok",
+      translating: "Analiz çevriliyor…"
     }
+  };
 
-    const i18n = {
-        en: {
-            title: "Executive Summary Dashboard",
-            subtitle: "Real-time consolidated financial insights.",
-            exec_summary: "Executive Summary (CEO & CFO Perspective)",
-            financial_health: "Financial Health",
-            z_score: "Altman Z-Score",
-            cash_runway: "Cash Runway",
-            roe: "Return on Equity",
-            ratio_title: "Ratio Analytics",
-            dupont_title: "DuPont Pillars",
-            budget_sim: "Budget Simulations & Forecasts",
-            cost_cutting: "Cost Cutting Savings Plans",
-            strategic_action: "Strategic Action Plan",
-            opportunities: "Opportunities & Growth",
-            risks: "Critical Risks",
-            langBtn: "TR",
-            health_healthy: "Healthy",
-            health_critical: "Critical",
-            chart_standard: "Standard Forecast",
-            chart_stress: "Recession Stress-Test",
-            sec_title: "Data Security & Forecast Integrity",
-            sec_conf: "Confidentiality Rate",
-            sec_fore: "Forecast Confidence Rate",
-            sec_conf_desc: "Data access restriction level",
-            sec_fore_desc: "Statistical reliability of projections",
-            months_suffix: " Months",
-            legal_title: "Legal Disclaimer",
-            legal_text: "All reports, financial ratios, forecasting scenarios, and executive summaries are automatically synthesized by a Local AI model (LLM/Llama 3). None of the data constitutes investment, financial, tax, or legal advice. LLM models may produce hallucinations. Users must verify all findings with a certified professional before any strategic action."
-        },
-        tr: {
-            title: "Yonetici Ozeti Paneli",
-            subtitle: "Gercek zamanli konsolide finansal analizler.",
-            exec_summary: "Yonetici Ozeti (CEO ve CFO Perspektifi)",
-            financial_health: "Finansal Saglik Durumu",
-            z_score: "Altman Z-Skoru",
-            cash_runway: "Nakit Omru (Vade)",
-            roe: "Ozsermaye Karlligi (ROE)",
-            ratio_title: "Finansal Rasyolar",
-            dupont_title: "DuPont Analizi",
-            budget_sim: "Butce Simulasyonlari ve Tahminler",
-            cost_cutting: "Maliyet Azaltma Tasarruf Planlari",
-            strategic_action: "Stratejik Aksiyon Plani",
-            opportunities: "Firsatlar ve Buyume Alanlari",
-            risks: "Kritik Riskler",
-            langBtn: "EN",
-            health_healthy: "Guvenli / Saglikli",
-            health_critical: "Kritik Riskli",
-            chart_standard: "Standart Tahmin",
-            chart_stress: "Resesyon Stres Testi",
-            sec_title: "Veri Guvenligi ve Tahmin Butunlugu",
-            sec_conf: "Gizlilik Orani",
-            sec_fore: "Tahmin Guven Orani",
-            sec_conf_desc: "Veri erisim kisitlama seviyesi",
-            sec_fore_desc: "Projeksiyonlarin istatistiksel guvenilirligi",
-            months_suffix: " Ay",
-            legal_title: "Yasal Uyari",
-            legal_text: "Bu yazilim ve icerisindeki coklu ajan sistemi tarafindan uretilen tum raporlar, rasyolar, analizler, senaryo tahminleri ve yonetici ozetleri tamamen yapay zeka (LLM/Llama 3) tarafindan otomatik olarak uretilmektedir. Kesinlikle yatirim tavsiyesi, finansal danismanlik, vergi tavsiyesi veya hukuki yonlendirme niteligi tasimamaktadir. Yapay zeka modelleri yanilsama uretebilir. Analizlerin lisansli bir YMM, Bagimsiz Denetci veya Finansal Danisman tarafindan dogrulanmasi kullanici sorumlulugundadir."
-        }
-    };
-
-    let currentLang = 'en';
-
-    function translateStaticDOM() {
-        try {
-            const t = i18n[currentLang];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (t[key]) {
-                    if (key === 'legal_text') el.innerHTML = t[key];
-                    else el.textContent = t[key];
-                }
-            });
-        } catch (e) { console.error("Ceviri hatasi:", e); }
+  // ─── COMPANY DROPDOWN ──────────────────────────────────────────────────────
+  function renderCompanyDropdown() {
+    const sel = document.getElementById('companySelect');
+    if (!sel) return;
+    const companies = dashboardData.companies_list || [];
+    if (!companies || companies.length === 0) {
+      sel.parentElement && (sel.parentElement.style.display = 'none');
+      return;
     }
+    sel.innerHTML = '';
+    companies.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.code || c.id || c.value || c;
+      opt.textContent = c.name || c.label || c.code || c;
+      if ((c.code || c) === dashboardData.company_code) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', () => {
+      // Şirket değiştirildiğinde sayfa yenileniyor (ceo_agent.py yeniden çalıştırılmalı)
+      console.log('Şirket seçildi:', sel.value);
+    });
+  }
 
-    function smartTranslateToTurkish(text) {
-        if (!text || currentLang === 'en') return text;
-        let r = text;
+  // ─── STATİK DOM ÇEVİRİSİ ──────────────────────────────────────────────────
+  function translateStaticDOM() {
+    const t = i18n[currentLang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.textContent = t[key];
+    });
+    const subTitle = document.getElementById('dashboard-subtitle');
+    if (subTitle) subTitle.innerHTML = `<strong>The Pi Suite</strong> — ${t.subtitle}`;
+  }
 
-        const patterns = [
-            [/Our comprehensive analysis indicates that the company is currently in a (Strong|Stable|Good|Healthy|solid) financial position, with a solid foundation for future growth\./gi,
-             'Kapsamli analizimiz, sirketin su anda guclu bir finansal konumda oldugunu ve gelecekteki buyume icin saglam bir temele sahip oldugunu gostermektedir.'],
-            [/The DuPont breakdown reveals that ROE is driven primarily by high (Financial Leverage|leverage), rather than (Operating Efficiency|operating efficiency)\./gi,
-             'DuPont ayristirmasi, ROE\'nin operasyonel verimlilikten ziyade yuksek finansal kaldiractan beslendigini ortaya koymaktadir.'],
-            [/Based on our analysis, we recommend the following top three priorities:/gi,
-             'Analizimize dayanarak, asagidaki uc oncelikli aksiyonu oneriyoruz:'],
-            [/By addressing these key areas, we believe the company can maintain its (Strong|Healthy) financial health, drive profitability, and mitigate risks, ultimately positioning itself for long-term success\./gi,
-             'Bu kilit alanlari ele alarak, sirketin guclu finansal sagligini koruyacagina, karlligi artiracagina ve riskleri azaltacagina inaniyoruz.'],
-            [/stands at ([\d.]+), demonstrating/gi, 'seviyesinde olup'],
-            [/ratio of ([\d.]+) suggests/gi, '$1 orani sunu gostermektedir:'],
-            [/Score of ([\d.]+) \((Safe Zone|Grey Zone|Distress Zone)\), indicating low risk of bankruptcy/gi, '$1 skoru (Guvenli Bolge) - iflas riski dusuktur'],
-            [/Expected ([\d.]+%) growth in (Q[1-4]) based on current sales pipeline/gi, '$1 buyume $2 ceyreginde beklenmektedir'],
-            [/Projected cash runway of (\d+) months under current burn rate/gi, 'Mevcut yanma hiziyla $1 aylik nakit omru ongorulmektedir'],
-            [/Potential ([\w\s]+) disruption in (Q[1-4]) due to geopolitical tensions/gi, '$2 doneminde jeopolitik gerilimler nedeniyle olasi $1 kesintisi'],
-            [/Implement (Zero-based Budgeting) for (Q[1-4])/gi, '$2 icin Sifir Tabanli Butceleme uygulayin'],
-            [/identify ([\d.]+%) potential savings in ([\w\s]+) spend/gi, '$2 harcamalarinda %$1 tasarruf potansiyeli tespit edin'],
-            [/Develop strategies to improve slow inventory turnover and optimize asset utilization/gi, 'Yavas envanter devir hizini iyilestirmek icin stratejiler gelistirin'],
-            [/Monitor geopolitical tensions and develop contingency plans to minimize the impact of potential ([\w\s]+) disruptions on ([\w\s]+) and ([\w\s]+)/gi,
-             'Jeopolitik gerilimleri izleyin ve olasi $1 kesintilerinin $2 ve $3 uzerindeki etkisini en aza indirmek icin acil durum planlari gelistirin'],
-            [/Our comprehensive analysis/gi, 'Kapsamli analizimiz'],
-            [/indicates that/gi, 'sunu gostermektedir:'],
-            [/is currently in a/gi, 'su anda'],
-            [/financial position/gi, 'finansal konumdadir'],
-            [/solid foundation for future growth/gi, 'gelecekteki buyume icin saglam temel'],
-            [/demonstrating/gi, 'gostermektedir'],
-            [/suggesting/gi, 'isaret etmektedir'],
-            [/The DuPont breakdown reveals/gi, 'DuPont ayristirmasi ortaya koymaktadir'],
-            [/driven primarily by/gi, 'agirlikli olarak su tarafindan yonlendirilmektedir:'],
-            [/rather than/gi, 'yerine'],
-            [/can improve/gi, 'iyilestirebilir'],
-            [/may impact/gi, 'etkileyebilir'],
-            [/impacting/gi, 'olumsuz etkilemektedir'],
-            [/Based on our analysis/gi, 'Analizimize dayanarak'],
-            [/we recommend/gi, 'oneriyoruz'],
-            [/top three priorities/gi, 'uc oncelikli aksiyonu'],
-            [/The ([\w\s]+) stands at/gi, '$1 seviyesindedir'],
-            [/The ([\w\s]+) ratio/gi, '$1 orani'],
-            [/Optimize ([\w\s]+) Spend/gi, '$1 Harcamasini Optimize Edin'],
-            [/Address ([\w\s]+) Turnover/gi, '$1 Devir Hizini Ele Alin'],
-            [/Mitigate ([\w\s]+) Risk/gi, '$1 Riskini Azaltin']
+  // ─── SOL PANEL: MARKDOWN + McKINSEY + EISENHOWer ─────────────────────────
+  function computeStrategicData() {
+    const metrics = dashboardData.EXECUTIVE_METRICS || {};
+    const budget = dashboardData.BUDGET_SIMULATIONS_FORECASTS || {};
+    const ratios = dashboardData.RATIO_ANALYTICS || {};
+    const dupont = dashboardData.DUPONT_PILLARS || {};
+
+    const zScore = parseFloat(metrics.altman_z_score?.value || metrics.z_score || 0);
+    const cashRunway = parseFloat(metrics.cash_runway_months || metrics.cash_runway || 0);
+    const healthScore = parseFloat(metrics.financial_health_score || 0);
+    const roe = parseFloat(metrics.return_on_equity_pct || metrics.roe || 0);
+    const netMargin = parseFloat(ratios.net_profit_margin_pct || 0);
+    const currentRatio = parseFloat(ratios.current_ratio || 0);
+    const debtEquity = parseFloat(ratios.debt_to_equity_ratio || 0);
+    const assetTurnover = parseFloat(dupont.dupont_asset_turnover || 0);
+
+    const stdForecast = budget.forecasted_cash_flow_standard || [];
+    const stressForecast = budget.forecasted_cash_flow_recession || [];
+
+    return { zScore, cashRunway, healthScore, roe, netMargin, currentRatio, debtEquity, assetTurnover, stdForecast, stressForecast };
+  }
+
+  function renderLeftPanel() {
+    const t = i18n[currentLang];
+    const d = computeStrategicData();
+    const isTr = currentLang === 'tr';
+
+    // ── Markdown Narrative ──
+    renderMarkdownNarrative();
+
+    // ── McKinsey Scenarios ──
+    const mckContainer = document.getElementById('mckinseyLeftPanel');
+    if (mckContainer) {
+      // Horizon descriptions
+      let h1, h2, h3, bestCase, bestActions, worstCase, worstActions;
+
+      if (isTr) {
+        h1 = `Mevcut cari oran (${d.currentRatio}) ve %${d.roe} ROE ile çekirdek operasyonel karlılığı koruyun. Nakit ömrü (${d.cashRunway} ay) takibini sıkılaştırın.`;
+        h2 = `Net kâr marjını %${d.netMargin}'den %${(d.netMargin * 1.12).toFixed(1)}'e taşıyacak dijital verimlilik yatırımları yapın. Varlık devir hızını (${d.assetTurnover}x) optimize edin.`;
+        h3 = `Borç/Özkaynak oranı (${d.debtEquity}) düşükken inovasyon fonlaması fırsatı var. Yapay zekâ tabanlı bütçe modelleme sistemleri kurun.`;
+
+        const growthPotential = d.stdForecast.length > 1
+          ? (d.stdForecast[d.stdForecast.length - 1] - d.stdForecast[0]).toLocaleString('tr-TR')
+          : `%${(d.roe * 1.15).toFixed(1)} hedef ROE`;
+
+        bestCase = `Maliyet optimizasyon planlarının tam uygulanması ve varlık devir hızı iyileşmesiyle kümülatif nakit büyüme potansiyeli: +${growthPotential}. Altman Z-Skoru (${d.zScore}) güvenli bölgede kalır.`;
+        bestActions = [
+          `Özsermaye karlılığını %${Math.min(35, d.roe * 1.2).toFixed(1)}'e çıkarmak için varlık optimizasyonu`,
+          `Nakit ömrünü ${Math.round(d.cashRunway * 1.3)} aya taşıyacak yatırım stratejisi`,
+          `Net kâr marjını %${(d.netMargin * 1.15).toFixed(1)} hedefine yükselt`
         ];
 
-        patterns.forEach(([p, rep]) => { r = r.replace(p, rep); });
+        const stressDrop = d.stdForecast.length > 1 && d.stressForecast.length > 1
+          ? (d.stdForecast[d.stdForecast.length - 1] - d.stressForecast[d.stressForecast.length - 1]).toLocaleString('tr-TR')
+          : null;
 
-        const dict = {
-            "Strong": "Guclu", "Stable": "Stabil", "Healthy": "Saglikli",
-            "Excellent": "Mukemmel", "Solid": "Saglam", "Good": "IyI",
-            "Current Ratio": "Cari Oran", "Quick Ratio": "Asit-Test Orani",
-            "Debt-to-Equity": "Borc/Ozsermaye", "Net Profit Margin": "Net Kar Marji",
-            "Return on Equity": "Ozsermaye Karlligi", "Cash Runway": "Nakit Omru",
-            "Altman Z-Score": "Altman Z-Skoru", "Asset Turnover": "Varlik Devir Hizi",
-            "Financial Leverage": "Finansal Kaldirac", "Operating Efficiency": "Operasyonel Verimlilik",
-            "Net Margin": "Net Marj", "Safe Zone": "Guvenli Bolge",
-            "Supply Chain": "Tedarik Zinciri", "Revenue": "Gelir",
-            "Marketing": "Pazarlama", "Operations": "Operasyonlar",
-            "Cash Flow": "Nakit Akisi", "Company": "Sirket"
-        };
+        worstCase = stressDrop
+          ? `Resesyon senaryosunda nakit kaybı riski: -${stressDrop}. ${d.cashRunway < 6 ? '⚠️ KRİTİK: Nakit ömrü 6 ayın altında!' : 'Rezervler makro şoku absorbe edebilir durumda.'} ${d.zScore < 1.8 ? 'Altman Z-Skoru iflas bölgesine yaklaşıyor!' : ''}`
+          : `Makroekonomik daralma senaryosunda ${d.cashRunway} aylık nakit ömrü baskı altına girebilir. Z-Skoru (${d.zScore}) ${d.zScore < 2.5 ? 'gri bölgeye gerileme riski taşıyor' : 'güvenli bölgede ancak izlenmeli'}.`;
+        worstActions = [
+          'Pazarlama harcamalarında anında %15 kısıntı uygula',
+          `Nakit ömrünü en az ${Math.max(12, Math.round(d.cashRunway))} aya çıkaracak acil rezerv planı`,
+          'Atıl yazılım aboneliklerini ve yatırımları dondur'
+        ];
+      } else {
+        h1 = `Protect core operational profitability with current ratio (${d.currentRatio}) and ROE at ${d.roe}%. Tighten cash runway monitoring (${d.cashRunway} months).`;
+        h2 = `Invest in digital efficiency to lift net margin from ${d.netMargin}% to ${(d.netMargin * 1.12).toFixed(1)}%. Optimize asset turnover (currently ${d.assetTurnover}x).`;
+        h3 = `With debt/equity at ${d.debtEquity}, strategic innovation funding is accessible. Build AI-driven budget modeling capabilities for long-term advantage.`;
 
-        const sortedWords = Object.keys(dict).sort((a, b) => b.length - a.length);
-        sortedWords.forEach(en => {
-            const tr = dict[en];
-            const escaped = en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            r = r.replace(new RegExp('\\b' + escaped + '\\b', 'gi'), tr);
-        });
+        const growthPotential = d.stdForecast.length > 1
+          ? (d.stdForecast[d.stdForecast.length - 1] - d.stdForecast[0]).toLocaleString('en-US')
+          : `target ROE ${(d.roe * 1.15).toFixed(1)}%`;
 
-        return r;
+        bestCase = `Full cost optimization and improved asset turnover yield cumulative cash growth potential of +${growthPotential}. Altman Z-Score (${d.zScore}) remains in safe zone.`;
+        bestActions = [
+          `Lift equity return to ${Math.min(35, d.roe * 1.2).toFixed(1)}% via asset optimization`,
+          `Extend cash runway to ${Math.round(d.cashRunway * 1.3)} months through strategic investment`,
+          `Target net profit margin at ${(d.netMargin * 1.15).toFixed(1)}%`
+        ];
+
+        const stressDrop = d.stdForecast.length > 1 && d.stressForecast.length > 1
+          ? (d.stdForecast[d.stdForecast.length - 1] - d.stressForecast[d.stressForecast.length - 1]).toLocaleString('en-US')
+          : null;
+
+        worstCase = stressDrop
+          ? `Recession exposure: -${stressDrop} cash loss risk. ${d.cashRunway < 6 ? '⚠️ CRITICAL: Cash runway below 6 months!' : 'Reserves sufficient to absorb macro shocks.'} ${d.zScore < 1.8 ? 'Altman Z-Score approaching distress zone!' : ''}`
+          : `In a macroeconomic contraction, the ${d.cashRunway}-month cash runway could come under pressure. Z-Score (${d.zScore}) ${d.zScore < 2.5 ? 'risks falling into grey zone' : 'safe but requires monitoring'}.`;
+        worstActions = [
+          'Immediately cut marketing spend by 15%',
+          `Deploy emergency reserve plan to maintain minimum ${Math.max(12, Math.round(d.cashRunway))}-month runway`,
+          'Freeze redundant software subscriptions and non-core investments'
+        ];
+      }
+
+      mckContainer.innerHTML = `
+        <div class="space-y-4">
+          <h3 class="panel-section-title">${t.mckinsey_title}</h3>
+
+          <div class="horizon-cards">
+            <div class="horizon-card h1">
+              <span class="horizon-badge">H1</span>
+              <div>
+                <div class="horizon-label">${t.mckinsey_h1}</div>
+                <p class="horizon-text">${h1}</p>
+              </div>
+            </div>
+            <div class="horizon-card h2">
+              <span class="horizon-badge">H2</span>
+              <div>
+                <div class="horizon-label">${t.mckinsey_h2}</div>
+                <p class="horizon-text">${h2}</p>
+              </div>
+            </div>
+            <div class="horizon-card h3">
+              <span class="horizon-badge">H3</span>
+              <div>
+                <div class="horizon-label">${t.mckinsey_h3}</div>
+                <p class="horizon-text">${h3}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="scenario-block best">
+            <div class="scenario-header">${t.mckinsey_best}</div>
+            <p class="scenario-text">${bestCase}</p>
+            <div class="scenario-actions">
+              <span class="action-label">${t.best_action}:</span>
+              <ul>${bestActions.map(a => `<li>${a}</li>`).join('')}</ul>
+            </div>
+          </div>
+
+          <div class="scenario-block worst">
+            <div class="scenario-header">${t.mckinsey_worst}</div>
+            <p class="scenario-text">${worstCase}</p>
+            <div class="scenario-actions">
+              <span class="action-label">${t.worst_action}:</span>
+              <ul>${worstActions.map(a => `<li>${a}</li>`).join('')}</ul>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
-    function renderSecurityWidget() {
-        try {
-            const confValEl = document.getElementById('confidentiality-rate-val');
-            const confDescEl = document.getElementById('confidentiality-rate-desc');
-            const safeValEl = document.getElementById('confidence-rate-val');
-            const safeDescEl = document.getElementById('confidence-rate-desc');
+    // ── Eisenhower Matrix ──
+    const eisContainer = document.getElementById('eisenhowerLeftPanel');
+    if (eisContainer) {
+      const matrix = buildEisenhowerMatrix(d, isTr);
 
-            let confText, safeText;
-            if (currentLang === 'tr') {
-                confText = dashboardData.confidentiality_rate_tr || "95% (Cok Gizli)";
-                safeText = dashboardData.forecast_confidence_rate_tr || "88% (Dogrulanmis Veri)";
-            } else {
-                confText = dashboardData.confidentiality_rate_en || "95% (Highly Restricted)";
-                safeText = dashboardData.forecast_confidence_rate_en || "88% (Verified Baseline)";
-            }
+      const buildCell = (items, labelKey, cls) => `
+        <div class="eis-cell ${cls}">
+          <div class="eis-label">${t[labelKey]}</div>
+          <ul>${items.length ? items.map(i => `<li>${i}</li>`).join('') : `<li class="muted">${t.no_data}</li>`}</ul>
+        </div>`;
 
-            function parseRate(text) {
-                const m = text.match(/(\d+%)/);
-                return {
-                    num: m ? m[1] : text.split(' ')[0],
-                    detail: text.replace(m ? m[1] : '', '').replace(/^[\s\-:()]+/, '').trim()
-                };
-            }
+      eisContainer.innerHTML = `
+        <div class="space-y-3">
+          <h3 class="panel-section-title">${t.eisenhower_title}</h3>
+          <div class="eis-matrix">
+            <div class="eis-axis-col">
+              <div class="eis-axis-label">${t.eisenhower_important}</div>
+              <div class="eis-axis-label">${t.eisenhower_not_important}</div>
+            </div>
+            <div class="eis-grid">
+              <div class="eis-axis-row">
+                <span>${t.eisenhower_urgent}</span>
+                <span>${t.eisenhower_not_urgent}</span>
+              </div>
+              <div class="eis-cells">
+                ${buildCell(matrix.do, 'eisenhower_do', 'do')}
+                ${buildCell(matrix.schedule, 'eisenhower_schedule', 'schedule')}
+                ${buildCell(matrix.delegate, 'eisenhower_delegate', 'delegate')}
+                ${buildCell(matrix.eliminate, 'eisenhower_eliminate', 'eliminate')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
 
-            if (confValEl && confDescEl) {
-                const c = parseRate(confText);
-                confValEl.textContent = c.num;
-                confDescEl.textContent = c.detail;
-                confDescEl.title = confText;
-            }
-            if (safeValEl && safeDescEl) {
-                const s = parseRate(safeText);
-                safeValEl.textContent = s.num;
-                safeDescEl.textContent = s.detail;
-                safeDescEl.title = safeText;
-            }
-        } catch (e) { console.error("Security widget hatasi:", e); }
+  function buildEisenhowerMatrix(d, isTr) {
+    const matrix = { do: [], schedule: [], delegate: [], eliminate: [] };
+
+    if (isTr) {
+      // DO - Acil & Önemli
+      if (d.cashRunway > 0 && d.cashRunway < 6)
+        matrix.do.push(`Nakit krizini çöz — Ömür ${d.cashRunway} ay!`);
+      if (d.zScore > 0 && d.zScore < 1.8)
+        matrix.do.push(`Z-Skoru (${d.zScore}) iflas bölgesi — Yeniden yapılanma başlat`);
+      if (d.currentRatio > 0 && d.currentRatio < 1)
+        matrix.do.push('Cari oran kritik seviyede — Kısa vadeli borçları yeniden yapılandır');
+      if (d.zScore >= 1.8 && d.cashRunway >= 6)
+        matrix.do.push(`Mevcut finansal sağlık skorunu (${d.healthScore}/10) koru`);
+
+      // SCHEDULE - Önemli & Acil Değil
+      if (d.roe > 0 && d.roe < 15)
+        matrix.schedule.push(`ROE'yi %${d.roe}'dan %${Math.round(d.roe * 1.3)}'a taşı`);
+      matrix.schedule.push('Sıfır tabanlı bütçeleme (ZBB) geçişini planla');
+      if (d.assetTurnover < 1)
+        matrix.schedule.push(`Varlık devir hızını (${d.assetTurnover}x) optimize et`);
+      matrix.schedule.push('Dijital altyapı yatırım takvimini hazırla');
+
+      // DELEGATE - Acil & Önemli Değil
+      matrix.delegate.push('Rutin rasyo raporlamalarını analiz ekibine devret');
+      matrix.delegate.push('Yazılım lisans denetimini BT birimine aktar');
+      if (d.debtEquity < 0.3)
+        matrix.delegate.push('Düşük riskli borç yönetimini finans direktörüne devret');
+
+      // ELIMINATE - Acil Değil & Önemli Değil
+      matrix.eliminate.push('Verimsiz reklam kanallarındaki bütçeleri durdur');
+      matrix.eliminate.push('Atıl yazılım aboneliklerini iptal et');
+      matrix.eliminate.push('Manuel veri giriş süreçlerini kaldır');
+    } else {
+      // DO
+      if (d.cashRunway > 0 && d.cashRunway < 6)
+        matrix.do.push(`Fix cash flow — Runway is ${d.cashRunway} months!`);
+      if (d.zScore > 0 && d.zScore < 1.8)
+        matrix.do.push(`Z-Score (${d.zScore}) in distress — Initiate restructuring now`);
+      if (d.currentRatio > 0 && d.currentRatio < 1)
+        matrix.do.push('Current ratio critical — Restructure short-term debt');
+      if (d.zScore >= 1.8 && d.cashRunway >= 6)
+        matrix.do.push(`Maintain financial health score at ${d.healthScore}/10`);
+
+      // SCHEDULE
+      if (d.roe > 0 && d.roe < 15)
+        matrix.schedule.push(`Build ROE from ${d.roe}% to ${Math.round(d.roe * 1.3)}%`);
+      matrix.schedule.push('Plan Zero-Based Budgeting (ZBB) transition');
+      if (d.assetTurnover < 1)
+        matrix.schedule.push(`Optimize asset turnover (currently ${d.assetTurnover}x)`);
+      matrix.schedule.push('Prepare digital infrastructure investment roadmap');
+
+      // DELEGATE
+      matrix.delegate.push('Delegate routine ratio reporting to analyst team');
+      matrix.delegate.push('Transfer software license audit to IT department');
+      if (d.debtEquity < 0.3)
+        matrix.delegate.push('Assign low-risk debt management to CFO office');
+
+      // ELIMINATE
+      matrix.eliminate.push('Stop spend on underperforming ad channels');
+      matrix.eliminate.push('Cancel redundant software subscriptions');
+      matrix.eliminate.push('Remove manual data entry workflows');
     }
 
-    function renderStrategicLists() {
-        try {
-            function buildList(id, arr) {
-                const el = document.getElementById(id);
-                if (!el) return;
-                const items = Array.isArray(arr) ? arr : [arr];
-                el.innerHTML = '<ul style="padding-left:20px; list-style-type:disc;">' +
-                    items.map(i => '<li>' + i + '</li>').join('') + '</ul>';
-            }
-            buildList('redFlagsContainer', dashboardData.critical_risks);
-            buildList('greenFlagsContainer', dashboardData.growth_opportunities);
-            buildList('actionPlanContainer', dashboardData.strategic_action_plan);
-        } catch (e) { console.error("Liste hatasi:", e); }
+    return matrix;
+  }
+
+  // ─── MARKDOWN NARRATIVE ───────────────────────────────────────────────────
+  function renderMarkdownNarrative() {
+    const container = document.getElementById('markdownContainer');
+    if (!container) return;
+    const content = dashboardData.markdown_content || '';
+    if (!content) {
+      container.innerHTML = `<p class="text-slate-400 text-center py-4">${i18n[currentLang].no_data}</p>`;
+      return;
+    }
+    try {
+      container.innerHTML = (typeof marked !== 'undefined' && typeof marked.parse === 'function')
+        ? marked.parse(content)
+        : content.replace(/\n/g, '<br>');
+    } catch (e) {
+      container.innerHTML = content.replace(/\n/g, '<br>');
+    }
+  }
+
+  // ─── SAĞ PANEL BİLEŞENLERİ ────────────────────────────────────────────────
+  function renderHealthScore() {
+    const metrics = dashboardData.EXECUTIVE_METRICS || {};
+    const scoreValue = metrics.financial_health_score || 0;
+
+    const scoreEl = document.getElementById('healthScoreValue');
+    if (scoreEl) scoreEl.textContent = scoreValue;
+
+    const circle = document.getElementById('healthScoreCircle');
+    if (circle) {
+      const circ = 2 * Math.PI * 15.9155;
+      circle.style.strokeDasharray = `${circ} ${circ}`;
+      circle.style.strokeDashoffset = circ - (scoreValue / 10) * circ;
     }
 
-    function renderHealthScore() {
-        try {
-            const m = dashboardData.EXECUTIVE_METRICS || {};
-            const score = m.financial_health_score || 7.8;
-            if (document.getElementById('healthScoreValue'))
-                document.getElementById('healthScoreValue').textContent = score;
-
-            const circle = document.getElementById('healthScoreCircle');
-            if (circle) {
-                const radius = circle.r.baseVal.value;
-                const circ = radius * 2 * Math.PI;
-                circle.style.strokeDasharray = circ + ' ' + circ;
-                circle.style.strokeDashoffset = circ - (score / 10) * circ;
-            }
-
-            const badge = document.getElementById('healthStatus');
-            if (badge) {
-                badge.textContent = score >= 7 ? i18n[currentLang].health_healthy : i18n[currentLang].health_critical;
-                badge.style.color = score >= 7 ? '#10b981' : '#ef4444';
-            }
-
-            if (document.getElementById('zScoreValue'))
-                document.getElementById('zScoreValue').textContent =
-                    (m.altman_z_score ? m.altman_z_score.value : 2.85) + ' (' + (m.altman_z_score ? m.altman_z_score.zone : 'SAFE') + ')';
-            if (document.getElementById('roeValue'))
-                document.getElementById('roeValue').textContent = '%' + (m.return_on_equity_pct || 22.4);
-            if (document.getElementById('cashRunwayValue'))
-                document.getElementById('cashRunwayValue').textContent =
-                    (m.cash_runway_months || 16.5) + ' ' + i18n[currentLang].months_suffix;
-        } catch (e) { console.error("Health score hatasi:", e); }
+    const statusBadge = document.getElementById('healthStatus');
+    if (statusBadge) {
+      const healthy = scoreValue >= 7;
+      statusBadge.textContent = healthy ? i18n[currentLang].health_healthy : i18n[currentLang].health_critical;
+      statusBadge.className = `health-badge ${healthy ? 'healthy' : 'critical'}`;
     }
 
-    function populateGrid(gridId, dataObj) {
-        try {
-            const grid = document.getElementById(gridId);
-            if (!grid || !dataObj) return;
-            grid.innerHTML = '';
-            for (const [k, v] of Object.entries(dataObj)) {
-                const div = document.createElement('div');
-                div.className = 'metric-box';
-                div.innerHTML = '<div class="num">' + v + '</div><div class="title">' +
-                    k.replace(/_/g, ' ').toUpperCase() + '</div>';
-                grid.appendChild(div);
-            }
-        } catch (e) { console.error("Grid hatasi:", e); }
-    }
+    const zScoreEl = document.getElementById('zScoreValue');
+    if (zScoreEl)
+      zScoreEl.textContent = `${metrics.altman_z_score?.value || 0} (${metrics.altman_z_score?.zone || 'N/A'})`;
 
-    function renderMarkdownNarrative() {
-        try {
-            const el = document.getElementById('markdownContainer');
-            if (!el) return;
-            if (!dashboardData.markdown_content) {
-                el.innerHTML = '<p style="color:#94a3b8;">Yonetici ozeti yuklenmedi.</p>';
-                return;
-            }
-            let text = dashboardData.markdown_content;
-            if (currentLang === 'tr') text = smartTranslateToTurkish(text);
-            if (typeof marked !== 'undefined') {
-                el.innerHTML = marked.parse(text);
-            } else {
-                el.innerHTML = text
-                    .replace(/\n/g, '<br>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/^# (.*)$/gm, '<h3>$1</h3>');
-            }
-        } catch (e) { console.error("Markdown hatasi:", e); }
-    }
+    const roeEl = document.getElementById('roeValue');
+    if (roeEl) roeEl.textContent = `${metrics.return_on_equity_pct || 0}%`;
 
-    function renderChart() {
-        try {
-            const ctx = document.getElementById('cashFlowChart');
-            if (!ctx) return;
-            const budgets = dashboardData.BUDGET_SIMULATIONS_FORECASTS || {};
-            const std = budgets.forecasted_cash_flow_standard || [0];
-            const rec = budgets.forecasted_cash_flow_recession || [0];
-            if (window.myChart) window.myChart.destroy();
-            window.myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array.from({length: std.length}, (_, i) =>
-                        currentLang === 'tr' ? (i+1) + '. Ay' : 'Month ' + (i+1)),
-                    datasets: [
-                        { label: i18n[currentLang].chart_standard, data: std, borderColor: '#10b981', fill: false },
-                        { label: i18n[currentLang].chart_stress, data: rec, borderColor: '#ef4444', fill: false }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        } catch (e) { console.error("Grafik hatasi:", e); }
-    }
+    const cashEl = document.getElementById('cashRunwayValue');
+    if (cashEl) cashEl.textContent = `${metrics.cash_runway_months || 0}${i18n[currentLang].months_suffix}`;
+  }
 
-    function runUiPipeline() {
-        console.log("UI Pipeline baslatiliyor...");
-        translateStaticDOM();
-        renderSecurityWidget();
-        renderHealthScore();
-        populateGrid('ratioAnalyticsGrid', dashboardData.RATIO_ANALYTICS);
-        populateGrid('dupontGrid', dashboardData.DUPONT_PILLARS);
-        populateGrid('savingsGrid', dashboardData.BUDGET_SIMULATIONS_FORECASTS ? dashboardData.BUDGET_SIMULATIONS_FORECASTS.cost_cutting_savings : null);
-        renderStrategicLists();
-        renderMarkdownNarrative();
-        renderChart();
-        console.log("UI Pipeline tamamlandi");
+  function populateGrid(gridId, dataObj) {
+    const grid = document.getElementById(gridId);
+    if (!grid || !dataObj) return;
+    grid.innerHTML = '';
+    for (const [key, value] of Object.entries(dataObj)) {
+      const div = document.createElement('div');
+      div.className = 'metric-box';
+      div.innerHTML = `
+        <div class="metric-val">${value}</div>
+        <div class="metric-key">${key.replace(/_/g, ' ')}</div>`;
+      grid.appendChild(div);
     }
+  }
 
-    const langToggle = document.getElementById('langToggle');
-    if (langToggle) {
-        langToggle.addEventListener('click', () => {
-            currentLang = currentLang === 'en' ? 'tr' : 'en';
-            langToggle.textContent = i18n[currentLang].langBtn;
-            runUiPipeline();
-        });
-    }
+  function renderStrategicLists() {
+    const buildList = (id, arr) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = `<ul>${(arr && arr.length ? arr : [i18n[currentLang].no_data]).map(item => `<li>${item}</li>`).join('')}</ul>`;
+    };
+    buildList('redFlagsContainer', dashboardData.critical_risks);
+    buildList('greenFlagsContainer', dashboardData.growth_opportunities);
+    buildList('actionPlanContainer', dashboardData.strategic_action_plan);
+  }
 
-    runUiPipeline();
+  function renderSecurityWidget() {
+    const confVal = document.getElementById('confidentiality-rate-val');
+    const safeVal = document.getElementById('confidence-rate-val');
+    if (confVal) confVal.textContent = currentLang === 'tr' ? dashboardData.confidentiality_rate_tr : dashboardData.confidentiality_rate_en;
+    if (safeVal) safeVal.textContent = currentLang === 'tr' ? dashboardData.forecast_confidence_rate_tr : dashboardData.forecast_confidence_rate_en;
+  }
+
+  function renderChart() {
+    const ctx = document.getElementById('cashFlowChart');
+    if (!ctx) return;
+    const b = dashboardData.BUDGET_SIMULATIONS_FORECASTS || {};
+    const std = b.forecasted_cash_flow_standard || [];
+    const rec = b.forecasted_cash_flow_recession || [];
+    if (window.myChart) window.myChart.destroy();
+    window.myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array.from({ length: std.length || 12 }, (_, i) =>
+          currentLang === 'tr' ? `${i + 1}. Ay` : `Month ${i + 1}`),
+        datasets: [
+          { label: i18n[currentLang].chart_standard, data: std, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)', fill: true, tension: 0.3 },
+          { label: i18n[currentLang].chart_stress, data: rec, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)', fill: true, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+        scales: {
+          x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+          y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+        }
+      }
+    });
+  }
+
+  function renderHistoricalChart() {
+    const ctx = document.getElementById('historicalChart');
+    if (!ctx) return;
+    const hc = dashboardData.historical_comparison;
+    if (!hc || !hc.labels || !hc.health_history || !hc.roe_history) return;
+    const minLen = Math.min(hc.labels.length, hc.health_history.length, hc.roe_history.length);
+    if (minLen < 2) return;
+    if (window.historicalChartInstance) window.historicalChartInstance.destroy();
+    window.historicalChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: hc.labels.slice(0, minLen),
+        datasets: [
+          { label: currentLang === 'tr' ? 'Finansal Sağlık Skoru' : 'Financial Health Score', data: hc.health_history.slice(0, minLen), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
+          { label: 'ROE %', data: hc.roe_history.slice(0, minLen), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+        scales: {
+          y: { type: 'linear', position: 'left', ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+          y1: { type: 'linear', position: 'right', ticks: { color: '#64748b' }, grid: { drawOnChartArea: false } }
+        }
+      }
+    });
+  }
+
+  // ─── TEMA ─────────────────────────────────────────────────────────────────
+  const themeToggle = document.getElementById('themeToggle');
+  let storedTheme = null;
+  try { storedTheme = localStorage.getItem('theme'); } catch (e) {}
+  if (storedTheme === 'bw') document.body.classList.add('theme-bw');
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const isBw = document.body.classList.toggle('theme-bw');
+      try { localStorage.setItem('theme', isBw ? 'bw' : 'default'); } catch (e) {}
+      const icon = document.getElementById('themeToggleIcon');
+      const txt = document.getElementById('themeToggleText');
+      if (icon) icon.textContent = isBw ? '🌈' : '⚫';
+      if (txt) txt.textContent = isBw ? (currentLang === 'tr' ? 'Renkli Mod' : 'Color Mode') : (currentLang === 'tr' ? 'Siyah-Beyaz' : 'Black & White');
+    });
+  }
+
+  // ─── PDF ──────────────────────────────────────────────────────────────────
+  window.exportToPDF = () => window.print();
+
+  // ─── DİL DEĞİŞTİRİCİ ─────────────────────────────────────────────────────
+  const langToggle = document.getElementById('langToggle');
+  if (langToggle) {
+    langToggle.addEventListener('click', () => {
+      currentLang = currentLang === 'en' ? 'tr' : 'en';
+      langToggle.textContent = i18n[currentLang].langBtn;
+      runUiPipeline();
+    });
+  }
+
+  // ─── PIPELINE ─────────────────────────────────────────────────────────────
+  function runUiPipeline() {
+    translateStaticDOM();
+    renderSecurityWidget();
+    renderHealthScore();
+    renderLeftPanel();
+    renderStrategicLists();
+    populateGrid('ratioAnalyticsGrid', dashboardData.RATIO_ANALYTICS);
+    populateGrid('dupontGrid', dashboardData.DUPONT_PILLARS);
+    populateGrid('savingsGrid', dashboardData.BUDGET_SIMULATIONS_FORECASTS?.cost_cutting_savings || null);
+    renderChart();
+    renderHistoricalChart();
+  }
+
+  renderCompanyDropdown();
+  runUiPipeline();
 });
