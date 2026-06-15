@@ -1,12 +1,17 @@
 import logging
+# Ortak kural setimizi içeri aktarıyoruz
+from base_agent import BaseAgent
 
-logger = logging.getLogger('OptimizerAgent')
-
-class OptimizerAgent:
+class OptimizerAgent(BaseAgent):
     """
     Role: Financial Optimizer Agent
+    Bu sınıf BaseAgent şablonundan türetilmiştir ve kurallara tam uyar.
     """
-    SYSTEM_PROMPT = """Context: You are the Optimizer Agent within the Antigravity Multi-Agent system. Your job is to identify cost-saving opportunities and resource allocation improvements based on the financial data provided by the CEO Agent.
+    def __init__(self):
+        # Üst sınıfa (BaseAgent) ajanın adını ve kalıcı sistem promptunu gönderiyoruz
+        super().__init__(
+            name="Optimizer Agent",
+            system_prompt="""Context: You are the Optimizer Agent within the Antigravity Multi-Agent system. Your job is to identify cost-saving opportunities and resource allocation improvements based on the financial data provided by the CEO Agent.
 
 Instructions:
 1. Review the structured financial data, particularly expense accounts and resource allocation.
@@ -15,38 +20,42 @@ Instructions:
 4. Prepare an optimization report detailing your suggestions.
 5. Return your findings to the Central Memory for the CEO Agent to consolidate.
 """
-
-    def __init__(self):
-        self.name = "Optimizer Agent"
+        )
 
     def process(self, memory):
-        memory.add_log(f"[{self.name}] Started processing structured data for optimization...")
+        # BaseAgent'tan gelen standart başlangıç logunu tetikliyoruz
+        self.log_start(memory)
         
-        # In a real scenario, the agent would analyze the expenses and allocations
+        # Gerçek senaryoda Excel verisi buradan okunabilir:
         # structured_data = memory.get("structured_data")
         
-        memory.add_log(f"[{self.name}] Identifying cost-saving opportunities and inefficiencies...")
-        
-        # Mocking the findings
+        # Hafızadaki mevcut alt ajan bulgularını alıyoruz
         findings = memory.get("sub_agent_findings", {})
+        
+        # Kendi analiz sonuçlarımızı ekliyoruz
         findings[self.name] = {
             "Cost Savings": "Identified 15% potential savings in marketing spend.",
             "Inefficiencies": "Software subscription redundancies costing $12k annually.",
             "Resource Allocation": "Recommend shifting budget from legacy IT to cloud infrastructure.",
             "Optimization Strategy": "Implement zero-based budgeting for Q4."
         }
+        
+        # Güncellenmiş listeyi merkezi hafızaya geri yazıyoruz
         memory.set("sub_agent_findings", findings)
-        memory.add_log(f"[{self.name}] Completed optimization analysis and updated Central Memory.")
+        
+        # BaseAgent'tan gelen standart bitiş logunu tetikliyoruz
+        self.log_end(memory)
 
 if __name__ == "__main__":
     from ceo_agent import CentralMemory
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     
+    # Test ortamı
     memory = CentralMemory()
     memory.set("structured_data", {"mock": "data"})
     
     agent = OptimizerAgent()
     agent.process(memory)
     
-    print("\nFindings stored in memory:")
+    print("\nHafızaya Kaydedilen Bulgular:")
     print(memory.get("sub_agent_findings"))
