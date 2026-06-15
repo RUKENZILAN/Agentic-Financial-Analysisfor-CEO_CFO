@@ -115,3 +115,6 @@ Yapay zeka modelleri doğası gereği yanılsama (halüsinasyon) üretebilir vey
 
 Herhangi bir stratejik karar almadan önce, analizlerin lisanslı bir Yeminli Mali Müşavir (YMM), Bağımsız Denetçi veya Finansal Danışman tarafından doğrulanması kullanıcının kendi sorumluluğundadır.
 
+<img width="1180" height="984" alt="image" src="https://github.com/user-attachments/assets/70a2eb4f-4f32-49ae-9fbd-5cb4207730f6" />
+<img width="1164" height="978" alt="image" src="https://github.com/user-attachments/assets/666f63e0-811d-4160-ba80-d9b9504b78a0" />
+<img width="1170" height="970" alt="image" src="https://github.com/user-attachments/assets/42908f03-8f72-4b8f-abe3-3ba0ac06cf1f" />
