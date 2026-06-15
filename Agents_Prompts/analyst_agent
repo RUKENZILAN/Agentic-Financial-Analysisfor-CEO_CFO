@@ -1,33 +1,29 @@
 import logging
+# Oluşturduğumuz şablonu içeri aktarıyoruz
+from base_agent import BaseAgent
 
-logger = logging.getLogger('AnalystAgent')
-
-class AnalystAgent:
+class AnalystAgent(BaseAgent):
     """
     Role: Financial Analyst Agent
     """
-    SYSTEM_PROMPT = """Context: You are the Financial Analyst Agent within the Antigravity Multi-Agent system. Your job is to deeply analyze the structured financial data provided by the CEO Agent.
-
-Instructions:
-1. Review the structured financial data (Trial Balances, Balance Sheets, Income Statements).
-2. Calculate key financial ratios (Liquidity, Solvency, Efficiency, Profitability).
-3. Identify trends and anomalies over time.
-4. Prepare a detailed analytical report summarizing your findings.
-5. Return your findings to the Central Memory for the CEO Agent to consolidate.
-"""
-
     def __init__(self):
-        self.name = "Analyst Agent"
+        # Üst sınıfa (BaseAgent) ajanın adını ve promptunu gönderiyoruz
+        super().__init__(
+            name="Analyst Agent",
+            system_prompt=(
+                "Context: You are the Financial Analyst Agent...\n"
+                "Instructions:\n1. Calculate key financial ratios..."
+            )
+        )
 
     def process(self, memory):
-        memory.add_log(f"[{self.name}] Started processing structured data...")
+        # BaseAgent içindeki ortak log fonksiyonunu çağırıyoruz
+        self.log_start(memory)
         
-        # In a real scenario, the agent would pull structured_data and analyze it.
-        # structured_data = memory.get("structured_data")
+        # 🎯 GERÇEK ANALİZ MANTIĞI BURAYA GELECEK
+        # Örn: structured_data = memory.get("structured_data")
         
-        memory.add_log(f"[{self.name}] Calculating key financial ratios and identifying trends...")
-        
-        # Mocking the findings
+        # Hafızadaki mevcut bulguları al ve güncelle
         findings = memory.get("sub_agent_findings", {})
         findings[self.name] = {
             "Liquidity": "Strong, Current Ratio at 2.5",
@@ -36,17 +32,14 @@ Instructions:
             "Anomalies": "Unusual spike in administrative expenses in Q3"
         }
         memory.set("sub_agent_findings", findings)
-        memory.add_log(f"[{self.name}] Completed analysis and updated Central Memory.")
+        
+        # Standart bitiş logunu çağırıyoruz
+        self.log_end(memory)
 
 if __name__ == "__main__":
     from ceo_agent import CentralMemory
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     
     memory = CentralMemory()
-    memory.set("structured_data", {"mock": "data"})
-    
     agent = AnalystAgent()
     agent.process(memory)
-    
-    print("\nFindings stored in memory:")
-    print(memory.get("sub_agent_findings"))
