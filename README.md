@@ -1,4 +1,6 @@
-# Antigravity Financial Dashboard & Multi-Agent System
+# Antigravity Financial Dashboard & Multi-Agent System<img width="788" height="988" alt="Screenshot_2" src="https://github.com/user-attachments/assets/5da59d4e-8262-43f4-9e40-b625b4a00858" />
+<img width="775" height="963" alt="Screenshot_1" src="https://github.com/user-attachments/assets/9c9009b3-7a58-4e72-86d1-4ec8be3c2ab6" />
+
 
 🌍 **Language Selection / Dil Seçimi:**
 - [English](#english-version)
