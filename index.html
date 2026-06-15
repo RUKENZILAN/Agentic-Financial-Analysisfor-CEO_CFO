@@ -3,129 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antigravity Financial Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title data-i18n="title">Executive Summary Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --border: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: ui-sans-serif, system-ui, sans-serif;
+        }
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .metric-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        .metric-box .num {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #10b981;
+            word-wrap: break-word;
+            line-height: 1.2;
+        }
+        .metric-box .title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .security-section {
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .security-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+        }
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        /* ⚖️ YASAL UYARI FOOTER STİLİ */
+        .legal-disclaimer-container {
+            max-width: 1600px;
+            margin: 2rem auto 0 auto;
+            padding: 0 2rem 2rem 2rem;
+        }
+        .legal-disclaimer {
+            background-color: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            border-left: 4px solid #f59e0b;
+            border-radius: 0.75rem;
+            padding: 1.5rem 2rem;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        .legal-disclaimer h3 {
+            color: #fbbf24;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .legal-disclaimer p {
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="background-gradients">
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
-    </div>
 
     <div class="dashboard-container">
-        <header style="position: relative;">
-            <div class="logo">Antigravity <span>AI</span></div>
-            <div class="header-controls" style="position: absolute; top: 0; right: 0; display: flex; gap: 1rem;">
-                <button id="langToggle" class="theme-toggle" style="position: relative;">🇹🇷 TR</button>
-                <button id="themeToggle" class="theme-toggle" style="position: relative;">🌓 Theme</button>
+        <header class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
+            <div>
+                <h1 id="mainTitle" class="text-3xl font-bold text-white tracking-tight" data-i18n="title">Executive Summary Dashboard</h1>
+                <p id="subTitle" class="text-slate-400 mt-1" data-i18n="subtitle">Real-time consolidated financial insights.</p>
             </div>
-            <h1 data-i18n="title">Executive Summary Dashboard</h1>
-            <p class="subtitle" data-i18n="subtitle">Real-time consolidated financial insights.</p>
+            <button id="langToggle" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                🇹🇷 TR
+            </button>
         </header>
 
-        <main class="two-column-layout">
-            <!-- LEFT COLUMN -->
-            <div class="layout-col-left">
-                <!-- Executive Summary (Markdown Output) -->
-                <section class="glass-card executive-summary-card">
-                    <h2 data-i18n="exec_summary">Executive Summary (CEO & CFO Perspective)</h2>
-                    <div id="markdownContainer" class="markdown-content">
-                        <!-- Populated by JS via marked.js -->
-                    </div>
-                </section>
-
-                <!-- Ratio Analytics & DuPont -->
-                <section class="glass-card ratios-card">
-                    <h2 data-i18n="ratio_dupont">Ratio Analytics & DuPont Pillars</h2>
-                    
-                    <h3 data-i18n="ratio_title" style="color: var(--text-secondary); margin: 1rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">Ratio Analytics</h3>
-                    <div class="metric-grid" id="ratioAnalyticsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <!-- Populated by JS -->
-                    </div>
-
-                    <h3 data-i18n="dupont_title" style="color: var(--text-secondary); margin: 1.5rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">DuPont Pillars</h3>
-                    <div class="metric-grid" id="dupontGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <!-- Populated by JS -->
-                    </div>
-                </section>
-
-                <!-- Budget Simulations (Chart) -->
-                <section class="glass-card chart-card">
-                    <h2 data-i18n="budget_sim">Budget Simulations & Forecasts</h2>
-                    <div style="position: relative; height: 300px; width: 100%; margin-bottom: 1.5rem;">
-                        <canvas id="cashFlowChart"></canvas>
-                    </div>
-                    <h3 data-i18n="cost_cutting" style="color: var(--text-secondary); margin: 1rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">Cost Cutting Savings Plans</h3>
-                    <div class="metric-grid" id="savingsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <!-- Populated by JS -->
-                    </div>
-                </section>
-
-                <!-- Strategic Narrative: Action Plan -->
-                <section class="glass-card action-card">
-                    <h2>🚀 <span data-i18n="strategic_action">Strategic Action Plan</span></h2>
-                    <ul id="actionPlanList" class="narrative-list">
-                        <!-- Populated by JS -->
-                    </ul>
-                </section>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-1 flex flex-col">
+                <div class="card flex-1">
+                    <h2 class="text-xl font-semibold mb-4 border-b border-slate-700 pb-2 text-emerald-400" data-i18n="exec_summary">Executive Summary</h2>
+                    <div id="markdownContainer" class="prose prose-invert max-w-none text-slate-300 space-y-4">
+                        </div>
+                </div>
             </div>
 
-            <!-- RIGHT COLUMN -->
-            <div class="layout-col-right">
-                <!-- Executive Metrics Card -->
-                <section class="glass-card metric-card">
-                    <h2 data-i18n="financial_health">Financial Health</h2>
-                    <div class="score-container">
-                        <svg class="progress-ring" width="120" height="120">
-                            <circle class="progress-ring__circle bg" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
-                            <circle id="healthScoreCircle" class="progress-ring__circle" stroke="#4ade80" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
-                        </svg>
-                        <div class="score-text">
-                            <span id="healthScoreValue">--</span>
-                            <span class="out-of">/10</span>
+            <div class="lg:col-span-2 space-y-6">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="card flex flex-col items-center justify-center text-center">
+                        <h3 class="text-sm font-semibold text-slate-400 mb-2" data-i18n="financial_health">Financial Health</h3>
+                        <div class="relative w-24 h-24 flex items-center justify-center">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-slate-700" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="healthScoreCircle" class="text-emerald-500" stroke-width="3" stroke-dasharray="100, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <span id="healthScoreValue" class="absolute text-2xl font-bold text-white">7.8</span>
+                        </div>
+                        <span id="healthStatus" class="mt-2 px-3 py-1 rounded-full text-xs font-semibold">Healthy</span>
+                    </div>
+
+                    <div class="card flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider" data-i18n="z_score">Altman Z-Score</h4>
+                            <div id="zScoreValue" class="text-2xl font-bold text-white mt-1">2.85 (SAFE)</div>
+                        </div>
+                        <div class="mt-4">
+                            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider" data-i18n="roe">Return on Equity</h4>
+                            <div id="roeValue" class="text-2xl font-bold text-emerald-400 mt-1">22.4%</div>
                         </div>
                     </div>
-                    <div class="status-badge" id="healthStatus">Evaluating...</div>
-                    
-                    <div class="metric-row" style="margin-top: 2rem; width: 100%;">
-                        <span class="label" data-i18n="z_score">Altman Z-Score</span>
-                        <span class="value" id="zScoreValue">--</span>
+
+                    <div class="card flex flex-col justify-center">
+                        <h4 class="text-sm font-semibold text-slate-400 mb-1" data-i18n="cash_runway">Cash Runway</h4>
+                        <div id="cashRunwayValue" class="text-3xl font-bold text-amber-400">16.5 Months</div>
                     </div>
-                    <div class="metric-row" style="width: 100%;">
-                        <span class="label" data-i18n="cash_runway">Cash Runway</span>
-                        <span class="value" id="cashRunwayValue">--</span>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-4" data-i18n="budget_sim">Budget Simulations & Forecasts</h3>
+                    <div class="h-64">
+                        <canvas id="cashFlowChart"></canvas>
                     </div>
-                    <div class="metric-row" style="width: 100%;">
-                        <span class="label" data-i18n="roe">Return on Equity</span>
-                        <span class="value" id="roeValue">--</span>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-3" data-i18n="ratio_title">Ratio Analytics</h3>
+                    <div id="ratioAnalyticsGrid" class="grid-3"></div>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-3" data-i18n="dupont_title">DuPont Pillars</h3>
+                    <div id="dupontGrid" class="grid-3"></div>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-lg font-semibold mb-3" data-i18n="cost_cutting">Cost Cutting Savings Plans</h3>
+                    <div id="savingsGrid" class="grid-3"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="card border-l-4 border-red-500">
+                        <h4 class="text-sm font-bold text-red-400 mb-2" data-i18n="risks">Critical Risks</h4>
+                        <div id="redFlagsContainer"></div>
+                    </div>
+                    <div class="card border-l-4 border-emerald-500">
+                        <h4 class="text-sm font-bold text-emerald-400 mb-2" data-i18n="opportunities">Opportunities & Growth</h4>
+                        <div id="greenFlagsContainer"></div>
+                    </div>
+                    <div class="card border-l-4 border-blue-500">
+                        <h4 class="text-sm font-bold text-blue-400 mb-2" data-i18n="strategic_action">Strategic Action Plan</h4>
+                        <div id="actionPlanContainer"></div>
+                    </div>
+                </div>
+
+                <section class="security-section">
+                    <h2 data-i18n="sec_title">Data Security & Forecast Integrity</h2>
+                    <div class="security-grid">
+                        <div class="metric-box">
+                            <div class="num" id="confidentiality-rate-val">95%</div>
+                            <div class="title" data-i18n="sec_conf">Confidentiality Rate:</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="num" id="confidence-rate-val">88%</div>
+                            <div class="title" data-i18n="sec_fore">Forecast Confidence Rate:</div>
+                        </div>
                     </div>
                 </section>
 
-                <!-- Red Flags -->
-                <section class="glass-card flags-card red-flags">
-                    <h2><span class="icon">⚠️</span> <span data-i18n="risks">Critical Risks</span></h2>
-                    <ul id="redFlagsList">
-                        <!-- Populated by JS -->
-                    </ul>
-                </section>
-
-                <!-- Green Flags -->
-                <section class="glass-card flags-card green-flags">
-                    <h2><span class="icon">✅</span> <span data-i18n="opportunities">Opportunities & Growth</span></h2>
-                    <ul id="greenFlagsList">
-                        <!-- Populated by JS -->
-                    </ul>
-                </section>
             </div>
-        </main>
+        </div>
     </div>
 
-    <!-- Data generated by Python UI/UX Agent -->
+    <!-- ⚖️ YASAL UYARI / LEGAL DISCLAIMER FOOTER -->
+    <div class="legal-disclaimer-container">
+        <div class="legal-disclaimer">
+            <h3 data-i18n="legal_title">⚖️ Legal Disclaimer</h3>
+            <p data-i18n="legal_text">Loading disclaimer...</p>
+        </div>
+    </div>
+
     <script src="dashboard_data.js"></script>
     <script src="app.js"></script>
 </body>
