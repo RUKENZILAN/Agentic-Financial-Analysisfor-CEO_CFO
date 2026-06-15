@@ -1,12 +1,14 @@
 import logging
+from base_agent import BaseAgent
 
-logger = logging.getLogger('AuditorAgent')
-
-class AuditorAgent:
+class AuditorAgent(BaseAgent):
     """
     Role: Financial Auditor Agent
     """
-    SYSTEM_PROMPT = """Context: You are the Auditor Agent within the Antigravity Multi-Agent system. Your job is to ensure the integrity, accuracy, and compliance of the financial data provided by the CEO Agent.
+    def __init__(self):
+        super().__init__(
+            name="Auditor Agent",
+            system_prompt="""Context: You are the Auditor Agent within the Antigravity Multi-Agent system. Your job is to ensure the integrity, accuracy, and compliance of the financial data provided by the CEO Agent.
 
 Instructions:
 1. Review the structured financial data (Trial Balances, Balance Sheets, Income Statements).
@@ -15,19 +17,11 @@ Instructions:
 4. Prepare an audit report detailing any issues found.
 5. Return your findings to the Central Memory for the CEO Agent to consolidate.
 """
-
-    def __init__(self):
-        self.name = "Auditor Agent"
+        )
 
     def process(self, memory):
-        memory.add_log(f"[{self.name}] Started processing structured data for auditing...")
+        self.log_start(memory)
         
-        # In a real scenario, the agent would perform checks on structured_data
-        # structured_data = memory.get("structured_data")
-        
-        memory.add_log(f"[{self.name}] Performing discrepancy and compliance checks...")
-        
-        # Mocking the findings
         findings = memory.get("sub_agent_findings", {})
         findings[self.name] = {
             "Equation Check": "Passed (Assets = Liabilities + Equity)",
@@ -36,17 +30,13 @@ Instructions:
             "Unusual Transactions": "No significant unusual transactions flagged"
         }
         memory.set("sub_agent_findings", findings)
-        memory.add_log(f"[{self.name}] Completed audit and updated Central Memory.")
+        
+        self.log_end(memory)
 
 if __name__ == "__main__":
     from ceo_agent import CentralMemory
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     
     memory = CentralMemory()
-    memory.set("structured_data", {"mock": "data"})
-    
     agent = AuditorAgent()
     agent.process(memory)
-    
-    print("\nFindings stored in memory:")
-    print(memory.get("sub_agent_findings"))
