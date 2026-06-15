@@ -1,12 +1,17 @@
 import logging
+# Ortak kural setimizi (şablonu) içeri aktarıyoruz
+from base_agent import BaseAgent
 
-logger = logging.getLogger('DuPontAgent')
-
-class DuPontAgent:
+class DuPontAgent(BaseAgent):
     """
     Role: DuPont Analysis Agent
+    Bu sınıf BaseAgent şablonundan türetilmiştir ve mimari kurallara tam uyar.
     """
-    SYSTEM_PROMPT = """Context: You are the DuPont Analysis Agent within the Antigravity Multi-Agent system. Your job is to synthesize the findings from the Analyst, Auditor, Optimizer, and Forecaster agents to provide a comprehensive breakdown of the Return on Equity (ROE).
+    def __init__(self):
+        # Üst sınıfa (BaseAgent) ajanın adını ve kalıcı sistem promptunu gönderiyoruz
+        super().__init__(
+            name="DuPont Agent",
+            system_prompt="""Context: You are the DuPont Analysis Agent within the Antigravity Multi-Agent system. Your job is to synthesize the findings from the Analyst, Auditor, Optimizer, and Forecaster agents to provide a comprehensive breakdown of the Return on Equity (ROE).
 
 Instructions:
 1. Retrieve the findings of the Analyst, Auditor, Optimizer, and Forecaster agents from the Central Memory.
@@ -15,44 +20,44 @@ Instructions:
 4. Prepare a final synthesis report focusing on the drivers of profitability.
 5. Return your findings to the Central Memory for the CEO Agent to use in the Executive Summary.
 """
-
-    def __init__(self):
-        self.name = "DuPont Agent"
+        )
 
     def process(self, memory):
-        memory.add_log(f"[{self.name}] Started processing...")
+        # BaseAgent'tan gelen ortak başlangıç logunu tetikliyoruz
+        self.log_start(memory)
         
-        memory.add_log(f"[{self.name}] Pulling findings from Analyst, Auditor, Optimizer, and Forecaster agents...")
-        previous_findings = memory.get("sub_agent_findings", {})
-        
-        # In a real scenario, the agent would read these findings and perform the analysis
+        # Diğer ajanların hafızaya bıraktığı bulguları buradan çekebiliriz:
+        # previous_findings = memory.get("sub_agent_findings", {})
         # analyst_findings = previous_findings.get("Analyst Agent")
         # auditor_findings = previous_findings.get("Auditor Agent")
-        # optimizer_findings = previous_findings.get("Optimizer Agent")
-        # forecaster_findings = previous_findings.get("Forecaster & Risk Agent")
         
-        memory.add_log(f"[{self.name}] Synthesizing findings and performing DuPont Analysis...")
-        
-        # Mocking the findings
+        # Hafızadaki mevcut alt ajan bulguları listesini alıyoruz
         findings = memory.get("sub_agent_findings", {})
+        
+        # DuPont analiz sentez sonuçlarımızı ekliyoruz
         findings[self.name] = {
             "DuPont Breakdown": "ROE driven primarily by high financial leverage rather than operating efficiency.",
             "Profit Margin Impact": "Optimizer's cost-saving strategies can improve Net Margin by 1.5%.",
             "Asset Turnover Impact": "Analyst noted slow inventory turnover dragging down overall asset efficiency.",
             "Risk Impact": "Forecaster's supply chain risk could further degrade asset turnover in Q4."
         }
+        
+        # Güncellenen verileri merkezi hafızaya geri yazıyoruz
         memory.set("sub_agent_findings", findings)
-        memory.add_log(f"[{self.name}] Completed DuPont analysis and updated Central Memory.")
+        
+        # BaseAgent'tan gelen ortak bitiş logunu tetikliyoruz
+        self.log_end(memory)
 
 if __name__ == "__main__":
     from ceo_agent import CentralMemory
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     
+    # Yerel test ortamı
     memory = CentralMemory()
     memory.set("sub_agent_findings", {"Analyst Agent": "mock_data"})
     
     agent = DuPontAgent()
     agent.process(memory)
     
-    print("\nFindings stored in memory:")
+    print("\nHafızaya Kaydedilen DuPont Bulguları:")
     print(memory.get("sub_agent_findings"))
