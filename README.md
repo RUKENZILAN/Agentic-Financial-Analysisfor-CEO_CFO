@@ -1,9 +1,11 @@
 The Pi Suite Financial Dashboard & Multi-Agent System
-🌍 Language Selection / Dil Seçimi:
 
-**English
+<img width="1504" height="888" alt="pdf" src="https://github.com/user-attachments/assets/9938dd43-8909-4f6a-b461-e902aca41374" />
+<img width="706" height="561" alt="LAng selection" src="https://github.com/user-attachments/assets/9c714412-fff0-4de5-b53a-ccb837663583" />
+<img width="1315" height="874" alt="Screenshot_1" src="https://github.com/user-attachments/assets/76b0c24e-691b-42b5-b105-38c32db3f790" />
+<img width="1337" height="855" alt="Screenshot_2" src="https://github.com/user-attachments/assets/a0ee625f-ebf0-4be8-87f4-a140d34742bc" />
+<img width="1279" height="924" alt="Screenshot_3" src="https://github.com/user-attachments/assets/03f3c783-8ae4-4d99-ba2c-038cbc27911b" />
 
-Türkçe**
 
 **🇬🇧 English Version**
 This repository contains a Multi-Agent Financial AI System architecture designed to standardize, analyze, and visualize corporate financial data.
