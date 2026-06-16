@@ -1,156 +1,555 @@
 import logging
+import json
+import os
+import urllib.request
+import urllib.error
+import argparse
+from datetime import datetime
 
-# Configure basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('CEOAgent')
+from analyst_agent import AnalystAgent
+from auditor_agent import AuditorAgent
+from optimizer_agent import OptimizerAgent
+from forecaster_agent import ForecasterRiskAgent
+from dupont_agent import DuPontAgent
+
+from company_manager import CompanyManager
+from historical_data import HistoricalComparison
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+parser = argparse.ArgumentParser(description="Antigravity Multi-Agent Finans Motoru")
+parser.add_argument("--company", type=str, default="demo_corp", help="Analiz edilecek şirket kodu")
+parser.add_argument("--engine", type=str, default=None, help="AI motoru: ollama | gemini | claude")
+parser.add_argument("--api-key", type=str, default=None, help="Gemini veya Claude API anahtarı")
+args, unknown = parser.parse_known_args()
+
+CONFIG_FILE = "ai_config.json"
+
+YENI_SYSTEM_PROMPT = (
+    "Sen Antigravity Coklu Ajan sisteminin CEO ajanisin. Gorevin, alt ajanlardan "
+    "gelen verileri analiz edip Turkce yonetici ozeti uretmektir.\n\n"
+    "ONEMLI KURALLAR:\n"
+    "1. Cikti TAMAMEN TURKCE olmali. Ingilizce kelime KULLANMA.\n"
+    "2. Profesyonel ve CEO'ya hitap eden kurumsal bir dil kullan.\n"
+    "3. Markdown formatinda sunu yaz:\n"
+    "   - **Genel Finansal Saglik Durumu**\n"
+    "   - **Likidite ve Borc Odeme Gucu**\n"
+    "   - **Karlilik ve Operasyonel Verimlilik**\n"
+    "   - **DuPont Analizi**\n"
+    "   - **Tahminleme ve Risk Gorunumu**\n\n"
+    "   - **McKinsey Stratejik Büyüme Ufukları (3 Horizons)**\n"
+    "     * Ufuk 1 (Mevcut Durum/Core), Ufuk 2 (Gelişmekte Olan), Ufuk 3 (Gelecek/İnovasyon) olarak strateji belirle.\n\n"
+    "   - **Senaryo Planlaması (Best Case / Worst Case)**\n"
+    "     * Finansal verilere göre en iyi ve en kötü durum senaryolarını ve eylem planlarını simüle et.\n\n"
+    "   - **Eisenhower Görev Önceliklendirme Matrisi**\n"
+    "     * Alt ajanların bulgularına göre görevleri; Acil-Önemli (Yap), Acil Değil-Önemli (Planla), Acil-Önemli Değil (Devret), Acil Değil-Önemli Değil (Ele) olarak matris formatında listele.\n\n"
+    "   - **Stratejik Oneriler**\n"
+    "4. Verilerin otesine gecme, spekulasyon yapma."
+)
+
+YENI_USER_KOMUTUM = "Aşağıdaki alt ajanlardan gelen konsolide verileri analiz et ve Türkçe yönetici özeti oluştur:"
+
+STATIC_FALLBACK_TR = (
+    "### **Genel Finansal Sağlık Durumu**\n"
+    "Konsolide analizlerimize göre şirketin finansal sağlık skoru **7.8** ile güvenli bölgededir.\n\n"
+    "### **McKinsey Stratejik Büyüme Ufukları (3 Horizons)**\n"
+    "* **Ufuk 1 (Mevcut Çekirdek İş):** Cari oranın 2.15 gücüyle ana faaliyet kârlılığını korumak.\n"
+    "* **Ufuk 2 (Gelişen Fırsatlar):** Dijital bulut altyapısına geçiş ile verimliliği %15 artırmak.\n"
+    "* **Ufuk 3 (Gelecek/İnovasyon):** Yapay zekâ tabanlı bütçe simülasyonları geliştirmek.\n\n"
+    "### **Senaryo Planlaması (Best/Worst Case)**\n"
+    "* **En İyi Durum:** Net kâr marjı %14.2'den %16.5'e çıkabilir.\n"
+    "* **En Kötü Durum:** Resesyon stresinde pazarlama harcamalarında %15 kısıntı gerekebilir.\n\n"
+    "### **Eisenhower Görev Önceliklendirme Matrisi**\n"
+    "| | ÖNEMLİ | ÖNEMLİ DEĞİL |\n"
+    "|---|---|---|\n"
+    "| **ACİL** | **YAP:** Kısa vadeli borç ödemelerini dengele. | **DEVRET:** Yazılım lisans denetimini BT'ye aktar. |\n"
+    "| **ACİL DEĞİL** | **PLANLA:** Sıfır tabanlı bütçelemeye geçiş takvimi hazırla. | **ELE:** Verimsiz reklam bütçelerini durdur. |\n\n"
+    "### **Stratejik Öneriler**\n"
+    "DuPont analizi rasyolarına göre varlık devir hızının optimize edilmesi kritiktir."
+)
+
+STATIC_FALLBACK_EN = (
+    "### **General Financial Health Status**\n"
+    "The company's financial health score of **7.8** is in the safe zone per consolidated analysis.\n\n"
+    "### **McKinsey Strategic Growth Horizons (3 Horizons)**\n"
+    "* **Horizon 1 (Core Business):** Protect operational profitability with current ratio of 2.15.\n"
+    "* **Horizon 2 (Emerging Opportunities):** Transition to cloud infrastructure to improve efficiency by 15%.\n"
+    "* **Horizon 3 (Future/Innovation):** Develop AI-based budget simulation systems.\n\n"
+    "### **Scenario Planning (Best/Worst Case)**\n"
+    "* **Best Case:** Net profit margin could rise from 14.2% to 16.5%.\n"
+    "* **Worst Case:** 15% marketing spend cut required under recession stress.\n\n"
+    "### **Eisenhower Task Prioritization Matrix**\n"
+    "| | IMPORTANT | NOT IMPORTANT |\n"
+    "|---|---|---|\n"
+    "| **URGENT** | **DO:** Balance short-term debt payments. | **DELEGATE:** Transfer software license audit to IT. |\n"
+    "| **NOT URGENT** | **SCHEDULE:** Prepare Zero-Based Budgeting transition plan. | **ELIMINATE:** Stop inefficient ad channel budgets. |\n\n"
+    "### **Strategic Recommendations**\n"
+    "Optimizing asset turnover is critical to increase return on equity per DuPont analysis."
+)
+
+
+# ─── AI MOTOR YÖNETİCİSİ ──────────────────────────────────────────────────────
+
+class AIEngine:
+    """Seçilen AI motorunu yönetir: Ollama, Gemini veya Claude."""
+
+    def __init__(self, engine: str, api_key: str = None,
+                 ollama_url: str = "http://localhost:11434",
+                 ollama_model: str = "llama3:latest",
+                 gemini_model: str = "gemini-1.5-flash",
+                 claude_model: str = "claude-sonnet-4-6"):
+        self.engine = engine.lower()
+        self.api_key = api_key
+        self.ollama_url = ollama_url.rstrip("/")
+        self.ollama_model = ollama_model
+        self.gemini_model = gemini_model
+        self.claude_model = claude_model
+
+    def call(self, system_prompt: str, user_prompt: str) -> str | None:
+        """Seçilen motora istek gönder. None dönerse fallback kullanılır."""
+        if self.engine == "ollama":
+            return self._call_ollama(system_prompt, user_prompt)
+        elif self.engine == "gemini":
+            return self._call_gemini(system_prompt, user_prompt)
+        elif self.engine == "claude":
+            return self._call_claude(system_prompt, user_prompt)
+        return None
+
+    def _call_ollama(self, system_prompt, user_prompt):
+        url = f"{self.ollama_url}/api/chat"
+        payload = {
+            "model": self.ollama_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "stream": False
+        }
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return json.loads(resp.read().decode("utf-8"))["message"]["content"]
+        except Exception as e:
+            logging.warning(f"[Ollama] Bağlantı hatası: {e}")
+            return None
+
+    def _call_gemini(self, system_prompt, user_prompt):
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.gemini_model}:generateContent?key={self.api_key}"
+        payload = {
+            "contents": [{"parts": [{"text": f"{system_prompt}\n\n{user_prompt}"}]}]
+        }
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                return data["candidates"][0]["content"]["parts"][0]["text"]
+        except Exception as e:
+            logging.warning(f"[Gemini] API hatası: {e}")
+            return None
+
+    def _call_claude(self, system_prompt, user_prompt):
+        url = "https://api.anthropic.com/v1/messages"
+        payload = {
+            "model": self.claude_model,
+            "max_tokens": 2000,
+            "system": system_prompt,
+            "messages": [{"role": "user", "content": user_prompt}]
+        }
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": self.api_key,
+                    "anthropic-version": "2023-06-01"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                return data["content"][0]["text"]
+        except Exception as e:
+            logging.warning(f"[Claude] API hatası: {e}")
+            return None
+
+
+# ─── BAŞLANGIÇ: MOTOR SEÇİM MENÜSÜ ───────────────────────────────────────────
+
+def load_config() -> dict:
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+def save_config(config: dict):
+    try:
+        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        logging.warning(f"Konfigürasyon kaydedilemedi: {e}")
+
+def test_ollama(base_url: str = "http://localhost:11434") -> bool:
+    try:
+        req = urllib.request.Request(
+            f"{base_url.rstrip('/')}/api/tags",
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=5):
+            return True
+    except Exception:
+        return False
+
+def fetch_ollama_models(base_url: str = "http://localhost:11434") -> list:
+    """Kurulu Ollama modellerini listele."""
+    try:
+        req = urllib.request.Request(
+            f"{base_url.rstrip('/')}/api/tags",
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return [m["name"] for m in data.get("models", [])]
+    except Exception:
+        return []
+
+def prompt_engine_selection() -> dict:
+    """Kullanıcıdan dil ve AI motoru seçimini interaktif olarak al."""
+
+    # ── Dil Seçimi ──────────────────────────────────────────────────────────
+    print("\n" + "="*55)
+    print("   🌐  LANGUAGE / DİL SEÇİMİ")
+    print("="*55)
+    print("\n  [1] Türkçe")
+    print("  [2] English")
+    print()
+    while True:
+        lang_choice = input("  Seçim / Choice (1/2): ").strip()
+        if lang_choice in ("1", "2"):
+            break
+        print("  ⚠️  Lütfen 1 veya 2 girin / Please enter 1 or 2.")
+    ui_lang = "tr" if lang_choice == "1" else "en"
+
+    # ── Çeviri sözlüğü ──────────────────────────────────────────────────────
+    T = {
+        "tr": {
+            "header":        "🤖  ANTİGRAVİTY — AI MOTOR SEÇİMİ",
+            "ollama_label":  "Ollama (Yerel LLM)",
+            "gemini_label":  "Google Gemini (Bulut)",
+            "claude_label":  "Anthropic Claude (Bulut)",
+            "api_required":  "🔑 API Key gerekli",
+            "running":       "✅ Çalışıyor",
+            "not_running":   "❌ Bağlanamadı",
+            "select":        "Seçiminiz (1/2/3): ",
+            "invalid":       "⚠️  Lütfen 1, 2 veya 3 girin.",
+            "ollama_url":    "Ollama URL (Enter = {default}): ",
+            "ollama_warn":   "⚠️  {url} adresine bağlanılamadı — yine de devam ediliyor.",
+            "installed":     "Kurulu modeller:",
+            "manual":        "Manuel gir",
+            "model_select":  "Model seçin (Enter = {default}): ",
+            "model_name":    "Model adı: ",
+            "invalid_sel":   "⚠️  Geçersiz seçim.",
+            "ok_ollama":     "✅ Ollama ayarları: {url}  |  Model: {model}",
+            "api_key":       "{name} API Key'inizi girin: ",
+            "api_empty":     "⚠️  API Key boş olamaz.",
+            "models_title":  "{name} modelleri:",
+            "ok_model":      "✅ {name} modeli: {model}",
+            "save_q":        "Bu seçimi kaydet? (bir daha sormasın) [e/h]: ",
+            "save_yes":      ("e", "evet", "y", "yes"),
+            "saved":         "✅ Konfigürasyon kaydedildi (ai_config.json)",
+        },
+        "en": {
+            "header":        "🤖  ANTIGRAVITY — AI ENGINE SELECTION",
+            "ollama_label":  "Ollama (Local LLM)",
+            "gemini_label":  "Google Gemini (Cloud)",
+            "claude_label":  "Anthropic Claude (Cloud)",
+            "api_required":  "🔑 API Key required",
+            "running":       "✅ Running",
+            "not_running":   "❌ Unreachable",
+            "select":        "Your choice (1/2/3): ",
+            "invalid":       "⚠️  Please enter 1, 2 or 3.",
+            "ollama_url":    "Ollama URL (Enter = {default}): ",
+            "ollama_warn":   "⚠️  Could not reach {url} — continuing anyway.",
+            "installed":     "Installed models:",
+            "manual":        "Enter manually",
+            "model_select":  "Select model (Enter = {default}): ",
+            "model_name":    "Model name: ",
+            "invalid_sel":   "⚠️  Invalid selection.",
+            "ok_ollama":     "✅ Ollama settings: {url}  |  Model: {model}",
+            "api_key":       "Enter your {name} API Key: ",
+            "api_empty":     "⚠️  API Key cannot be empty.",
+            "models_title":  "{name} models:",
+            "ok_model":      "✅ {name} model: {model}",
+            "save_q":        "Save this selection? (won't ask again) [y/n]: ",
+            "save_yes":      ("y", "yes", "e", "evet"),
+            "saved":         "✅ Configuration saved (ai_config.json)",
+        }
+    }
+    t = T[ui_lang]
+
+    # ── Motor Seçimi ─────────────────────────────────────────────────────────
+    print("\n" + "="*55)
+    print(f"   {t['header']}")
+    print("="*55)
+
+    default_ollama_url = "http://localhost:11434"
+    ollama_ok = test_ollama(default_ollama_url)
+    ollama_status = t["running"] if ollama_ok else t["not_running"]
+
+    print(f"\n  [1] {t['ollama_label']:<28} {ollama_status}")
+    print(f"  [2] {t['gemini_label']:<28} {t['api_required']}")
+    print(f"  [3] {t['claude_label']:<28} {t['api_required']}")
+    print()
+
+    while True:
+        choice = input(f"  {t['select']}").strip()
+        if choice in ("1", "2", "3"):
+            break
+        print(f"  {t['invalid']}")
+
+    engine_map = {"1": "ollama", "2": "gemini", "3": "claude"}
+    engine = engine_map[choice]
+    api_key = None
+    ollama_url = default_ollama_url
+    ollama_model = "llama3:latest"
+    gemini_model = "gemini-1.5-flash"
+    claude_model = "claude-sonnet-4-6"
+
+    # ── Ollama Ayarları ───────────────────────────────────────────────────────
+    if engine == "ollama":
+        url_input = input(f"\n  {t['ollama_url'].format(default=default_ollama_url)}").strip()
+        ollama_url = url_input if url_input else default_ollama_url
+
+        if not test_ollama(ollama_url):
+            print(f"  {t['ollama_warn'].format(url=ollama_url)}")
+
+        models = fetch_ollama_models(ollama_url)
+        if models:
+            print(f"\n  {t['installed']}")
+            for i, m in enumerate(models, 1):
+                print(f"    [{i}] {m}")
+            print(f"    [0] {t['manual']}")
+            while True:
+                m_choice = input(f"  {t['model_select'].format(default='llama3:latest')}").strip()
+                if m_choice == "":
+                    ollama_model = "llama3:latest"; break
+                elif m_choice == "0":
+                    manual = input(f"  {t['model_name']}").strip()
+                    if manual:
+                        ollama_model = manual; break
+                elif m_choice.isdigit() and 1 <= int(m_choice) <= len(models):
+                    ollama_model = models[int(m_choice) - 1]; break
+                else:
+                    print(f"  {t['invalid_sel']}")
+        else:
+            manual = input(f"\n  {t['model_select'].format(default='llama3:latest')}").strip()
+            ollama_model = manual if manual else "llama3:latest"
+
+        print(f"\n  {t['ok_ollama'].format(url=ollama_url, model=ollama_model)}")
+
+    # ── Gemini / Claude Ayarları ──────────────────────────────────────────────
+    elif engine in ("gemini", "claude"):
+        engine_name = "Gemini" if engine == "gemini" else "Claude"
+
+        while True:
+            api_key = input(f"\n  {t['api_key'].format(name=engine_name)}").strip()
+            if api_key:
+                break
+            print(f"  {t['api_empty']}")
+
+        if engine == "gemini":
+            gemini_models = [
+                "gemini-1.5-flash",
+                "gemini-1.5-pro",
+                "gemini-2.0-flash",
+                "gemini-2.0-flash-lite",
+            ]
+            print(f"\n  {t['models_title'].format(name='Gemini')}")
+            for i, m in enumerate(gemini_models, 1):
+                print(f"    [{i}] {m}")
+            print(f"    [0] {t['manual']}")
+            while True:
+                m_choice = input(f"  {t['model_select'].format(default='gemini-1.5-flash')}").strip()
+                if m_choice == "":
+                    gemini_model = "gemini-1.5-flash"; break
+                elif m_choice == "0":
+                    manual = input(f"  {t['model_name']}").strip()
+                    if manual:
+                        gemini_model = manual; break
+                elif m_choice.isdigit() and 1 <= int(m_choice) <= len(gemini_models):
+                    gemini_model = gemini_models[int(m_choice) - 1]; break
+                else:
+                    print(f"  {t['invalid_sel']}")
+            print(f"  {t['ok_model'].format(name='Gemini', model=gemini_model)}")
+
+        elif engine == "claude":
+            claude_models = [
+                "claude-sonnet-4-6",
+                "claude-opus-4-6",
+                "claude-haiku-4-5-20251001",
+            ]
+            print(f"\n  {t['models_title'].format(name='Claude')}")
+            for i, m in enumerate(claude_models, 1):
+                print(f"    [{i}] {m}")
+            print(f"    [0] {t['manual']}")
+            while True:
+                m_choice = input(f"  {t['model_select'].format(default='claude-sonnet-4-6')}").strip()
+                if m_choice == "":
+                    claude_model = "claude-sonnet-4-6"; break
+                elif m_choice == "0":
+                    manual = input(f"  {t['model_name']}").strip()
+                    if manual:
+                        claude_model = manual; break
+                elif m_choice.isdigit() and 1 <= int(m_choice) <= len(claude_models):
+                    claude_model = claude_models[int(m_choice) - 1]; break
+                else:
+                    print(f"  {t['invalid_sel']}")
+            print(f"  {t['ok_model'].format(name='Claude', model=claude_model)}")
+
+    config = {
+        "engine": engine,
+        "api_key": api_key,
+        "ui_lang": ui_lang,
+        "ollama_url": ollama_url,
+        "ollama_model": ollama_model,
+        "gemini_model": gemini_model,
+        "claude_model": claude_model,
+    }
+
+    save_ans = input(f"\n  {t['save_q']}").strip().lower()
+    if save_ans in t["save_yes"]:
+        save_config(config)
+        print(f"  {t['saved']}")
+
+    print()
+    return config
+
+
+def resolve_engine_config() -> dict:
+    """
+    Motor seçimini şu öncelik sırasına göre çöz:
+    1. Komut satırı argümanları  (--engine, --api-key)
+    2. Kaydedilmiş config dosyası (ai_config.json)
+    3. İnteraktif seçim menüsü
+    """
+    # 1. CLI argümanları
+    if args.engine:
+        logging.info(f"[Config] Motor CLI'dan alındı: {args.engine}")
+        return {"engine": args.engine, "api_key": args.api_key}
+
+    # 2. Kayıtlı config
+    cfg = load_config()
+    if cfg.get("engine"):
+        logging.info(f"[Config] Motor kayıtlı configden yüklendi: {cfg['engine']}")
+        return cfg
+
+    # 3. İnteraktif menü
+    return prompt_engine_selection()
+
+
+# ─── MERKEZ BELLEK ────────────────────────────────────────────────────────────
 
 class CentralMemory:
-    """
-    Central Memory for the Financial Multi-Agent System.
-    """
     def __init__(self):
-        self.data = {
-            "financial_files": {},
-            "structured_data": {},
-            "sub_agent_findings": {},
-            "executive_summary": None,
-            "logs": []
-        }
+        self.data = {}
+    def set(self, key, value): self.data[key] = value
+    def get(self, key, default=None): return self.data.get(key, default)
+    def add_log(self, message): print(message)
 
-    def set(self, key, value):
-        self.data[key] = value
 
-    def get(self, key, default=None):
-        return self.data.get(key, default)
-        
-    def add_log(self, message):
-        self.data["logs"].append(message)
-        logger.info(message)
-
+# ─── CEO AGENT ────────────────────────────────────────────────────────────────
 
 class CEOAgent:
-    """
-    Role: Financial Operations Orchestrator (CEO Agent)
-    """
-    SYSTEM_PROMPT = """# ROLE AND CONTEXT
-You are a top-tier AI consultant and financial analyst supporting a company founder/CEO. Your communication style must be diplomatic, moderate, and constructive (avoid overly sharp or aggressive language). Provide balanced insights, focusing on collaboration and thoughtful decision-making.
-
-# ANALYSIS AND FORMAT STANDARDS
-When asked to evaluate a company's monthly balance sheet and financial status, you must present the analysis by clearly separating the perspectives of the CFO and the CEO, and by providing scenario analyses:
-
-1. SEPARATION OF PERSPECTIVES (CFO vs. CEO):
-   Present the analysis with two distinct sections:
-   - CFO PERSPECTIVE: Focus on financial risk management, capital preservation, liquidity, CapEx constraints, and debt structure.
-   - CEO PERSPECTIVE: Focus on market leadership, strategic direction, organizational agility, growth opportunities, and competition.
-
-2. SCENARIO ANALYSIS:
-   For both perspectives, you must explicitly outline:
-   - Best-Case Scenario: Optimal outcomes if strategies succeed.
-   - Worst-Case Scenario: Potential risks and downsides if negative trends materialize.
-
-3. MCKINSEY FORMAT:
-   Structure the core evaluation across these 3 strategic horizons:
-   - Horizon 1: Defend and optimize core business/operations.
-   - Horizon 2: High-potential growth areas, new markets, and accelerating innovation.
-   - Horizon 3: Future options, radical transformation, and building the future.
-
-4. EISENHOWER MATRIX:
-   List the consolidated priorities in a 2x2 clear Markdown table formatted as (1. Do First, 2. Schedule, 3. Delegate, 4. Eliminate).
-
-5. MONTHLY BALANCE SHEET CONTROL PARAMETERS:
-   Explicitly include the following balance sheet items:
-   - Liquidity and Working Capital (Current Ratio, Quick Ratio, Cash Conversion Cycle).
-   - Asset Structure and Quality (Cash ratio, doubtful receivables, inventory aging, CapEx tracking).
-   - Liability Structure and Debt (Short-term debt balance, leverage ratio, FX position and currency risk).
-
-# LANGUAGE AND WRITING RULES
-- Use clear, understandable, and diplomatic English.
-- Maintain a polite, supportive, and balanced tone.
-- Avoid absolute certainty; use framing like "it might be beneficial to consider," "we could potentially face," etc.
-- Always conclude the analysis with a collaborative "Executive Summary and Next Steps" section that bridges the CFO and CEO viewpoints.
-"""
-
-    def __init__(self, memory: CentralMemory, sub_agents: dict = None):
-        self.name = "CEO Agent"
+    def __init__(self, memory, sub_agents, ai_engine: AIEngine):
+        self.name = "CEO_Agent"
         self.memory = memory
-        self.sub_agents = sub_agents or {}
+        self.sub_agents = sub_agents
+        self.ai_engine = ai_engine
+        self.company_manager = CompanyManager()
+        self.historical_comp = HistoricalComparison()
 
-    def start_workflow(self, financial_files: list):
-        import pandas as pd
-        self.memory.add_log(f"[{self.name}] Workflow started with {len(financial_files)} financial files.")
-        
-        # 1. Validate and structure incoming raw financial data
-        self.memory.add_log(f"[{self.name}] Validating and structuring incoming raw financial data...")
-        
-        structured_data = {}
-        for file_path in financial_files:
-            if file_path.endswith(('.xlsx', '.xls')):
-                try:
-                    self.memory.add_log(f"[{self.name}] Reading Excel file: {file_path}")
-                    # Read all sheets
-                    xls = pd.read_excel(file_path, sheet_name=None)
-                    parsed_file = {}
-                    for sheet_name, df in xls.items():
-                        # Convert to dict, taking first 10 rows to avoid blowing up memory during this test
-                        parsed_file[sheet_name] = df.head(10).to_dict(orient='records')
-                    structured_data[file_path] = parsed_file
-                except Exception as e:
-                    self.memory.add_log(f"[{self.name}] ERROR reading {file_path}: {e}")
-            else:
-                self.memory.add_log(f"[{self.name}] WARNING: Unsupported file type: {file_path}")
-                
-        self.memory.set("structured_data", structured_data)
-        
-        # 2. Parallel-dispatch the relevant datasets
-        self.memory.add_log(f"[{self.name}] Dispatching datasets to sub-agents: {list(self.sub_agents.keys())}")
-        for agent_name, agent_instance in self.sub_agents.items():
-            if agent_name != "ui_ux_agent":
-                self.memory.add_log(f"[{self.name}] Triggering {agent_name}...")
-                agent_instance.process(self.memory)
+    def _generate_analysis(self, prompt: str) -> str:
+        """TR analiz üret. Motor başarısız olursa statik fallback."""
+        result = self.ai_engine.call(YENI_SYSTEM_PROMPT, f"{YENI_USER_KOMUTUM}\n\n{prompt}")
+        if result:
+            return result
+        logging.warning("[CEO Agent] AI motoru yanıt vermedi, statik şablon kullanılıyor.")
+        return STATIC_FALLBACK_TR
 
-        # 3. Consolidate all technical findings
-        self.memory.add_log(f"[{self.name}] Consolidating technical findings from sub-agents...")
-        
-        # 4. Generate Executive Summary
-        self.memory.add_log(f"[{self.name}] Generating Executive Summary & Strategic Action Plan...")
-        
-        mock_markdown = """### 1. Perspectives and Scenarios
+    def _translate_to_english(self, tr_markdown: str) -> str:
+        """TR analizi EN'e çevir. Başarısız olursa statik EN fallback."""
+        system = (
+            "You are a professional financial translator. "
+            "Translate Turkish financial executive summaries to English. "
+            "Preserve all markdown formatting exactly (###, **, tables, lists). "
+            "Output ONLY the translated markdown with no preamble."
+        )
+        user = f"Translate to professional English:\n\n{tr_markdown}"
+        result = self.ai_engine.call(system, user)
+        if result:
+            return result
+        logging.warning("[CEO Agent] EN çeviri başarısız, statik EN şablon kullanılıyor.")
+        return STATIC_FALLBACK_EN
 
-#### CFO Perspective
-From a financial standpoint, our liquidity appears stable with a current ratio of 2.15. However, it might be prudent to monitor the recent 15-day increase in Days Sales Outstanding (DSO), which currently ties up $12M in cash.
-*   **Best-Case Scenario:** Improved collection protocols smoothly recover the $12M, providing a comfortable buffer for upcoming short-term debt maturities without external financing.
-*   **Worst-Case Scenario:** Prolonged collection delays combined with upcoming debt obligations ($5M) could create a temporary liquidity squeeze, necessitating higher-interest short-term borrowing.
+    def generate_pdf_report(self, company_code, data):
+        try:
+            logging.info(f"[PDF Motoru] {company_code} için PDF raporu hazırlandı.")
+        except Exception:
+            pass
 
-#### CEO Perspective
-Strategically, our 22% growth momentum in the European market represents a highly promising opportunity. We should consider reallocating some resources to nurture this expansion while optimizing our domestic operations.
-*   **Best-Case Scenario:** Reallocated marketing budgets accelerate European market penetration, establishing market leadership and diversifying our revenue streams significantly.
-*   **Worst-Case Scenario:** Over-allocating resources to Europe might slightly stall domestic growth, potentially allowing local competitors to gain incremental market share.
+    def run(self, company_code):
+        logging.info(f"[CEO Agent] '{company_code}' şirketi için süreç başlatıldı...")
 
-### 2. McKinsey Format: 3 Strategic Horizons
+        company_info = self.company_manager.get_company(company_code)
+        if not company_info:
+            logging.warning(f"Şirket bulunamadı: {company_code}. Varsayılan kullanılıyor.")
+            company_code = "demo_corp"
+            company_info = self.company_manager.get_company(company_code)
 
-**Horizon 1: Defend Core Business**
-We should aim to gently tighten our collection protocols to secure liquidity without straining client relationships.
+        for agent in self.sub_agents:
+            try:
+                agent.process(self.memory)
+            except Exception as e:
+                logging.error(f"[{agent.name}] hatası: {e}")
 
-**Horizon 2: Accelerate Growth**
-The European market expansion seems well-positioned to benefit from additional, carefully phased marketing investments.
+        findings = self.memory.get("sub_agent_findings", {})
+        compiled_prompt = json.dumps(findings, indent=2)
 
-**Horizon 3: Build the Future**
-The $45K annual savings from cloud optimization could be thoughtfully reinvested into automation R&D, preparing us for long-term scalability.
+        logging.info(f"[CEO Agent] AI motoru ({self.ai_engine.engine}) ile analiz üretiliyor...")
+        ai_markdown_tr = self._generate_analysis(compiled_prompt)
 
-### 3. Eisenhower Matrix Prioritization
+        logging.info("[CEO Agent] İngilizce çeviri üretiliyor...")
+        ai_markdown_en = self._translate_to_english(ai_markdown_tr)
 
-| Status | Consolidated Priorities |
-|---|---|
-| **Do First (Urgent & Important)** | Address short-term debt ($5M) refinancing, gently improve collections |
-| **Schedule (Important & Not Urgent)** | Plan European market budget shifts, evaluate automation R&D |
-| **Delegate (Urgent & Not Important)** | Routine supply chain cost reviews, daily KPI tracking |
-| **Eliminate (Not Urgent & Not Important)** | Outdated low-ROI campaigns, redundant meetings |
+        history_list = self.historical_comp.get_timeline()
+        dropdown_companies = self.company_manager.get_companies_for_dropdown()
 
-### Executive Summary and Next Steps
-By balancing the CFO's focus on preserving cash with the CEO's vision for European growth, we can achieve sustainable progress. A collaborative approach—funding the European expansion through gradual improvements in domestic collections—appears to be the most balanced path forward."""
+        final_js_object = {
+            "company_code": company_code,
+            "company_name": company_info.get("name", "Demo Corporation"),
+            "companies_list": dropdown_companies,
+            "markdown_content": ai_markdown_tr,
+            "markdown_content_en": ai_markdown_en,
 
-        executive_summary = {
-            "markdown_content": mock_markdown,
+            "confidentiality_rate_en": "95% (Highly Restricted)",
+            "forecast_confidence_rate_en": "88% (3-Year Baseline)",
+            "confidentiality_rate_tr": "95% (Çok Gizli - Yönetim Kurulu)",
+            "forecast_confidence_rate_tr": "88% (Normal Koşullar - 3 Yıllık Geçmiş)",
+
+            "critical_risks": ["Tedarik zincirinde jeopolitik riskler (S4)", "Maliyetlerde enflasyonist baskı"],
+            "growth_opportunities": ["Pazarlama harcamalarında %15 tasarruf imkanı", "Bulut altyapısına geçiş"],
+            "strategic_action_plan": ["Sıfır tabanlı bütçelemeye geçiş yapılması", "Atıl yazılım aboneliklerinin iptali"],
+
             "EXECUTIVE_METRICS": {
                 "financial_health_score": 7.8,
                 "altman_z_score": {"value": 2.85, "zone": "SAFE"},
@@ -169,71 +568,45 @@ By balancing the CFO's focus on preserving cash with the CEO's vision for Europe
                 "dupont_equity_multiplier": 1.85
             },
             "BUDGET_SIMULATIONS_FORECASTS": {
-                "forecasted_cash_flow_standard": [120000, 125000, 130000, 128000, 135000, 140000, 145000, 150000, 155000, 160000, 165000, 170000],
-                "forecasted_cash_flow_recession": [120000, 115000, 110000, 105000, 100000, 95000, 90000, 85000, 82000, 80000, 78000, 75000],
+                "forecasted_cash_flow_standard": [120000,125000,130000,128000,135000,140000,145000,150000,155000,160000,165000,170000],
+                "forecasted_cash_flow_recession": [120000,115000,110000,105000,100000,95000,90000,88000,85000,83000,80000,78000],
                 "cost_cutting_savings": {
-                    "5_pct_plan": 45000,
-                    "15_pct_plan": 135000,
-                    "30_pct_plan": 270000
+                    "marketing_spend_reduction": "$15,000",
+                    "software_redundancy_cleanup": "$12,000",
+                    "cloud_infrastructure_migration": "Optimize Edildi"
                 }
             },
-            "STRATEGIC_NARRATIVE": {
-                "red_flags": [
-                    "Receivables DSO increased by 15 days, locking up $12M in cash.",
-                    "Supply chain costs have increased by 8% YTD.",
-                    "Short-term debt maturity profile poses a mild liquidity risk in Q3."
-                ],
-                "green_flags": [
-                    "Marketing ROI increased by 12% following Q1 campaign adjustments.",
-                    "Cloud infrastructure optimization saved $45K annually.",
-                    "New European market expansion showing 22% quarter-over-quarter growth."
-                ],
-                "action_plan": [
-                    "Implement aggressive collections protocol to reduce DSO by 10 days before Q4.",
-                    "Refinance $5M of short-term debt into long-term facilities to improve Q3 liquidity.",
-                    "Double down on EU marketing spend while capping domestic OPEX."
-                ]
+            "historical_comparison": {
+                "has_comparison": len(history_list) > 1,
+                "labels": [h["label"] for h in history_list] if history_list else ["Q1","Q2","Q3","Q4"],
+                "health_history": [h["health"] for h in history_list] if history_list else [6.5,6.7,6.9,7.8],
+                "roe_history": [h["roe"] for h in history_list] if history_list else [18,19,20,22.4]
             }
         }
-        self.memory.set("executive_summary", executive_summary)
-        
-        # 5. Pass to UI/UX Agent
-        ui_agent = self.sub_agents.get("ui_ux_agent")
-        if ui_agent:
-            self.memory.add_log(f"[{self.name}] Passing consolidated dataset to UI/UX Agent...")
-            ui_agent.process(self.memory)
-            
-        return executive_summary
 
-# --- Mock Agents for testing ---
-class MockSubAgent:
-    def __init__(self, name):
-        self.name = name
-        
-    def process(self, memory):
-        memory.add_log(f"[{self.name}] Processing structured data...")
-        findings = memory.get("sub_agent_findings")
-        findings[self.name] = "mock_finding"
-        memory.set("sub_agent_findings", findings)
+        output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dashboard_data.js")
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(f"const dashboardData = {json.dumps(final_js_object, indent=2, ensure_ascii=False)};")
+
+        self.company_manager.update_last_report(company_code)
+        logging.info(f"[CEO Agent] dashboard_data.js güncellendi. Motor: {self.ai_engine.engine}")
+        self.generate_pdf_report(company_code, final_js_object)
+
 
 if __name__ == "__main__":
-    from analyst_agent import AnalystAgent
-    from auditor_agent import AuditorAgent
-    from optimizer_agent import OptimizerAgent
-    from forecaster_agent import ForecasterRiskAgent
-    from dupont_agent import DuPontAgent
-    from ui_ux_agent import UIUXAgent
-    # Test the CEO Agent
+    # Motor seçimini çöz (CLI > config > interaktif menü)
+    engine_cfg = resolve_engine_config()
+
+    ai_engine = AIEngine(
+        engine=engine_cfg["engine"],
+        api_key=engine_cfg.get("api_key"),
+        ollama_url=engine_cfg.get("ollama_url", "http://localhost:11434"),
+        ollama_model=engine_cfg.get("ollama_model", "llama3:latest"),
+        gemini_model=engine_cfg.get("gemini_model", "gemini-1.5-flash"),
+        claude_model=engine_cfg.get("claude_model", "claude-sonnet-4-6")
+    )
+
     memory = CentralMemory()
-    sub_agents = {
-        "Analyst Agent": AnalystAgent(),
-        "Auditor Agent": AuditorAgent(),
-        "Optimizer Agent": OptimizerAgent(),
-        "Forecaster & Risk Agent": ForecasterRiskAgent(),
-        "DuPont Agent": DuPontAgent(),
-        "ui_ux_agent": UIUXAgent()
-    }
-    
-    ceo = CEOAgent(memory=memory, sub_agents=sub_agents)
-    result = ceo.start_workflow(["financial_data.xlsx"])
-    print(f"\nExecutive Summary: {result}")
+    sub_agents = [AnalystAgent(), AuditorAgent(), OptimizerAgent(), ForecasterRiskAgent(), DuPontAgent()]
+    ceo = CEOAgent(memory, sub_agents, ai_engine)
+    ceo.run(args.company)

@@ -1,117 +1,122 @@
-# Antigravity Financial Dashboard & Multi-Agent System
+**The Pi Suite Financial Dashboard & Multi-Agent System**
+<img width="706" height="561" alt="LAng selection" src="https://github.com/user-attachments/assets/9c714412-fff0-4de5-b53a-ccb837663583" />
+<img width="1315" height="874" alt="Screenshot_1" src="https://github.com/user-attachments/assets/76b0c24e-691b-42b5-b105-38c32db3f790" />
+<img width="1337" height="855" alt="Screenshot_2" src="https://github.com/user-attachments/assets/a0ee625f-ebf0-4be8-87f4-a140d34742bc" />
+<img width="1279" height="924" alt="Screenshot_3" src="https://github.com/user-attachments/assets/03f3c783-8ae4-4d99-ba2c-038cbc27911b" />
+<img width="1504" height="888" alt="pdf" src="https://github.com/user-attachments/assets/9938dd43-8909-4f6a-b461-e902aca41374" />
 
-🌍 **Language Selection / Dil Seçimi:**
-- [English](#english-version)
-- [Türkçe](#türkçe-versiyon)
 
-🇬🇧 English Version
+**🇬🇧 English Version**
 This repository contains a Multi-Agent Financial AI System architecture designed to standardize, analyze, and visualize corporate financial data.
 
-Led by the CEO Agent as the central orchestrator, the system delegates tasks to specialized sub-agents and compiles the findings into a strategic Executive Summary using a 100% Local LLM Engine.
+Led by the CEO Agent as the central orchestrator, the system delegates tasks to specialized sub-agents and compiles the findings into a strategic Executive Summary. With the latest update, the system supports both local LLMs and prominent cloud AI engines with dynamic English/Turkish language support.
 
+**What's New in the Latest Update?**
+Multi-Engine AI Support: You are no longer restricted to local Ollama. You can now use Google Gemini or Anthropic Claude cloud APIs.
 
+Interactive Setup CLI: On the first execution, an interactive menu guides you to configure your language, AI engine, URLs, custom models, and API keys.
 
-🛠️ Step-by-Step User Guide (Ollama & Excel Preparation)
-Follow these 3 simple steps to seamlessly run the system and get precise financial analyses from your local LLM without any cloud API errors:
+Persistent Configuration: All choices are safely stored in ai_config.json so you only configure the system once.
 
+Architecture Refactor (CORS Fix): The frontend no longer makes direct API calls to Anthropic to avoid browser CORS blocks. The CEO Agent now generates the AI Analysis report in both Turkish and English simultaneously on the backend and streams it straight to the UI cache.
+
+UI Optimization: The redundant company select dropdown has been removed from the header for a cleaner, unified dashboard experience.
+
+Bug Fixes: Resolved the critical AttributeError: 'HistoricalComparison' object has no attribute 'get_history_for_chart' bug by streamlining it with the correct backend method get_timeline().
+
+**Step-by-Step User Guide**
 Step 1: Preparing the Excel File (financial_data.xlsx)
-For sub-agents to correctly parse the data and calculate financial ratios (Liquidity, Solvency, DuPont, etc.) without bugs, your Excel file must follow these criteria:
+For sub-agents to correctly parse the data and calculate financial ratios (Liquidity, Solvency, DuPont, etc.), your Excel file must follow these criteria:
 
-File Name: The Excel file inside the directory must be named exactly financial_data.xlsx.
+File Name: Must be named exactly financial_data.xlsx.
 
-Format & Content: Your Excel file should contain corporate financial records such as the Trial Balance, Balance Sheet, and Income Statement.
+Content: Should contain corporate financial records such as the Trial Balance, Balance Sheet, and Income Statement.
 
-Location: Place this Excel file directly inside the root project folder, alongside ceo_agent.py and run_dashboard_exe.
+Location: Place this file directly inside the root project folder, alongside ceo_agent.py and the application binary.
 
-Step 2: Running the Local LLM Engine & Selecting Llama 3
-This system entirely bypasses external cloud APIs (like Google Gemini). Instead, it triggers the AI models locally on your machine. You must spin up the local engine before execution:
-
-Open your terminal (Terminal on Mac/Linux, Command Prompt cmd on Windows).
-
-Start the Ollama background service by typing the following command and hitting Enter:
+Step 2: Running the System & AI Engine Configuration
+Navigate to your project root folder via terminal and trigger the main application:
 
 Bash
-ollama serve
-Open a new terminal window and run the default Llama 3 model using this command to ensure the engine is selected and ready:
+# For Python environment:
+python ceo_agent.py
 
-Bash
-ollama run llama3
-(If this is the first time running Llama 3 on your machine, Ollama will automatically download the model weights during this step).
-
-Step 3: Triggering the Agentic Pipeline & Opening the Dashboard
-Once your Excel file is in place and Ollama is active with Llama 3, you are ready to initiate the multi-agent execution:
-
-In your terminal, navigate (cd) to the root project folder.
-
-Execute the main compiled application binary:
-
-Bash
+# For compiled binary:
 ./run_dashboard_exe
-The Workflow: run_dashboard_exe immediately kicks off the specialized sub-agents (Analyst, Auditor, DuPont, etc.) sequentially. They process the raw Excel numbers. Then, the CEOAgent collects these findings, combines them with the dynamic prompts you wrote at the top of ceo_agent.py, and forwards the unified payload to your local Llama 3 engine.
+First-Run Interactive Configuration Workflow:
+Language Selection: Choose between [1] Türkçe or [2] English for the CLI menu.
 
-The Output: The analysis takes only a few seconds. The script automatically updates the dashboard_data.js file and launches your default web browser to view index.html (Financial Dashboard), displaying beautiful glassmorphic visual graphs and markdown summaries.
+**Engine Selection: Choose your preferred AI brain:**
+[1] Ollama: Enters a sub-menu asking for your Ollama URL (Default: http://localhost:11434) and dynamically fetches your locally installed models (e.g., llama3, mistral, gemma) using the local tags endpoint.
 
-IMPORTANT NOTE AND LEGAL DISCLAIMER: > All reports, financial ratios, forecasting scenarios, and executive summaries generated by this software and its Multi-Agent architecture are automatically synthesized by a Local Artificial Intelligence model (LLM/Llama 3).
+[2] Google Gemini: Asks for your Gemini API Key and lets you choose models like gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash, etc.
 
-None of the data, evaluations, or narratives provided by this tool constitute investment, financial, tax, or legal advice.
+[3] Anthropic Claude: Asks for your Claude API Key and lets you choose models like claude-sonnet-4-6, claude-opus-4-6, etc.
 
-Large Language Models (LLMs) may exhibit hallucinations or misinterpret complex corporate financial structures. Therefore, the developers and creators of this software shall not be held legally or financially liable for any business decisions, losses, or damages resulting from the use of these automated outputs.
+Automatic Execution: Your selections are saved to ai_config.json. The next time you run the application, it will bypass the configuration screens and boot up instantly.
 
-Users are strictly advised to verify all automated findings with a certified Public Accountant, Auditor, or licensed Financial Advisor before executing any strategic corporate actions.
+Step 3: Viewing the Dashboard
+Once the AI pipeline finishes its heavy lifting, it updates dashboard_data.js and automatically launches your default web browser to display index.html.
 
+Toggle between TR/EN seamlessly in the top right corner. The "AI Analysis" tab will now instantaneous switch translation on the fly without any layout delays or API errors!
 
--------------------------------------------------------
-TR Turkish Version
+**⚖️ Legal Disclaimer
+**IMPORTANT NOTE: All reports, financial ratios, forecasting scenarios, and executive summaries generated by this software are automatically synthesized by Artificial Intelligence models. None of the data, evaluations, or narratives constitute professional investment, financial, tax, or legal advice. LLMs may exhibit hallucinations. Users are strictly advised to verify all automated findings with a certified Public Accountant or licensed Financial Advisor before executing corporate actions.
 
-🛠️ Adım Adım Kullanım Kılavuzu (Ollama & Excel Hazırlığı)
-Sistemi sorunsuz bir şekilde çalıştırmak ve yerel yapay zeka modelinizden en doğru finansal analizleri almak için aşağıdaki 3 adımı sırasıyla takip etmeniz yeterlidir:
+🇹🇷 Türkçe Versiyon
+Bu depo, kurumsal finansal verileri standartlaştırmak, analiz etmek ve görselleştirmek için tasarlanmış Çoklu Ajanlı (Multi-Agent) Finansal Yapay Zeka Sistemi mimarisini içerir.
 
+Merkezi orkestratör olan CEO Agent liderliğindeki sistem, görevleri uzman alt ajanlara devreder ve bulguları stratejik bir Yönetici Özeti halinde derler. Son güncellemeyle birlikte sistem, dinamik Türkçe/İngilizce dil desteğinin yanı sıra hem yerel LLM'leri hem de popüler bulut yapay zeka motorlarını destekler hale getirilmiştir.
+
+**Son Güncellemede Neler Değişti?** 
+Çoklu Yapay Zeka Motoru Desteği: Yalnızca yerel Ollama modeline bağlı kalma zorunluluğu ortadan kalktı. Artık Google Gemini ve Anthropic Claude bulut API'lerini de kullanabilirsiniz.
+
+İnteraktif Kurulum Sihirbazı (CLI): Uygulama ilk kez çalıştırıldığında; dil tercihinizi, kullanmak istediğiniz yapay zeka motorunu, bağlantı adreslerini ve API anahtarlarınızı adım adım sorarak yapılandırır.
+
+Kalıcı Konfigürasyon: Seçimleriniz ai_config.json dosyasına güvenli bir şekilde kaydedilir. Böylece ayarları yalnızca bir kez yapmanız yeterli olur.
+
+Mimari Revizyon (CORS Çözümü): Tarayıcı tabanlı CORS engellemelerini aşmak için frontend üzerindeki Anthropic API çağrıları tamamen kaldırıldı. CEO Agent artık hem Türkçe hem de İngilizce raporları arka planda (backend) eşzamanlı olarak üretip dashboard_data.js önbelleğine yazar. Dil geçişleri anlık ve hatasız gerçekleşir.
+
+Arayüz Temizliği: Üst menüde yer alan ve işlevsiz kalan "Company Select" (Şirket Seçim) açılır menüsü daha temiz bir dashboard deneyimi için tamamen kaldırıldı.
+
+Kod Optimizasyonu ve Bug Çözümü: Derleme esnasında karşılaşılan AttributeError: 'HistoricalComparison' object has no attribute 'get_history_for_chart' hatası, ceo_agent.py içindeki eski metodun güncel backend fonksiyonu olan get_timeline() ile senkronize edilmesiyle tamamen düzeltildi.
+
+**Adım Adım Kullanım Kılavuzu**
 1. Adım: Excel Dosyasının (financial_data.xlsx) Hazırlanması
-Yapay zeka ajanlarının verileri doğru okuyabilmesi ve finansal rasyoları (Likitide, Kaldıraç, DuPont vb.) hatasız hesaplayabilmesi için Excel dosyanızın şu standartlara uygun olması gerekir:
+Yapay zeka ajanlarının finansal rasyoları (Likitide, Kaldıraç, DuPont vb.) hatasız hesaplayabilmesi için Excel dosyanızın şu standartlara uygun olması gerekir:
 
-Dosya Adı: Klasörün içindeki Excel dosyasının adı milimetrik olarak financial_data.xlsx olmalıdır.
+Dosya Adı: Klasörün içindeki Excel dosyasının adı tam olarak financial_data.xlsx olmalıdır.
 
-Format ve İçerik: Excel dosyanızın içerisinde firmanıza ait güncel Mizan (Trial Balance), Bilanço (Balance Sheet) ve Gelir Tablosu (Income Statement) hesapları yer almalıdır.
+İçerik: Dosya içerisinde firmanıza ait güncel Mizan, Bilanço ve Gelir Tablosu hesapları yer almalıdır.
 
-Konum: Hazırladığınız bu Excel dosyasını, ceo_agent.py ve run_dashboard_exe dosyalarının bulunduğu ana proje klasörünün içine bırakın.
+Konum: Bu Excel dosyasını ceo_agent.py veya derlenmiş binary uygulamanızın olduğu ana proje klasörüne bırakın.
 
-2. Adım: Arka Planda Yapay Zeka Motorunun (Ollama) ve Llama 3'ün Seçilmesi
-Sistem harici bir bulut API'si (Google Gemini vb.) kullanmaz; tamamen bilgisayarınızın içindeki yapay zekayı tetikler. Bu yüzden çalıştırmadan önce motoru ayağa kaldırmalıyız:
-
-Bilgisayarınızda terminali (Mac/Linux için Terminal, Windows için cmd) açın.
-
-Ollama motorunu arka planda başlatmak için şu komutu yazıp Enter'a basın:
+2. Adım: Sistemin Çalıştırılması ve AI Motoru Seçimi
+Terminalinizden projenin bulunduğu klasör dizinine geçiş yapın ve ana uygulamayı tetikleyin:
 
 Bash
-ollama serve
-Sistemin varsayılan olarak kullandığı Llama 3 modelini seçmek ve aktif hale getirmek için yeni bir terminal penceresi açıp şu komutu çalıştırın:
+# Python ortamında çalıştırmak için:
+python ceo_agent.py
 
-Bash
-ollama run llama3
-(Eğer bilgisayarınızda Llama 3 modeli ilk kez çalışacaksa, Ollama bu aşamada modeli otomatik olarak indirecektir).
-
-3. Adım: Ajan Sisteminin Tetiklenmesi ve Dashboard'un Açılması
-Excel dosyanız klasörde hazırsa ve Ollama arka planda Llama 3 modeliyle birlikte çalışıyorsa, artık finansal pipeline'ı başlatabilirsiniz:
-
-Terminalden projenizin bulunduğu klasör dizinine geçiş yapın.
-
-Ana derlenmiş uygulamayı çalıştırmak için şu komutu girin:
-
-Bash
+# Derlenmiş .exe / binary çalıştırmak için:
 ./run_dashboard_exe
-Akış Sırası: run_dashboard_exe uygulaması çalışır çalışmaz alt ajanları (Analyst, Auditor, DuPont vb.) sırayla tetikler. Ajanlar Excel dosyasını okuyup ham verileri işler. CEO Agent, toplanan bu verileri ceo_agent.py dosyasının en üstüne yazdığınız güncel promptlar ile birleştirerek arka planda bekleyen Llama 3 modeline gönderir.
+İlk Çalıştırma İnteraktif Seçim Akışı:
+Dil Seçimi: Konsol arayüzünü hangi dilde kullanmak istediğinizi seçin: [1] Türkçe / [2] English.
 
-Sonuç: Analiz saniyeler içinde tamamlanır, dashboard_data.js dosyası güncellenir ve sistem otomatik olarak tarayıcınızda index.html (Financial Dashboard) ekranını açarak tüm analiz sonuçlarını görsel olarak önünüze serer.
+**Motor Seçimi (AI Engine): Tercih ettiğiniz yapay zeka beynini seçin:
+**
+[1] Ollama (Yerel LLM): Ollama URL adresinizi sorar (Varsayılan: http://localhost:11434). Ardından bilgisayarınızda yüklü olan tüm modelleri (llama3, mistral, gemma vb.) otomatik listeleyerek numaralandırma ile seçtirir.
 
-Bu kılavuz sayesinde projeyi bilgisayarına indiren veya .exe / derlenmiş halini verdiğin herhangi bir kullanıcı, hiçbir teknik karmaşa yaşamadan Excel'ini koyup yerel model üzerinden sistemi saniyeler içinde koşturabilir!
+[2] Google Gemini (Bulut): Gemini API Key'inizi talep eder ve gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash gibi güncel modellerden birini seçmenizi sağlar.
 
-⚖️ Yasal Uyarı / Legal Disclaimer
-🇹🇷 Türkçe Sürüm
-ÖNEMLİ NOT VE YASAL UYARI: > Bu yazılım ve içerisindeki çoklu ajan (Multi-Agent) sistemi tarafından üretilen tüm raporlar, rasyolar, analizler, senaryo tahminleri ve yönetici özetleri tamamen yapay zeka (LLM/Llama 3) tarafından otomatik olarak üretilmektedir.
+[3] Anthropic Claude (Bulut): Claude API Key'inizi talep eder ve claude-sonnet-4-6, claude-opus-4-6 gibi modelleri listeler.
 
-Bu sistem tarafından sunulan hiçbir veri, analiz veya yorum kesinlikle bir yatırım tavsiyesi, finansal danışmanlık, vergi tavsiyesi veya hukuki yönlendirme niteliği taşımamaktadır.
+Otomatik Kayıt: Yapılan tüm seçimler ai_config.json dosyasına yazılır. Sonraki çalıştırmalarda bu sorular sorulmadan sistem direkt analize başlar.
 
-Yapay zeka modelleri doğası gereği yanılsama (halüsinasyon) üretebilir veya finansal verileri yanlış yorumlayabilir. Bu nedenle, sistemin ürettiği raporlar doğrultusunda alınacak hiçbir ticari, finansal veya stratejik karardan yazılım geliştirici (Antigravity geliştiricileri) hukuki ve cezai olarak sorumlu tutulamaz.
+3. Adım: Dashboard Analiz Ekranı
+Analiz saniyeler içinde tamamlandığında, sistem dashboard_data.js dosyasını günceller ve tarayıcınızda otomatik olarak index.html (Financial Dashboard) ekranını açar.
 
-Herhangi bir stratejik karar almadan önce, analizlerin lisanslı bir Yeminli Mali Müşavir (YMM), Bağımsız Denetçi veya Finansal Danışman tarafından doğrulanması kullanıcının kendi sorumluluğundadır.
+Sağ üst köşedeki TR/EN butonlarını kullanarak arayüzü değiştirebilirsiniz. "Yapay Zeka Analizi" (AI Analysis) sekmesi, arka planda çift dilli üretildiği için artık donma veya API hatası olmaksızın anında dil değiştirir!
 
+**⚖️ Yasal Uyarı**
+ÖNEMLİ NOT: Bu yazılım ve içerisindeki çoklu ajan sistemi tarafından üretilen tüm raporlar, rasyolar ve yönetici özetleri tamamen yapay zeka modelleri tarafından otomatik olarak üretilmektedir. Sunulan hiçbir veri veya yorum, kesinlikle bir yatırım tavsiyesi, finansal danışmanlık veya hukuki yönlendirme niteliği taşımamaktadır. Herhangi bir stratejik karar almadan önce, analizlerin lisanslı bir Mali Müşavir, Bağımsız Denetçi veya Finansal Danışman tarafından doğrulanması kullanıcının kendi sorumluluğundadır.

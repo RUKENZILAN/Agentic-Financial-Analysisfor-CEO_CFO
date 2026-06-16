@@ -1,0 +1,62 @@
+[
+  {
+    "date": "2025-06-20T09:33:38.003749",
+    "label": "Q2 2025",
+    "financial_health_score": 6.65,
+    "altman_z_score": 2.5,
+    "cash_runway_months": 15.0,
+    "roe_pct": 19.19,
+    "current_ratio": 2.0,
+    "quick_ratio": 1.3,
+    "debt_to_equity": 0.6,
+    "net_margin_pct": 13.0
+  },
+  {
+    "date": "2025-09-18T09:33:38.003749",
+    "label": "Q3 2025",
+    "financial_health_score": 6.98,
+    "altman_z_score": 2.63,
+    "cash_runway_months": 15.5,
+    "roe_pct": 18.9,
+    "current_ratio": 2.05,
+    "quick_ratio": 1.34,
+    "debt_to_equity": 0.59,
+    "net_margin_pct": 13.3
+  },
+  {
+    "date": "2025-12-17T09:33:38.003749",
+    "label": "Q4 2025",
+    "financial_health_score": 6.96,
+    "altman_z_score": 2.74,
+    "cash_runway_months": 16.0,
+    "roe_pct": 19.09,
+    "current_ratio": 2.1,
+    "quick_ratio": 1.38,
+    "debt_to_equity": 0.58,
+    "net_margin_pct": 13.6
+  },
+  {
+    "date": "2026-03-17T09:33:38.003749",
+    "label": "Q1 2026",
+    "financial_health_score": 7.31,
+    "altman_z_score": 2.84,
+    "cash_runway_months": 16.5,
+    "roe_pct": 20.18,
+    "current_ratio": 2.15,
+    "quick_ratio": 1.42,
+    "debt_to_equity": 0.57,
+    "net_margin_pct": 13.9
+  },
+  {
+    "date": "2026-06-15T09:33:38.003749",
+    "label": "15.06.2026",
+    "financial_health_score": 6.0,
+    "altman_z_score": 0,
+    "cash_runway_months": 24,
+    "roe_pct": 0,
+    "current_ratio": 0,
+    "quick_ratio": 0,
+    "debt_to_equity": 0,
+    "net_margin_pct": 0
+  }
+]

@@ -1,132 +1,553 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antigravity Financial Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="title">Executive Summary Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  <style>
+  /* ── TOKENS ── */
+  :root {
+    --bg-main:     #080f1e;
+    --bg-card:     #0e1a2e;
+    --bg-card-alt: #111f35;
+    --border:      #1e3050;
+    --border-glow: #2563eb40;
+    --accent:      #3b82f6;
+    --accent-em:   #10b981;
+    --accent-warn: #f59e0b;
+    --accent-risk: #ef4444;
+    --text-1:      #f0f4ff;
+    --text-2:      #8ba3c8;
+    --text-3:      #4a6080;
+    --font-mono:   'ui-monospace', 'Cascadia Code', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    background: var(--bg-main);
+    color: var(--text-1);
+    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-main); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── LAYOUT ── */
+  .shell { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; }
+
+  /* ── HEADER ── */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; flex-direction: column; gap: 0.2rem; }
+  .brand-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-1);
+    line-height: 1;
+  }
+  .brand-title span { color: var(--accent); }
+  .brand-sub { font-size: 0.78rem; color: var(--text-2); }
+  .brand-sub strong { color: var(--accent-em); }
+
+  .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-success { background: #065f46; color: #6ee7b7; border: 1px solid #047857; }
+  .btn-success:hover { background: #047857; }
+  .btn-ghost { background: #1e293b; color: var(--text-2); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: #253348; color: var(--text-1); }
+
+  select.company-select {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    padding: 0.45rem 0.9rem;
+    border-radius: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238ba3c8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 2rem;
+  }
+
+  /* ── GRID ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.1rem 1.25rem;
+  }
+  .card + .card { margin-top: 1rem; }
+  .card-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-2);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .card-title .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .card-title .dot-green { background: var(--accent-em); }
+
+  /* ── LEFT PANEL ── */
+  .left-panel { position: sticky; top: 1.25rem; }
+  .left-panel .card { max-height: 88vh; overflow-y: auto; }
+
+  .panel-tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+    background: var(--bg-main);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    color: var(--text-3);
+    background: transparent;
+    border: none;
+    transition: all 0.15s;
+  }
+  .tab-btn.active { background: var(--bg-card-alt); color: var(--text-1); border: 1px solid var(--border); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Markdown styles */
+  #markdownContainer h1, #markdownContainer h2, #markdownContainer h3 {
+    color: var(--text-1);
+    margin: 1rem 0 0.4rem;
+    line-height: 1.3;
+  }
+  #markdownContainer h1 { font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+  #markdownContainer h2 { font-size: 0.9rem; }
+  #markdownContainer h3 { font-size: 0.83rem; color: var(--accent); }
+  #markdownContainer p { font-size: 0.8rem; color: var(--text-2); margin: 0.4rem 0; }
+  #markdownContainer ul, #markdownContainer ol { padding-left: 1.2rem; margin: 0.3rem 0; }
+  #markdownContainer li { font-size: 0.79rem; color: var(--text-2); margin: 0.15rem 0; }
+  #markdownContainer strong { color: var(--text-1); }
+  #markdownContainer table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin: 0.5rem 0; }
+  #markdownContainer th { background: var(--bg-card-alt); padding: 0.4rem 0.5rem; text-align: left; color: var(--text-2); font-weight: 600; border: 1px solid var(--border); }
+  #markdownContainer td { padding: 0.35rem 0.5rem; border: 1px solid var(--border); color: var(--text-2); }
+
+  /* McKinsey left panel */
+  .panel-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .panel-section-title::before { content: ''; width: 3px; height: 14px; background: var(--accent); border-radius: 2px; display: inline-block; }
+
+  .horizon-cards { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+  .horizon-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.5rem;
+    border-left: 3px solid transparent;
+  }
+  .horizon-card.h1 { background: rgba(59,130,246,0.07); border-left-color: var(--accent); }
+  .horizon-card.h2 { background: rgba(245,158,11,0.07); border-left-color: var(--accent-warn); }
+  .horizon-card.h3 { background: rgba(16,185,129,0.07); border-left-color: var(--accent-em); }
+  .horizon-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.3rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .h1 .horizon-badge { background: rgba(59,130,246,0.2); color: #60a5fa; }
+  .h2 .horizon-badge { background: rgba(245,158,11,0.2); color: #fbbf24; }
+  .h3 .horizon-badge { background: rgba(16,185,129,0.2); color: #34d399; }
+  .horizon-label { font-size: 0.7rem; font-weight: 700; color: var(--text-1); margin-bottom: 0.2rem; }
+  .horizon-text { font-size: 0.74rem; color: var(--text-2); line-height: 1.5; }
+
+  .scenario-block {
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+  .scenario-block.best { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.2); }
+  .scenario-block.worst { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); }
+  .scenario-header { font-size: 0.72rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .scenario-block.best .scenario-header { color: var(--accent-em); }
+  .scenario-block.worst .scenario-header { color: var(--accent-risk); }
+  .scenario-text { font-size: 0.75rem; color: var(--text-2); line-height: 1.5; margin-bottom: 0.5rem; }
+  .scenario-actions .action-label { font-size: 0.68rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .scenario-actions ul { margin: 0.3rem 0 0 0; padding-left: 1rem; }
+  .scenario-actions li { font-size: 0.72rem; color: var(--text-2); margin: 0.15rem 0; }
+
+  /* Eisenhower */
+  .eis-matrix { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .eis-axis-col {
+    display: flex; flex-direction: column; justify-content: space-around;
+    writing-mode: vertical-rl; text-orientation: mixed;
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-3);
+    padding: 0.5rem 0; transform: rotate(180deg);
+    flex-shrink: 0; width: 1rem;
+  }
+  .eis-grid { flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
+  .eis-axis-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    text-align: center; gap: 0.4rem;
+    font-size: 0.6rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3);
+    padding: 0 0.1rem;
+  }
+  .eis-cells { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+  .eis-cell { border-radius: 0.45rem; padding: 0.6rem 0.65rem; }
+  .eis-cell.do    { background: rgba(239,68,68,0.08);   border: 1px solid rgba(239,68,68,0.2); }
+  .eis-cell.schedule  { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); }
+  .eis-cell.delegate  { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
+  .eis-cell.eliminate { background: rgba(100,116,139,0.08); border: 1px solid rgba(100,116,139,0.2); }
+  .eis-label { font-size: 0.65rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .eis-cell.do .eis-label       { color: #f87171; }
+  .eis-cell.schedule .eis-label { color: #60a5fa; }
+  .eis-cell.delegate .eis-label { color: #fbbf24; }
+  .eis-cell.eliminate .eis-label{ color: var(--text-3); }
+  .eis-cell ul { list-style: disc; padding-left: 1rem; margin: 0; }
+  .eis-cell li { font-size: 0.68rem; color: var(--text-2); line-height: 1.4; margin: 0.1rem 0; }
+  .eis-cell li.muted { color: var(--text-3); list-style: none; margin-left: -1rem; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel { display: flex; flex-direction: column; gap: 1rem; }
+
+  /* ── KPI ROW ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+  @media (max-width: 768px) { .kpi-row { grid-template-columns: repeat(2,1fr); } }
+
+  .kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.65rem;
+    padding: 0.85rem 1rem;
+    display: flex; flex-direction: column; gap: 0.35rem;
+  }
+  .kpi-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-2); }
+  .kpi-value { font-size: 1.5rem; font-weight: 800; line-height: 1; color: var(--text-1); }
+  .kpi-value.green { color: var(--accent-em); }
+  .kpi-value.amber { color: var(--accent-warn); }
+  .kpi-value.blue  { color: var(--accent); }
+
+  /* Health score ring */
+  .kpi-card.health-card { align-items: center; padding: 0.75rem; }
+  .health-ring { position: relative; width: 72px; height: 72px; }
+  .health-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .health-ring .ring-val {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; font-weight: 800; color: var(--text-1);
+  }
+  .health-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 99px;
+    letter-spacing: 0.05em;
+  }
+  .health-badge.healthy { background: rgba(16,185,129,0.15); color: #34d399; }
+  .health-badge.critical { background: rgba(239,68,68,0.15); color: #f87171; }
+
+  /* ── METRIC GRID ── */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; }
+  .metric-box {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.75rem;
+    text-align: center;
+  }
+  .metric-val { font-size: 1rem; font-weight: 700; color: var(--text-1); }
+  .metric-key { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-2); margin-top: 0.2rem; line-height: 1.3; }
+
+  /* ── FLAG CARDS ── */
+  .flag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  @media (max-width: 768px) { .flag-grid { grid-template-columns: 1fr; } }
+  .flag-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.65rem;
+    padding: 0.85rem 1rem;
+  }
+  .flag-card ul { list-style: none; padding: 0; margin: 0; }
+  .flag-card li { font-size: 0.75rem; color: var(--text-2); padding: 0.25rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.4rem; }
+  .flag-card li:last-child { border-bottom: none; }
+  .flag-card li::before { flex-shrink: 0; margin-top: 0.15rem; }
+  .flag-card.risk li::before   { content: '▸'; color: var(--accent-risk); }
+  .flag-card.opp li::before    { content: '▸'; color: var(--accent-em); }
+  .flag-card.action li::before { content: '▸'; color: var(--accent); }
+  .flag-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.6rem; }
+  .flag-card.risk .flag-title   { color: var(--accent-risk); }
+  .flag-card.opp .flag-title    { color: var(--accent-em); }
+  .flag-card.action .flag-title { color: var(--accent); }
+
+  /* ── SECURITY ── */
+  .security-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+  /* ── LEGAL ── */
+  .legal {
+    margin-top: 1.25rem;
+    padding: 0.85rem 1.1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.65rem;
+    font-size: 0.72rem;
+    color: var(--text-3);
+    line-height: 1.6;
+  }
+  .legal strong { color: var(--text-2); display: block; margin-bottom: 0.3rem; }
+
+  /* ── BLACK & WHITE MODE ── */
+  body.theme-bw {
+    --bg-main: #000; --bg-card: #111; --bg-card-alt: #1a1a1a;
+    --border: #333; --text-1: #fff; --text-2: #ccc; --text-3: #666;
+    --accent: #fff; --accent-em: #aaa; --accent-warn: #bbb; --accent-risk: #999;
+  }
+  body.theme-bw canvas { filter: grayscale(100%) brightness(1.3); }
+
+  /* ── CHART CONTAINERS ── */
+  .chart-wrap { height: 220px; position: relative; }
+  .chart-wrap-sm { height: 160px; position: relative; }
+  </style>
 </head>
 <body>
-    <div class="background-gradients">
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
+
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-title">The Pi <span>Suite</span></div>
+      <div id="dashboard-subtitle" class="brand-sub"><strong>Pi Suite</strong> — Real-time consolidated financial insights.</div>
+    </div>
+    <div class="header-actions">
+      <button onclick="exportToPDF()" class="btn btn-success">⬇ PDF</button>
+      <button id="themeToggle" class="btn btn-ghost">
+        <span id="themeToggleIcon">⚫</span>
+        <span id="themeToggleText">B&amp;W</span>
+      </button>
+      <button id="langToggle" class="btn btn-primary">TR</button>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- ══ LEFT PANEL ══ -->
+    <div class="left-panel">
+      <div class="card" style="padding: 1rem;">
+
+        <!-- Tabs -->
+        <div class="panel-tabs">
+          <button class="tab-btn active" onclick="switchTab('ai')" id="tab-ai" data-i18n="ai_narrative">AI Analysis</button>
+          <button class="tab-btn" onclick="switchTab('mckinsey')" id="tab-mckinsey" data-i18n="mckinsey_section">Scenarios</button>
+          <button class="tab-btn" onclick="switchTab('eisenhower')" id="tab-eisenhower" data-i18n="eisenhower_section">Priority</button>
+        </div>
+
+        <!-- AI Narrative Tab -->
+        <div id="panel-ai" class="tab-panel active">
+          <div class="card-title"><span class="dot dot-green"></span><span data-i18n="exec_summary">Executive Summary</span></div>
+          <div id="markdownContainer" style="font-size:0.8rem; color: var(--text-2); line-height: 1.65;">
+            Loading analysis...
+          </div>
+        </div>
+
+        <!-- McKinsey Tab -->
+        <div id="panel-mckinsey" class="tab-panel">
+          <div id="mckinseyLeftPanel"></div>
+        </div>
+
+        <!-- Eisenhower Tab -->
+        <div id="panel-eisenhower" class="tab-panel">
+          <div id="eisenhowerLeftPanel"></div>
+        </div>
+
+      </div>
     </div>
 
-    <div class="dashboard-container">
-        <header style="position: relative;">
-            <div class="logo">Antigravity <span>AI</span></div>
-            <div class="header-controls" style="position: absolute; top: 0; right: 0; display: flex; gap: 1rem;">
-                <button id="langToggle" class="theme-toggle" style="position: relative;">🇹🇷 TR</button>
-                <button id="themeToggle" class="theme-toggle" style="position: relative;">🌓 Theme</button>
-            </div>
-            <h1 data-i18n="title">Executive Summary Dashboard</h1>
-            <p class="subtitle" data-i18n="subtitle">Real-time consolidated financial insights.</p>
-        </header>
+    <!-- ══ RIGHT PANEL ══ -->
+    <div class="right-panel">
 
-        <main class="two-column-layout">
-            <!-- LEFT COLUMN -->
-            <div class="layout-col-left">
-                <!-- Executive Summary (Markdown Output) -->
-                <section class="glass-card executive-summary-card">
-                    <h2 data-i18n="exec_summary">Executive Summary (CEO & CFO Perspective)</h2>
-                    <div id="markdownContainer" class="markdown-content">
-                        <!-- Populated by JS via marked.js -->
-                    </div>
-                </section>
+      <!-- KPI ROW -->
+      <div class="kpi-row">
 
-                <!-- Ratio Analytics & DuPont -->
-                <section class="glass-card ratios-card">
-                    <h2 data-i18n="ratio_dupont">Ratio Analytics & DuPont Pillars</h2>
-                    
-                    <h3 data-i18n="ratio_title" style="color: var(--text-secondary); margin: 1rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">Ratio Analytics</h3>
-                    <div class="metric-grid" id="ratioAnalyticsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <!-- Populated by JS -->
-                    </div>
+        <!-- Health Score -->
+        <div class="kpi-card health-card">
+          <div class="kpi-label" data-i18n="financial_health">Financial Health</div>
+          <div class="health-ring">
+            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-width="3" stroke="#1e293b" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <path id="healthScoreCircle" stroke-width="3" stroke-linecap="round" stroke="#10b981" fill="none"
+                    stroke-dasharray="100,100"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            </svg>
+            <div class="ring-val"><span id="healthScoreValue">—</span></div>
+          </div>
+          <span id="healthStatus" class="health-badge healthy">—</span>
+        </div>
 
-                    <h3 data-i18n="dupont_title" style="color: var(--text-secondary); margin: 1.5rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">DuPont Pillars</h3>
-                    <div class="metric-grid" id="dupontGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <!-- Populated by JS -->
-                    </div>
-                </section>
+        <!-- Z-Score + ROE -->
+        <div class="kpi-card">
+          <div class="kpi-label" data-i18n="z_score">Altman Z-Score</div>
+          <div id="zScoreValue" class="kpi-value blue">—</div>
+          <div style="margin-top:auto; padding-top:0.75rem;">
+            <div class="kpi-label" data-i18n="roe">Return on Equity</div>
+            <div id="roeValue" class="kpi-value green">—</div>
+          </div>
+        </div>
 
-                <!-- Budget Simulations (Chart) -->
-                <section class="glass-card chart-card">
-                    <h2 data-i18n="budget_sim">Budget Simulations & Forecasts</h2>
-                    <div style="position: relative; height: 300px; width: 100%; margin-bottom: 1.5rem;">
-                        <canvas id="cashFlowChart"></canvas>
-                    </div>
-                    <h3 data-i18n="cost_cutting" style="color: var(--text-secondary); margin: 1rem 0 0.5rem; font-size: 0.9rem; text-transform: uppercase;">Cost Cutting Savings Plans</h3>
-                    <div class="metric-grid" id="savingsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <!-- Populated by JS -->
-                    </div>
-                </section>
+        <!-- Cash Runway -->
+        <div class="kpi-card" style="justify-content: space-between;">
+          <div class="kpi-label" data-i18n="cash_runway">Cash Runway</div>
+          <div id="cashRunwayValue" class="kpi-value amber">—</div>
+        </div>
 
-                <!-- Strategic Narrative: Action Plan -->
-                <section class="glass-card action-card">
-                    <h2>🚀 <span data-i18n="strategic_action">Strategic Action Plan</span></h2>
-                    <ul id="actionPlanList" class="narrative-list">
-                        <!-- Populated by JS -->
-                    </ul>
-                </section>
-            </div>
+        <!-- Security -->
+        <div class="kpi-card">
+          <div class="kpi-label" data-i18n="sec_conf">Confidentiality</div>
+          <div id="confidentiality-rate-val" class="kpi-value blue">95%</div>
+          <div style="margin-top:auto; padding-top:0.75rem;">
+            <div class="kpi-label" data-i18n="sec_fore">Forecast Confidence</div>
+            <div id="confidence-rate-val" class="kpi-value green">88%</div>
+          </div>
+        </div>
 
-            <!-- RIGHT COLUMN -->
-            <div class="layout-col-right">
-                <!-- Executive Metrics Card -->
-                <section class="glass-card metric-card">
-                    <h2 data-i18n="financial_health">Financial Health</h2>
-                    <div class="score-container">
-                        <svg class="progress-ring" width="120" height="120">
-                            <circle class="progress-ring__circle bg" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
-                            <circle id="healthScoreCircle" class="progress-ring__circle" stroke="#4ade80" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
-                        </svg>
-                        <div class="score-text">
-                            <span id="healthScoreValue">--</span>
-                            <span class="out-of">/10</span>
-                        </div>
-                    </div>
-                    <div class="status-badge" id="healthStatus">Evaluating...</div>
-                    
-                    <div class="metric-row" style="margin-top: 2rem; width: 100%;">
-                        <span class="label" data-i18n="z_score">Altman Z-Score</span>
-                        <span class="value" id="zScoreValue">--</span>
-                    </div>
-                    <div class="metric-row" style="width: 100%;">
-                        <span class="label" data-i18n="cash_runway">Cash Runway</span>
-                        <span class="value" id="cashRunwayValue">--</span>
-                    </div>
-                    <div class="metric-row" style="width: 100%;">
-                        <span class="label" data-i18n="roe">Return on Equity</span>
-                        <span class="value" id="roeValue">--</span>
-                    </div>
-                </section>
+      </div>
 
-                <!-- Red Flags -->
-                <section class="glass-card flags-card red-flags">
-                    <h2><span class="icon">⚠️</span> <span data-i18n="risks">Critical Risks</span></h2>
-                    <ul id="redFlagsList">
-                        <!-- Populated by JS -->
-                    </ul>
-                </section>
+      <!-- BUDGET CHART -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span><span data-i18n="budget_sim">Budget Simulations & Forecasts</span></div>
+        <div class="chart-wrap"><canvas id="cashFlowChart"></canvas></div>
+      </div>
 
-                <!-- Green Flags -->
-                <section class="glass-card flags-card green-flags">
-                    <h2><span class="icon">✅</span> <span data-i18n="opportunities">Opportunities & Growth</span></h2>
-                    <ul id="greenFlagsList">
-                        <!-- Populated by JS -->
-                    </ul>
-                </section>
-            </div>
-        </main>
-    </div>
+      <!-- RATIO + DUPONT -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <div class="card">
+          <div class="card-title"><span class="dot dot-green"></span><span data-i18n="ratio_title">Ratio Analytics</span></div>
+          <div id="ratioAnalyticsGrid" class="metric-grid"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="dot"></span><span data-i18n="dupont_title">DuPont Pillars</span></div>
+          <div id="dupontGrid" class="metric-grid"></div>
+        </div>
+      </div>
 
-    <!-- Data generated by Python UI/UX Agent -->
-    <script src="dashboard_data.js"></script>
-    <script src="app.js"></script>
+      <!-- HISTORICAL CHART -->
+      <div class="card">
+        <div class="card-title"><span class="dot dot-green"></span><span data-i18n="historical_title">Historical Comparison</span></div>
+        <div class="chart-wrap-sm"><canvas id="historicalChart"></canvas></div>
+      </div>
+
+      <!-- COST CUTTING -->
+      <div class="card">
+        <div class="card-title"><span class="dot"></span><span data-i18n="cost_cutting">Cost Cutting Savings</span></div>
+        <div id="savingsGrid" class="metric-grid"></div>
+      </div>
+
+      <!-- FLAGS -->
+      <div class="flag-grid">
+        <div class="flag-card risk">
+          <div class="flag-title" data-i18n="risks">Critical Risks</div>
+          <div id="redFlagsContainer"></div>
+        </div>
+        <div class="flag-card opp">
+          <div class="flag-title" data-i18n="opportunities">Opportunities & Growth</div>
+          <div id="greenFlagsContainer"></div>
+        </div>
+        <div class="flag-card action">
+          <div class="flag-title" data-i18n="strategic_action">Strategic Action Plan</div>
+          <div id="actionPlanContainer"></div>
+        </div>
+      </div>
+
+    </div><!-- /right-panel -->
+
+  </div><!-- /main-grid -->
+
+  <!-- LEGAL -->
+  <div class="legal">
+    <strong data-i18n="legal_title">⚖️ Legal Disclaimer</strong>
+    <span data-i18n="legal_text">Loading disclaimer...</span>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+  function switchTab(name) {
+    ['ai','mckinsey','eisenhower'].forEach(t => {
+      document.getElementById('panel-' + t)?.classList.toggle('active', t === name);
+      document.getElementById('tab-' + t)?.classList.toggle('active', t === name);
+    });
+  }
+</script>
+<script src="dashboard_data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
