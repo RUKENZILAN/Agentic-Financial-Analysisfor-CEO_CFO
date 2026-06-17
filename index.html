@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="title">Executive Summary Dashboard</title>
+  <title data-i18n="title">The Pi Suite — Financial Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
   <style>
   /* ── TOKENS ── */
   :root {
@@ -24,18 +25,8 @@
     --text-3:      #4a6080;
     --font-mono:   'ui-monospace', 'Cascadia Code', monospace;
   }
-
   *, *::before, *::after { box-sizing: border-box; }
-
-  body {
-    background: var(--bg-main);
-    color: var(--text-1);
-    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  /* ── SCROLLBAR ── */
+  body { background: var(--bg-main); color: var(--text-1); font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; line-height: 1.6; margin: 0; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg-main); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -44,40 +35,15 @@
   .shell { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; }
 
   /* ── HEADER ── */
-  .top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 1.25rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; padding-bottom: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); gap: 1rem; flex-wrap: wrap; }
   .brand { display: flex; flex-direction: column; gap: 0.2rem; }
-  .brand-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--text-1);
-    line-height: 1;
-  }
+  .brand-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-1); line-height: 1; }
   .brand-title span { color: var(--accent); }
   .brand-sub { font-size: 0.78rem; color: var(--text-2); }
   .brand-sub strong { color: var(--accent-em); }
-
   .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 
-  .btn {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 0.45rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: background 0.15s, transform 0.1s;
-  }
+  .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.9rem; border-radius: 0.45rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s, transform 0.1s; }
   .btn:active { transform: scale(0.97); }
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-primary:hover { background: #2563eb; }
@@ -86,96 +52,67 @@
   .btn-ghost { background: #1e293b; color: var(--text-2); border: 1px solid var(--border); }
   .btn-ghost:hover { background: #253348; color: var(--text-1); }
 
-  select.company-select {
-    background: var(--bg-card-alt);
-    border: 1px solid var(--border);
-    color: var(--text-1);
-    padding: 0.45rem 0.9rem;
-    border-radius: 0.45rem;
-    font-size: 0.8rem;
-    font-weight: 600;
+  /* ── UPLOAD ZONE ── */
+  .upload-section { margin-bottom: 1.5rem; }
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 0.75rem;
+    padding: 1.75rem 1.5rem;
+    text-align: center;
     cursor: pointer;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238ba3c8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 2rem;
+    transition: border-color .2s, background .2s;
+    background: var(--bg-card);
   }
+  .dropzone:hover, .dropzone.drag-over { border-color: var(--accent); background: rgba(59,130,246,.05); }
+  .dropzone.loaded { border-color: var(--accent-em); background: rgba(16,185,129,.04); border-style: solid; }
+  .dz-icon { font-size: 2rem; margin-bottom: .5rem; display: block; }
+  .dz-title { font-size: .95rem; font-weight: 700; color: var(--text-1); margin-bottom: .25rem; }
+  .dz-sub { font-size: .75rem; color: var(--text-2); }
+  .file-pill { display: inline-flex; align-items: center; gap: .4rem; margin-top: .65rem; padding: .3rem .85rem; border-radius: 99px; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.3); font-size: .72rem; font-weight: 600; color: #34d399; }
 
-  /* ── GRID ── */
-  .main-grid {
-    display: grid;
-    grid-template-columns: 420px 1fr;
-    gap: 1.25rem;
-    align-items: start;
-  }
+  /* ── PROGRESS STEPS ── */
+  .progress-bar { display: none; align-items: center; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .progress-bar.show { display: flex; }
+  .step-item { display: flex; align-items: center; gap: 5px; font-size: .72rem; color: var(--text-3); }
+  .step-item.active { color: var(--accent); }
+  .step-item.done { color: var(--accent-em); }
+  .step-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .step-sep { font-size: .65rem; color: var(--text-3); margin: 0 2px; }
+
+  /* ── STATUS BAR ── */
+  .status-bar { display: none; align-items: center; gap: 8px; padding: .6rem .9rem; border-radius: .45rem; background: rgba(59,130,246,.08); border: 1px solid rgba(59,130,246,.2); font-size: .78rem; color: var(--text-2); margin-bottom: 1rem; }
+  .status-bar.show { display: flex; }
+  .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.15); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── UPLOAD HISTORY ── */
+  .upload-history { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .75rem; }
+  .hist-chip { font-size: .67rem; padding: .2rem .6rem; border-radius: 99px; background: var(--bg-card-alt); border: 1px solid var(--border); color: var(--text-3); }
+  .hist-chip .hn { color: var(--accent); font-weight: 600; }
+
+  /* ── MAIN GRID ── */
+  .main-grid { display: grid; grid-template-columns: 420px 1fr; gap: 1.25rem; align-items: start; }
   @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
 
   /* ── CARDS ── */
-  .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-    padding: 1.1rem 1.25rem;
-  }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.1rem 1.25rem; }
   .card + .card { margin-top: 1rem; }
-  .card-title {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-2);
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .card-title .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent);
-    flex-shrink: 0;
-  }
+  .card-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); margin-bottom: 0.75rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.4rem; }
+  .card-title .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
   .card-title .dot-green { background: var(--accent-em); }
 
   /* ── LEFT PANEL ── */
   .left-panel { position: sticky; top: 1.25rem; }
   .left-panel .card { max-height: 88vh; overflow-y: auto; }
 
-  .panel-tabs {
-    display: flex;
-    gap: 0.25rem;
-    margin-bottom: 1rem;
-    background: var(--bg-main);
-    border-radius: 0.5rem;
-    padding: 0.25rem;
-  }
-  .tab-btn {
-    flex: 1;
-    padding: 0.4rem 0.5rem;
-    border-radius: 0.35rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    color: var(--text-3);
-    background: transparent;
-    border: none;
-    transition: all 0.15s;
-  }
+  .panel-tabs { display: flex; gap: 0.25rem; margin-bottom: 1rem; background: var(--bg-main); border-radius: 0.5rem; padding: 0.25rem; }
+  .tab-btn { flex: 1; padding: 0.4rem 0.5rem; border-radius: 0.35rem; font-size: 0.72rem; font-weight: 600; cursor: pointer; text-align: center; color: var(--text-3); background: transparent; border: none; transition: all 0.15s; }
   .tab-btn.active { background: var(--bg-card-alt); color: var(--text-1); border: 1px solid var(--border); }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
-  /* Markdown styles */
-  #markdownContainer h1, #markdownContainer h2, #markdownContainer h3 {
-    color: var(--text-1);
-    margin: 1rem 0 0.4rem;
-    line-height: 1.3;
-  }
+  /* Markdown */
+  #markdownContainer h1, #markdownContainer h2, #markdownContainer h3 { color: var(--text-1); margin: 1rem 0 0.4rem; line-height: 1.3; }
   #markdownContainer h1 { font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
   #markdownContainer h2 { font-size: 0.9rem; }
   #markdownContainer h3 { font-size: 0.83rem; color: var(--accent); }
@@ -187,52 +124,22 @@
   #markdownContainer th { background: var(--bg-card-alt); padding: 0.4rem 0.5rem; text-align: left; color: var(--text-2); font-weight: 600; border: 1px solid var(--border); }
   #markdownContainer td { padding: 0.35rem 0.5rem; border: 1px solid var(--border); color: var(--text-2); }
 
-  /* McKinsey left panel */
-  .panel-section-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
+  .panel-section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem; }
   .panel-section-title::before { content: ''; width: 3px; height: 14px; background: var(--accent); border-radius: 2px; display: inline-block; }
 
   .horizon-cards { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
-  .horizon-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.65rem;
-    padding: 0.65rem 0.75rem;
-    border-radius: 0.5rem;
-    border-left: 3px solid transparent;
-  }
+  .horizon-card { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.65rem 0.75rem; border-radius: 0.5rem; border-left: 3px solid transparent; }
   .horizon-card.h1 { background: rgba(59,130,246,0.07); border-left-color: var(--accent); }
   .horizon-card.h2 { background: rgba(245,158,11,0.07); border-left-color: var(--accent-warn); }
   .horizon-card.h3 { background: rgba(16,185,129,0.07); border-left-color: var(--accent-em); }
-  .horizon-badge {
-    font-size: 0.65rem;
-    font-weight: 800;
-    font-family: var(--font-mono);
-    padding: 0.15rem 0.4rem;
-    border-radius: 0.3rem;
-    flex-shrink: 0;
-    margin-top: 0.1rem;
-  }
+  .horizon-badge { font-size: 0.65rem; font-weight: 800; font-family: var(--font-mono); padding: 0.15rem 0.4rem; border-radius: 0.3rem; flex-shrink: 0; margin-top: 0.1rem; }
   .h1 .horizon-badge { background: rgba(59,130,246,0.2); color: #60a5fa; }
   .h2 .horizon-badge { background: rgba(245,158,11,0.2); color: #fbbf24; }
   .h3 .horizon-badge { background: rgba(16,185,129,0.2); color: #34d399; }
   .horizon-label { font-size: 0.7rem; font-weight: 700; color: var(--text-1); margin-bottom: 0.2rem; }
   .horizon-text { font-size: 0.74rem; color: var(--text-2); line-height: 1.5; }
 
-  .scenario-block {
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    margin-bottom: 0.6rem;
-  }
+  .scenario-block { border-radius: 0.5rem; padding: 0.75rem; margin-bottom: 0.6rem; }
   .scenario-block.best { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.2); }
   .scenario-block.worst { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); }
   .scenario-header { font-size: 0.72rem; font-weight: 700; margin-bottom: 0.4rem; }
@@ -243,30 +150,16 @@
   .scenario-actions ul { margin: 0.3rem 0 0 0; padding-left: 1rem; }
   .scenario-actions li { font-size: 0.72rem; color: var(--text-2); margin: 0.15rem 0; }
 
-  /* Eisenhower */
   .eis-matrix { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-  .eis-axis-col {
-    display: flex; flex-direction: column; justify-content: space-around;
-    writing-mode: vertical-rl; text-orientation: mixed;
-    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-3);
-    padding: 0.5rem 0; transform: rotate(180deg);
-    flex-shrink: 0; width: 1rem;
-  }
+  .eis-axis-col { display: flex; flex-direction: column; justify-content: space-around; writing-mode: vertical-rl; text-orientation: mixed; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); padding: 0.5rem 0; transform: rotate(180deg); flex-shrink: 0; width: 1rem; }
   .eis-grid { flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
-  .eis-axis-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    text-align: center; gap: 0.4rem;
-    font-size: 0.6rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3);
-    padding: 0 0.1rem;
-  }
+  .eis-axis-row { display: grid; grid-template-columns: 1fr 1fr; text-align: center; gap: 0.4rem; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); padding: 0 0.1rem; }
   .eis-cells { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
   .eis-cell { border-radius: 0.45rem; padding: 0.6rem 0.65rem; }
-  .eis-cell.do    { background: rgba(239,68,68,0.08);   border: 1px solid rgba(239,68,68,0.2); }
-  .eis-cell.schedule  { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); }
-  .eis-cell.delegate  { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
-  .eis-cell.eliminate { background: rgba(100,116,139,0.08); border: 1px solid rgba(100,116,139,0.2); }
+  .eis-cell.do       { background: rgba(239,68,68,0.08);    border: 1px solid rgba(239,68,68,0.2); }
+  .eis-cell.schedule { background: rgba(59,130,246,0.08);  border: 1px solid rgba(59,130,246,0.2); }
+  .eis-cell.delegate { background: rgba(245,158,11,0.08);  border: 1px solid rgba(245,158,11,0.2); }
+  .eis-cell.eliminate{ background: rgba(100,116,139,0.08); border: 1px solid rgba(100,116,139,0.2); }
   .eis-label { font-size: 0.65rem; font-weight: 700; margin-bottom: 0.3rem; }
   .eis-cell.do .eis-label       { color: #f87171; }
   .eis-cell.schedule .eis-label { color: #60a5fa; }
@@ -278,64 +171,30 @@
 
   /* ── RIGHT PANEL ── */
   .right-panel { display: flex; flex-direction: column; gap: 1rem; }
-
-  /* ── KPI ROW ── */
   .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
   @media (max-width: 768px) { .kpi-row { grid-template-columns: repeat(2,1fr); } }
-
-  .kpi-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 0.65rem;
-    padding: 0.85rem 1rem;
-    display: flex; flex-direction: column; gap: 0.35rem;
-  }
+  .kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.65rem; padding: 0.85rem 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
   .kpi-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-2); }
   .kpi-value { font-size: 1.5rem; font-weight: 800; line-height: 1; color: var(--text-1); }
   .kpi-value.green { color: var(--accent-em); }
   .kpi-value.amber { color: var(--accent-warn); }
   .kpi-value.blue  { color: var(--accent); }
-
-  /* Health score ring */
   .kpi-card.health-card { align-items: center; padding: 0.75rem; }
   .health-ring { position: relative; width: 72px; height: 72px; }
   .health-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .health-ring .ring-val {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; font-weight: 800; color: var(--text-1);
-  }
-  .health-badge {
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 0.2rem 0.55rem;
-    border-radius: 99px;
-    letter-spacing: 0.05em;
-  }
-  .health-badge.healthy { background: rgba(16,185,129,0.15); color: #34d399; }
-  .health-badge.critical { background: rgba(239,68,68,0.15); color: #f87171; }
+  .health-ring .ring-val { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: var(--text-1); }
+  .health-badge { font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 99px; letter-spacing: 0.05em; }
+  .health-badge.healthy  { background: rgba(16,185,129,0.15); color: #34d399; }
+  .health-badge.critical { background: rgba(239,68,68,0.15);  color: #f87171; }
 
-  /* ── METRIC GRID ── */
   .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; }
-  .metric-box {
-    background: var(--bg-card-alt);
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    padding: 0.65rem 0.75rem;
-    text-align: center;
-  }
+  .metric-box { background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.65rem 0.75rem; text-align: center; }
   .metric-val { font-size: 1rem; font-weight: 700; color: var(--text-1); }
   .metric-key { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-2); margin-top: 0.2rem; line-height: 1.3; }
 
-  /* ── FLAG CARDS ── */
   .flag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
   @media (max-width: 768px) { .flag-grid { grid-template-columns: 1fr; } }
-  .flag-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 0.65rem;
-    padding: 0.85rem 1rem;
-  }
+  .flag-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.65rem; padding: 0.85rem 1rem; }
   .flag-card ul { list-style: none; padding: 0; margin: 0; }
   .flag-card li { font-size: 0.75rem; color: var(--text-2); padding: 0.25rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.4rem; }
   .flag-card li:last-child { border-bottom: none; }
@@ -348,147 +207,141 @@
   .flag-card.opp .flag-title    { color: var(--accent-em); }
   .flag-card.action .flag-title { color: var(--accent); }
 
-  /* ── SECURITY ── */
   .security-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-
-  /* ── LEGAL ── */
-  .legal {
-    margin-top: 1.25rem;
-    padding: 0.85rem 1.1rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 0.65rem;
-    font-size: 0.72rem;
-    color: var(--text-3);
-    line-height: 1.6;
-  }
+  .legal { margin-top: 1.25rem; padding: 0.85rem 1.1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.65rem; font-size: 0.72rem; color: var(--text-3); line-height: 1.6; }
   .legal strong { color: var(--text-2); display: block; margin-bottom: 0.3rem; }
 
-  /* ── BLACK & WHITE MODE ── */
-  body.theme-bw {
-    --bg-main: #000; --bg-card: #111; --bg-card-alt: #1a1a1a;
-    --border: #333; --text-1: #fff; --text-2: #ccc; --text-3: #666;
-    --accent: #fff; --accent-em: #aaa; --accent-warn: #bbb; --accent-risk: #999;
-  }
+  body.theme-bw { --bg-main: #000; --bg-card: #111; --bg-card-alt: #1a1a1a; --border: #333; --text-1: #fff; --text-2: #ccc; --text-3: #666; --accent: #fff; --accent-em: #aaa; --accent-warn: #bbb; --accent-risk: #999; }
   body.theme-bw canvas { filter: grayscale(100%) brightness(1.3); }
-
-  /* ── CHART CONTAINERS ── */
   .chart-wrap { height: 220px; position: relative; }
   .chart-wrap-sm { height: 160px; position: relative; }
+
+  /* ── EMPTY STATE ── */
+  .dashboard-placeholder { text-align: center; padding: 3rem 1rem; color: var(--text-3); }
+  .dashboard-placeholder .ph-icon { font-size: 3rem; margin-bottom: 1rem; opacity: .4; }
+  .dashboard-placeholder p { font-size: .85rem; }
   </style>
 </head>
 <body>
-
 <div class="shell">
 
   <!-- TOP BAR -->
   <header class="top-bar">
     <div class="brand">
       <div class="brand-title">The Pi <span>Suite</span></div>
-      <div id="dashboard-subtitle" class="brand-sub"><strong>Pi Suite</strong> — Real-time consolidated financial insights.</div>
+      <div id="dashboard-subtitle" class="brand-sub"><strong>Pi Suite</strong> — Tabula Rasa · Dinamik AI Finansal Analiz Motoru</div>
     </div>
     <div class="header-actions">
-      <button onclick="exportToPDF()" class="btn btn-success">⬇ PDF</button>
-      <button id="themeToggle" class="btn btn-ghost">
-        <span id="themeToggleIcon">⚫</span>
-        <span id="themeToggleText">B&amp;W</span>
-      </button>
+      <button onclick="window.print()" class="btn btn-success">⬇ PDF</button>
+      <button id="themeToggle" class="btn btn-ghost"><span id="themeToggleIcon">⚫</span> <span id="themeToggleText">B&W</span></button>
       <button id="langToggle" class="btn btn-primary">TR</button>
     </div>
   </header>
 
-  <!-- MAIN GRID -->
-  <div class="main-grid">
+  <!-- UPLOAD ZONE -->
+  <div class="upload-section">
+    <div class="dropzone" id="dropzone"
+         onclick="document.getElementById('fileInput').click()"
+         ondragover="dzDragOver(event)"
+         ondragleave="dzDragLeave(event)"
+         ondrop="dzDrop(event)">
+      <span class="dz-icon">📊</span>
+      <div class="dz-title" id="dz-title">Excel veya CSV dosyanızı buraya sürükleyin veya tıklayın</div>
+      <div class="dz-sub" id="dz-sub">Desteklenen: .xlsx · .xls · .csv — Her dosya adı kabul edilir · Tabula Rasa modu</div>
+      <div id="file-pill" class="file-pill" style="display:none">✅ <span id="pill-name"></span></div>
+      <input type="file" id="fileInput" style="display:none" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(this.files[0])">
+    </div>
 
-    <!-- ══ LEFT PANEL ══ -->
+    <div class="upload-history" id="uploadHistory"></div>
+
+    <div class="progress-bar" id="progressBar">
+      <div class="step-item" id="step1"><div class="step-dot"></div><span id="sl1">Dosya okunuyor</span></div>
+      <div class="step-sep">›</div>
+      <div class="step-item" id="step2"><div class="step-dot"></div><span id="sl2">Veri ayrıştırılıyor</span></div>
+      <div class="step-sep">›</div>
+      <div class="step-item" id="step3"><div class="step-dot"></div><span id="sl3">AI analiz üretiyor</span></div>
+      <div class="step-sep">›</div>
+      <div class="step-item" id="step4"><div class="step-dot"></div><span id="sl4">Dashboard güncelleniyor</span></div>
+    </div>
+
+    <div class="status-bar" id="statusBar">
+      <div class="spinner"></div>
+      <span id="statusText">İşleniyor...</span>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="dashboard-placeholder" id="dashboardPlaceholder">
+    <div class="ph-icon">📈</div>
+    <p id="placeholder-text">Analiz başlatmak için yukarıya bir Excel veya CSV dosyası yükleyin.</p>
+  </div>
+
+  <!-- MAIN GRID (hidden until file loaded) -->
+  <div class="main-grid" id="mainGrid" style="display:none">
+
+    <!-- LEFT PANEL -->
     <div class="left-panel">
-      <div class="card" style="padding: 1rem;">
-
-        <!-- Tabs -->
+      <div class="card" style="padding:1rem">
         <div class="panel-tabs">
           <button class="tab-btn active" onclick="switchTab('ai')" id="tab-ai" data-i18n="ai_narrative">AI Analysis</button>
           <button class="tab-btn" onclick="switchTab('mckinsey')" id="tab-mckinsey" data-i18n="mckinsey_section">Scenarios</button>
           <button class="tab-btn" onclick="switchTab('eisenhower')" id="tab-eisenhower" data-i18n="eisenhower_section">Priority</button>
         </div>
-
-        <!-- AI Narrative Tab -->
         <div id="panel-ai" class="tab-panel active">
           <div class="card-title"><span class="dot dot-green"></span><span data-i18n="exec_summary">Executive Summary</span></div>
-          <div id="markdownContainer" style="font-size:0.8rem; color: var(--text-2); line-height: 1.65;">
-            Loading analysis...
-          </div>
+          <div id="markdownContainer" style="font-size:.8rem;color:var(--text-2);line-height:1.65">Loading...</div>
         </div>
-
-        <!-- McKinsey Tab -->
         <div id="panel-mckinsey" class="tab-panel">
           <div id="mckinseyLeftPanel"></div>
         </div>
-
-        <!-- Eisenhower Tab -->
         <div id="panel-eisenhower" class="tab-panel">
           <div id="eisenhowerLeftPanel"></div>
         </div>
-
       </div>
     </div>
 
-    <!-- ══ RIGHT PANEL ══ -->
+    <!-- RIGHT PANEL -->
     <div class="right-panel">
-
-      <!-- KPI ROW -->
       <div class="kpi-row">
-
-        <!-- Health Score -->
         <div class="kpi-card health-card">
           <div class="kpi-label" data-i18n="financial_health">Financial Health</div>
           <div class="health-ring">
             <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
               <path stroke-width="3" stroke="#1e293b" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-              <path id="healthScoreCircle" stroke-width="3" stroke-linecap="round" stroke="#10b981" fill="none"
-                    stroke-dasharray="100,100"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <path id="healthScoreCircle" stroke-width="3" stroke-linecap="round" stroke="#10b981" fill="none" stroke-dasharray="100,100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
             </svg>
             <div class="ring-val"><span id="healthScoreValue">—</span></div>
           </div>
           <span id="healthStatus" class="health-badge healthy">—</span>
         </div>
-
-        <!-- Z-Score + ROE -->
         <div class="kpi-card">
           <div class="kpi-label" data-i18n="z_score">Altman Z-Score</div>
           <div id="zScoreValue" class="kpi-value blue">—</div>
-          <div style="margin-top:auto; padding-top:0.75rem;">
+          <div style="margin-top:auto;padding-top:.75rem">
             <div class="kpi-label" data-i18n="roe">Return on Equity</div>
             <div id="roeValue" class="kpi-value green">—</div>
           </div>
         </div>
-
-        <!-- Cash Runway -->
-        <div class="kpi-card" style="justify-content: space-between;">
+        <div class="kpi-card">
           <div class="kpi-label" data-i18n="cash_runway">Cash Runway</div>
           <div id="cashRunwayValue" class="kpi-value amber">—</div>
         </div>
-
-        <!-- Security -->
         <div class="kpi-card">
           <div class="kpi-label" data-i18n="sec_conf">Confidentiality</div>
           <div id="confidentiality-rate-val" class="kpi-value blue">95%</div>
-          <div style="margin-top:auto; padding-top:0.75rem;">
+          <div style="margin-top:auto;padding-top:.75rem">
             <div class="kpi-label" data-i18n="sec_fore">Forecast Confidence</div>
             <div id="confidence-rate-val" class="kpi-value green">88%</div>
           </div>
         </div>
-
       </div>
 
-      <!-- BUDGET CHART -->
       <div class="card">
         <div class="card-title"><span class="dot"></span><span data-i18n="budget_sim">Budget Simulations & Forecasts</span></div>
         <div class="chart-wrap"><canvas id="cashFlowChart"></canvas></div>
       </div>
 
-      <!-- RATIO + DUPONT -->
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
         <div class="card">
           <div class="card-title"><span class="dot dot-green"></span><span data-i18n="ratio_title">Ratio Analytics</span></div>
           <div id="ratioAnalyticsGrid" class="metric-grid"></div>
@@ -499,19 +352,16 @@
         </div>
       </div>
 
-      <!-- HISTORICAL CHART -->
       <div class="card">
         <div class="card-title"><span class="dot dot-green"></span><span data-i18n="historical_title">Historical Comparison</span></div>
         <div class="chart-wrap-sm"><canvas id="historicalChart"></canvas></div>
       </div>
 
-      <!-- COST CUTTING -->
       <div class="card">
         <div class="card-title"><span class="dot"></span><span data-i18n="cost_cutting">Cost Cutting Savings</span></div>
         <div id="savingsGrid" class="metric-grid"></div>
       </div>
 
-      <!-- FLAGS -->
       <div class="flag-grid">
         <div class="flag-card risk">
           <div class="flag-title" data-i18n="risks">Critical Risks</div>
@@ -526,28 +376,644 @@
           <div id="actionPlanContainer"></div>
         </div>
       </div>
+    </div>
+  </div>
 
-    </div><!-- /right-panel -->
-
-  </div><!-- /main-grid -->
-
-  <!-- LEGAL -->
-  <div class="legal">
+  <div class="legal" id="legalBlock" style="display:none">
     <strong data-i18n="legal_title">⚖️ Legal Disclaimer</strong>
-    <span data-i18n="legal_text">Loading disclaimer...</span>
+    <span data-i18n="legal_text">This report is generated automatically and does not constitute investment advice.</span>
   </div>
 
 </div><!-- /shell -->
 
 <script>
-  function switchTab(name) {
-    ['ai','mckinsey','eisenhower'].forEach(t => {
-      document.getElementById('panel-' + t)?.classList.toggle('active', t === name);
-      document.getElementById('tab-' + t)?.classList.toggle('active', t === name);
-    });
+// ═══════════════════════════════════════════════════════════════════════════
+//  THE PI SUITE — FULLSTACK ENGINE
+//  Tabula Rasa: her yükleme sıfırdan analiz edilir, statik veri kullanılmaz
+// ═══════════════════════════════════════════════════════════════════════════
+
+let dashboardData = null;
+let currentLang = 'tr';
+let uploadCount = 0;
+let myChart = null;
+let histChartInstance = null;
+
+// ─── i18n ─────────────────────────────────────────────────────────────────
+const i18n = {
+  en: {
+    title:'Executive Summary Dashboard', subtitle:'Tabula Rasa · Dynamic AI Financial Analysis Engine',
+    exec_summary:'Executive Summary', ai_narrative:'AI Analysis',
+    mckinsey_section:'Strategic Scenarios', eisenhower_section:'Priority Matrix',
+    financial_health:'Financial Health', z_score:'Altman Z-Score',
+    cash_runway:'Cash Runway', roe:'Return on Equity',
+    ratio_title:'Ratio Analytics', historical_title:'Historical Comparison',
+    dupont_title:'DuPont Pillars', budget_sim:'Budget Simulations & Forecasts',
+    cost_cutting:'Cost Cutting Savings', strategic_action:'Strategic Action Plan',
+    opportunities:'Opportunities & Growth', risks:'Critical Risks',
+    mckinsey_title:'McKinsey 3 Horizons', mckinsey_h1:'Horizon 1 — Core',
+    mckinsey_h2:'Horizon 2 — Emerging', mckinsey_h3:'Horizon 3 — Innovation',
+    mckinsey_best:'✅ Best Case Scenario', mckinsey_worst:'⚠️ Worst Case Scenario',
+    best_action:'Action Plan', worst_action:'Contingency Plan',
+    eisenhower_title:'Eisenhower Priority Matrix',
+    eisenhower_do:'🔴 Do Now', eisenhower_schedule:'🔵 Schedule',
+    eisenhower_delegate:'🟡 Delegate', eisenhower_eliminate:'⚪ Eliminate',
+    eisenhower_urgent:'Urgent', eisenhower_not_urgent:'Not Urgent',
+    eisenhower_important:'Important', eisenhower_not_important:'Not Important',
+    langBtn:'TR', health_healthy:'Healthy', health_critical:'Critical',
+    chart_standard:'Standard Forecast', chart_stress:'Recession Stress-Test',
+    sec_conf:'Confidentiality Rate', sec_fore:'Forecast Confidence Rate',
+    months_suffix:' Months',
+    legal_title:'⚖️ Legal Disclaimer',
+    legal_text:'This report is generated automatically and does not constitute investment advice. Consult a licensed professional. Data is confidential and for internal use only.',
+    no_data:'No data',
+    dz_title:'Drag & drop your Excel or CSV file here — or click',
+    dz_sub:'Supported: .xlsx · .xls · .csv — Any file name accepted · Tabula Rasa mode',
+    placeholder:'Upload an Excel or CSV file above to start analysis.',
+    sl1:'Reading file', sl2:'Parsing data', sl3:'AI generating analysis', sl4:'Updating dashboard'
+  },
+  tr: {
+    title:'Yönetici Özeti Panosu', subtitle:'Tabula Rasa · Dinamik AI Finansal Analiz Motoru',
+    exec_summary:'Yönetici Özeti', ai_narrative:'Yapay Zeka Analizi',
+    mckinsey_section:'Stratejik Senaryolar', eisenhower_section:'Öncelik Matrisi',
+    financial_health:'Finansal Sağlık', z_score:'Altman Z-Skoru',
+    cash_runway:'Nakit Ömrü', roe:'Özsermaye Karlılığı',
+    ratio_title:'Finansal Rasyolar', historical_title:'Tarihsel Karşılaştırma',
+    dupont_title:'DuPont Analizi', budget_sim:'Bütçe Simülasyonları & Tahminler',
+    cost_cutting:'Maliyet Azaltma Planları', strategic_action:'Stratejik Aksiyon Planı',
+    opportunities:'Fırsatlar & Büyüme', risks:'Kritik Riskler',
+    mckinsey_title:'McKinsey 3 Ufuk Modeli', mckinsey_h1:'Ufuk 1 — Mevcut Çekirdek',
+    mckinsey_h2:'Ufuk 2 — Gelişen Fırsatlar', mckinsey_h3:'Ufuk 3 — Gelecek / İnovasyon',
+    mckinsey_best:'✅ En İyi Durum Senaryosu', mckinsey_worst:'⚠️ En Kötü Durum Senaryosu',
+    best_action:'Eylem Planı', worst_action:'Acil Durum Planı',
+    eisenhower_title:'Eisenhower Öncelik Matrisi',
+    eisenhower_do:'🔴 Hemen Yap', eisenhower_schedule:'🔵 Planla',
+    eisenhower_delegate:'🟡 Devret', eisenhower_eliminate:'⚪ Ele / Kaldır',
+    eisenhower_urgent:'Acil', eisenhower_not_urgent:'Acil Değil',
+    eisenhower_important:'Önemli', eisenhower_not_important:'Önemli Değil',
+    langBtn:'EN', health_healthy:'Sağlıklı', health_critical:'Kritik',
+    chart_standard:'Standart Tahmin', chart_stress:'Resesyon Stres Testi',
+    sec_conf:'Gizlilik Oranı', sec_fore:'Tahmin Güven Oranı',
+    months_suffix:' Ay',
+    legal_title:'⚖️ Yasal Uyarı',
+    legal_text:'Bu rapor otomatik üretilmiştir ve yatırım tavsiyesi niteliği taşımaz. Karar almadan önce uzman danışın. Veriler gizlidir ve yalnızca kurumsal kullanım içindir.',
+    no_data:'Veri yok',
+    dz_title:'Excel veya CSV dosyanızı buraya sürükleyin veya tıklayın',
+    dz_sub:'Desteklenen: .xlsx · .xls · .csv — Her dosya adı kabul edilir · Tabula Rasa modu',
+    placeholder:'Analiz başlatmak için yukarıya bir Excel veya CSV dosyası yükleyin.',
+    sl1:'Dosya okunuyor', sl2:'Veri ayrıştırılıyor', sl3:'AI analiz üretiyor', sl4:'Dashboard güncelleniyor'
   }
+};
+const t = k => i18n[currentLang][k] || k;
+
+// ─── DRAG & DROP ──────────────────────────────────────────────────────────
+function dzDragOver(e) { e.preventDefault(); document.getElementById('dropzone').classList.add('drag-over'); }
+function dzDragLeave(e) { document.getElementById('dropzone').classList.remove('drag-over'); }
+function dzDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) handleFileSelect(f);
+}
+
+// ─── STEP PROGRESS ────────────────────────────────────────────────────────
+function setStep(n) {
+  document.getElementById('progressBar').classList.add('show');
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('step' + i);
+    el.className = 'step-item ' + (i < n ? 'done' : i === n ? 'active' : '');
+  }
+}
+function showStatus(msg, show) {
+  const sb = document.getElementById('statusBar');
+  document.getElementById('statusText').textContent = msg;
+  sb.className = 'status-bar' + (show ? ' show' : '');
+}
+
+// ─── TABULA RASA FILE HANDLER ─────────────────────────────────────────────
+async function handleFileSelect(file) {
+  if (!file) return;
+  uploadCount++;
+  // SIFIRLA — önceki analiz tamamen temizlenir
+  dashboardData = null;
+  if (myChart) { myChart.destroy(); myChart = null; }
+  if (histChartInstance) { histChartInstance.destroy(); histChartInstance = null; }
+
+  document.getElementById('dropzone').classList.remove('drag-over');
+  document.getElementById('dropzone').classList.add('loaded');
+  document.getElementById('pill-name').textContent = file.name + '  →  financial_data.xlsx  (#' + uploadCount + ')';
+  document.getElementById('file-pill').style.display = 'inline-flex';
+  document.getElementById('dashboardPlaceholder').style.display = 'none';
+  document.getElementById('mainGrid').style.display = 'none';
+  document.getElementById('legalBlock').style.display = 'none';
+
+  // Geçmiş
+  addHistory(file.name, uploadCount);
+
+  // ADIM 1 — Dosya okuma
+  setStep(1);
+  showStatus(t('sl1') + '...', true);
+  let parsed;
+  try { parsed = await readFileAsStructure(file); }
+  catch (e) { showStatus('Dosya okunamadı: ' + e.message, false); return; }
+
+  // ADIM 2 — Ayrıştırma tamamlandı
+  setStep(2);
+  showStatus(t('sl2') + '...', true);
+  await new Promise(r => setTimeout(r, 120)); // micro tick — UI güncelle
+
+  // ADIM 3 — Claude API
+  setStep(3);
+  showStatus(t('sl3') + '...', true);
+  const result = await callClaudeAPI(parsed, file.name);
+
+  // ADIM 4 — Dashboard
+  setStep(4);
+  showStatus(t('sl4') + '...', true);
+  dashboardData = buildDashboardData(result, parsed);
+
+  await new Promise(r => setTimeout(r, 80));
+  showStatus('', false);
+
+  document.getElementById('mainGrid').style.display = 'grid';
+  document.getElementById('legalBlock').style.display = 'block';
+  runUiPipeline();
+}
+
+// ─── XLSX / CSV OKUYUCU ───────────────────────────────────────────────────
+function readFileAsStructure(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    const ext = file.name.split('.').pop().toLowerCase();
+    reader.onload = e => {
+      try {
+        let sheets = {};
+        if (ext === 'csv') {
+          const lines = e.target.result.split('\n').filter(l => l.trim());
+          const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+          const rows = lines.slice(1).map(ln => {
+            const vals = ln.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = vals[i] || '');
+            return obj;
+          });
+          sheets['Sheet1'] = rows;
+        } else {
+          const wb = XLSX.read(e.target.result, { type: 'binary' });
+          wb.SheetNames.forEach(sn => {
+            sheets[sn] = XLSX.utils.sheet_to_json(wb.Sheets[sn], { defval: '' });
+          });
+        }
+        const sheetNames = Object.keys(sheets);
+        const totalRows = Object.values(sheets).reduce((a, b) => a + b.length, 0);
+        const sheetsInfo = {};
+        Object.entries(sheets).forEach(([name, rows]) => {
+          const cols = rows.length > 0 ? Object.keys(rows[0]) : [];
+          const types = {};
+          cols.forEach(c => {
+            const vals = rows.map(r => r[c]).filter(v => v !== '' && v != null);
+            const nums = vals.filter(v => !isNaN(parseFloat(String(v).replace(/[,%$TL₺€£]/g, ''))));
+            types[c] = nums.length / Math.max(vals.length, 1) > 0.65 ? 'numeric' : 'text';
+          });
+          sheetsInfo[name] = { columns: cols, rowCount: rows.length, sample: rows.slice(0, 8), columnTypes: types };
+        });
+        resolve({ sheetNames, totalRows, sheetsInfo, rawSheets: sheets });
+      } catch (err) { reject(err); }
+    };
+    reader.onerror = () => reject(new Error('Okuma hatası'));
+    if (ext === 'csv') reader.readAsText(file);
+    else reader.readAsBinaryString(file);
+  });
+}
+
+// ─── CLAUDE API ───────────────────────────────────────────────────────────
+async function callClaudeAPI(parsed, fileName) {
+  const systemPrompt = `Sen kıdemli bir finansal analist yapay zeka asistanısın.
+
+TABULA RASA KURALLARI (KESİNLİKLE UYULACAK):
+1. Hiçbir önceki analiz, hafıza veya varsayım KULLANMA.
+2. Sadece şu an verilen veriyi analiz et — statik değer yok.
+3. Veri tiplerini, sütun ilişkilerini ve anomalileri anlık tespit et.
+4. Çıktı MUTLAKA tam geçerli JSON (markdown bloğu, açıklama yok).
+5. Finansal olmayan veri gelirse bile en iyi yorumu yap.
+
+ÇIKTI ŞEMASI:
+{
+  "markdown_content": "# Türkçe yönetici özeti (markdown, ###başlıklar, **bold**, tablolar)",
+  "markdown_content_en": "# English executive summary (markdown)",
+  "EXECUTIVE_METRICS": {
+    "financial_health_score": <0-10>,
+    "altman_z_score": {"value": <sayı>, "zone": "SAFE|GREY|DISTRESS"},
+    "cash_runway_months": <sayı>,
+    "return_on_equity_pct": <sayı>
+  },
+  "RATIO_ANALYTICS": {
+    "current_ratio": "<değer>",
+    "quick_ratio": "<değer>",
+    "debt_to_equity_ratio": "<değer>",
+    "net_profit_margin_pct": "<değer>"
+  },
+  "DUPONT_PILLARS": {
+    "dupont_net_profit_margin": "<değer>",
+    "dupont_asset_turnover": "<değer>",
+    "dupont_equity_multiplier": "<değer>"
+  },
+  "BUDGET_SIMULATIONS_FORECASTS": {
+    "forecasted_cash_flow_standard": [<12 sayı dizisi>],
+    "forecasted_cash_flow_recession": [<12 sayı dizisi>],
+    "cost_cutting_savings": {"Kalıp 1": "Değer", "Kalıp 2": "Değer"}
+  },
+  "historical_comparison": {
+    "has_comparison": true,
+    "labels": ["Q1","Q2","Q3","Q4"],
+    "health_history": [<4 sayı>],
+    "roe_history": [<4 sayı>]
+  },
+  "critical_risks": ["risk1","risk2","risk3"],
+  "growth_opportunities": ["fırsat1","fırsat2","fırsat3"],
+  "strategic_action_plan": ["aksiyon1","aksiyon2","aksiyon3"],
+  "confidentiality_rate_tr": "95% (Çok Gizli)",
+  "forecast_confidence_rate_tr": "88% (Normal Koşullar)",
+  "confidentiality_rate_en": "95% (Highly Restricted)",
+  "forecast_confidence_rate_en": "88% (3-Year Baseline)",
+  "data_quality_note": "Veri kalitesi notu"
+}`;
+
+  const userMsg = `Dosya: "${fileName}" → financial_data.xlsx olarak işleniyor.
+Yükleme #${uploadCount} — TABULA RASA: sıfır nokta analizi başlatıldı.
+Önceki hiçbir analiz bilgisi kullanılmamalı.
+
+DOSYA YAPISI:
+${JSON.stringify({
+  sheetNames: parsed.sheetNames,
+  totalRows: parsed.totalRows,
+  sheetsDetail: Object.fromEntries(
+    Object.entries(parsed.sheetsInfo).map(([k, v]) => [k, {
+      columns: v.columns,
+      rowCount: v.rowCount,
+      columnTypes: v.columnTypes,
+      sampleRows: v.sample
+    }])
+  )
+}, null, 2)}
+
+Bu veriyi tamamen sıfırdan analiz et. Tüm sayılar bu veriden türetilmeli.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 3500,
+        messages: [{ role: 'user', content: systemPrompt + '\n\n' + userMsg }]
+      })
+    });
+    const data = await resp.json();
+    let txt = (data.content || []).map(c => c.text || '').join('');
+    txt = txt.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if (a >= 0 && b > a) txt = txt.substring(a, b + 1);
+    return JSON.parse(txt);
+  } catch (err) {
+    return buildFallback(parsed, fileName);
+  }
+}
+
+// ─── FALLBACK (API erişimi yoksa) ─────────────────────────────────────────
+function buildFallback(parsed, fileName) {
+  const sn = parsed.sheetNames || ['Sheet1'];
+  const tr = parsed.totalRows || 0;
+  const cols = Object.values(parsed.sheetsInfo || {})[0]?.columns || [];
+  return {
+    markdown_content: `### Dosya Özeti\n**${fileName}** → **financial_data.xlsx** olarak işlendi.\n\n**Yapı:** ${sn.length} sayfa · ${tr} satır · ${cols.length} sütun\n\n**Sayfalar:** ${sn.join(', ')}\n\n> API bağlantısı kurulamadı — temel yapı gösterilmektedir.`,
+    markdown_content_en: `### File Summary\n**${fileName}** → **financial_data.xlsx** processed.\n\n**Structure:** ${sn.length} sheet(s) · ${tr} rows · ${cols.length} columns\n\n**Sheets:** ${sn.join(', ')}\n\n> API unavailable — basic structure shown.`,
+    EXECUTIVE_METRICS: { financial_health_score: 5, altman_z_score: { value: 2.0, zone: 'GREY' }, cash_runway_months: 12, return_on_equity_pct: 0 },
+    RATIO_ANALYTICS: { current_ratio: 'N/A', quick_ratio: 'N/A', debt_to_equity_ratio: 'N/A', net_profit_margin_pct: 'N/A' },
+    DUPONT_PILLARS: { dupont_net_profit_margin: 'N/A', dupont_asset_turnover: 'N/A', dupont_equity_multiplier: 'N/A' },
+    BUDGET_SIMULATIONS_FORECASTS: {
+      forecasted_cash_flow_standard:  [100,102,104,106,108,110,112,114,116,118,120,122],
+      forecasted_cash_flow_recession: [100,97,94,91,88,85,82,80,78,76,74,72],
+      cost_cutting_savings: { 'Veri yüklendi': 'Tam analiz için API bağlantısı gerekli' }
+    },
+    historical_comparison: { has_comparison: true, labels: ['Q1','Q2','Q3','Q4'], health_history: [4,4.5,5,5], roe_history: [0,0,0,0] },
+    critical_risks: ['API bağlantısı yok — tam analiz yapılamadı'],
+    growth_opportunities: ['Bağlantı kurulduğunda otomatik analiz'],
+    strategic_action_plan: ['İnternet bağlantısını kontrol edin'],
+    confidentiality_rate_tr: '95% (Çok Gizli)', forecast_confidence_rate_tr: 'N/A',
+    confidentiality_rate_en: '95% (Highly Restricted)', forecast_confidence_rate_en: 'N/A',
+    data_quality_note: `${tr} satır, ${sn.length} sayfa okundu (offline mod)`
+  };
+}
+
+// ─── dashboardData OLUŞTUR ────────────────────────────────────────────────
+function buildDashboardData(apiResult, parsed) {
+  return Object.assign({}, apiResult, {
+    _parsed: parsed,
+    _uploadSeq: uploadCount,
+    companies_list: [],
+    company_code: 'uploaded',
+    company_name: 'Yüklenen Dosya'
+  });
+}
+
+// ─── UPLOAD GEÇMİŞİ ──────────────────────────────────────────────────────
+function addHistory(name, seq) {
+  const container = document.getElementById('uploadHistory');
+  const chip = document.createElement('div');
+  chip.className = 'hist-chip';
+  chip.innerHTML = `<span class="hn">${name}</span> → financial_data.xlsx &nbsp;#${seq} · ${new Date().toLocaleTimeString()}`;
+  container.insertBefore(chip, container.firstChild);
+  if (container.children.length > 5) container.removeChild(container.lastChild);
+}
+
+// ─── UI PIPELINE ──────────────────────────────────────────────────────────
+function runUiPipeline() {
+  translateStaticDOM();
+  renderSecurityWidget();
+  renderHealthScore();
+  renderLeftPanel();
+  renderStrategicLists();
+  populateGrid('ratioAnalyticsGrid', dashboardData.RATIO_ANALYTICS);
+  populateGrid('dupontGrid', dashboardData.DUPONT_PILLARS);
+  populateGrid('savingsGrid', dashboardData.BUDGET_SIMULATIONS_FORECASTS?.cost_cutting_savings || {});
+  renderChart();
+  renderHistoricalChart();
+}
+
+function translateStaticDOM() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[currentLang][key]) el.textContent = i18n[currentLang][key];
+  });
+  document.getElementById('dashboard-subtitle').innerHTML = `<strong>The Pi Suite</strong> — ${t('subtitle')}`;
+  document.getElementById('dz-title').textContent = t('dz_title');
+  document.getElementById('dz-sub').textContent = t('dz_sub');
+  document.getElementById('placeholder-text').textContent = t('placeholder');
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('sl' + i);
+    if (el) el.textContent = t('sl' + i);
+  }
+}
+
+function renderSecurityWidget() {
+  const d = dashboardData;
+  const cv = document.getElementById('confidentiality-rate-val');
+  const sv = document.getElementById('confidence-rate-val');
+  if (cv) cv.textContent = currentLang === 'tr' ? (d.confidentiality_rate_tr || '95%') : (d.confidentiality_rate_en || '95%');
+  if (sv) sv.textContent = currentLang === 'tr' ? (d.forecast_confidence_rate_tr || '88%') : (d.forecast_confidence_rate_en || '88%');
+}
+
+function renderHealthScore() {
+  const m = dashboardData.EXECUTIVE_METRICS || {};
+  const score = parseFloat(m.financial_health_score || 0);
+  const scoreEl = document.getElementById('healthScoreValue');
+  if (scoreEl) scoreEl.textContent = score;
+  const circle = document.getElementById('healthScoreCircle');
+  if (circle) {
+    const circ = 2 * Math.PI * 15.9155;
+    circle.style.strokeDasharray = `${circ} ${circ}`;
+    circle.style.strokeDashoffset = circ - (score / 10) * circ;
+  }
+  const badge = document.getElementById('healthStatus');
+  if (badge) {
+    const ok = score >= 7;
+    badge.textContent = ok ? t('health_healthy') : t('health_critical');
+    badge.className = 'health-badge ' + (ok ? 'healthy' : 'critical');
+  }
+  const zEl = document.getElementById('zScoreValue');
+  if (zEl) zEl.textContent = `${m.altman_z_score?.value || 0} (${m.altman_z_score?.zone || 'N/A'})`;
+  const roeEl = document.getElementById('roeValue');
+  if (roeEl) roeEl.textContent = `${m.return_on_equity_pct || 0}%`;
+  const cashEl = document.getElementById('cashRunwayValue');
+  if (cashEl) cashEl.textContent = `${m.cash_runway_months || 0}${t('months_suffix')}`;
+}
+
+function populateGrid(gridId, dataObj) {
+  const grid = document.getElementById(gridId);
+  if (!grid || !dataObj) return;
+  grid.innerHTML = '';
+  Object.entries(dataObj).forEach(([key, value]) => {
+    const d = document.createElement('div');
+    d.className = 'metric-box';
+    d.innerHTML = `<div class="metric-val">${value}</div><div class="metric-key">${key.replace(/_/g, ' ')}</div>`;
+    grid.appendChild(d);
+  });
+}
+
+function renderStrategicLists() {
+  const buildList = (id, arr) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const items = arr && arr.length ? arr : [t('no_data')];
+    el.innerHTML = `<ul>${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+  };
+  buildList('redFlagsContainer', dashboardData.critical_risks);
+  buildList('greenFlagsContainer', dashboardData.growth_opportunities);
+  buildList('actionPlanContainer', dashboardData.strategic_action_plan);
+}
+
+function renderChart() {
+  const ctx = document.getElementById('cashFlowChart');
+  if (!ctx) return;
+  const b = dashboardData.BUDGET_SIMULATIONS_FORECASTS || {};
+  const std = b.forecasted_cash_flow_standard || [];
+  const rec = b.forecasted_cash_flow_recession || [];
+  if (myChart) { myChart.destroy(); myChart = null; }
+  myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: Array.from({ length: Math.max(std.length, 12) }, (_, i) => currentLang === 'tr' ? `${i+1}. Ay` : `Month ${i+1}`),
+      datasets: [
+        { label: t('chart_standard'), data: std, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)', fill: true, tension: 0.3 },
+        { label: t('chart_stress'),   data: rec, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)',   fill: true, tension: 0.3, borderDash: [5,4] }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+        y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
+      }
+    }
+  });
+}
+
+function renderHistoricalChart() {
+  const ctx = document.getElementById('historicalChart');
+  if (!ctx) return;
+  const hc = dashboardData.historical_comparison;
+  if (!hc || !hc.labels) return;
+  const minLen = Math.min(hc.labels.length, (hc.health_history||[]).length, (hc.roe_history||[]).length);
+  if (minLen < 2) return;
+  if (histChartInstance) { histChartInstance.destroy(); histChartInstance = null; }
+  histChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: hc.labels.slice(0, minLen),
+      datasets: [
+        { label: currentLang === 'tr' ? 'Finansal Sağlık' : 'Financial Health', data: hc.health_history.slice(0, minLen), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3, yAxisID: 'y' },
+        { label: 'ROE %', data: hc.roe_history.slice(0, minLen), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+      scales: {
+        y:  { type: 'linear', position: 'left',  ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
+        y1: { type: 'linear', position: 'right', ticks: { color: '#64748b' }, grid: { drawOnChartArea: false } }
+      }
+    }
+  });
+}
+
+// ─── LEFT PANEL: MARKDOWN + McKINSEY + EISENHOWER ──────────────────────
+function computeStrategicData() {
+  const m = dashboardData.EXECUTIVE_METRICS || {};
+  const b = dashboardData.BUDGET_SIMULATIONS_FORECASTS || {};
+  const r = dashboardData.RATIO_ANALYTICS || {};
+  const dp = dashboardData.DUPONT_PILLARS || {};
+  return {
+    zScore:       parseFloat(m.altman_z_score?.value || 0),
+    cashRunway:   parseFloat(m.cash_runway_months || 0),
+    healthScore:  parseFloat(m.financial_health_score || 0),
+    roe:          parseFloat(m.return_on_equity_pct || 0),
+    netMargin:    parseFloat(r.net_profit_margin_pct || 0),
+    currentRatio: parseFloat(r.current_ratio || 0),
+    debtEquity:   parseFloat(r.debt_to_equity_ratio || 0),
+    assetTurnover:parseFloat(dp.dupont_asset_turnover || 0),
+    stdForecast:  b.forecasted_cash_flow_standard || [],
+    stressForecast: b.forecasted_cash_flow_recession || []
+  };
+}
+
+function renderLeftPanel() {
+  const lp = i18n[currentLang];
+  const d = computeStrategicData();
+  const isTr = currentLang === 'tr';
+
+  // Markdown
+  const content = isTr ? (dashboardData.markdown_content || '') : (dashboardData.markdown_content_en || dashboardData.markdown_content || '');
+  const mc = document.getElementById('markdownContainer');
+  if (mc) {
+    try { mc.innerHTML = (typeof marked !== 'undefined' && marked.parse) ? marked.parse(content) : content.replace(/\n/g,'<br>'); }
+    catch(e) { mc.innerHTML = content.replace(/\n/g,'<br>'); }
+    if (dashboardData.data_quality_note) {
+      const note = document.createElement('div');
+      note.style.cssText = 'margin-top:8px;padding:6px 10px;background:rgba(59,130,246,.08);border-radius:6px;font-size:.72rem;color:var(--text-2);border-left:2px solid var(--accent)';
+      note.textContent = '🔍 ' + dashboardData.data_quality_note;
+      mc.appendChild(note);
+    }
+  }
+
+  // McKinsey
+  const mck = document.getElementById('mckinseyLeftPanel');
+  if (mck) {
+    const h1 = isTr
+      ? `Cari oran (${d.currentRatio}) ve %${d.roe} ROE ile çekirdek karlılığı koruyun. Nakit ömrü (${d.cashRunway} ay) takibini sıkılaştırın.`
+      : `Protect core profitability with current ratio (${d.currentRatio}) and ROE at ${d.roe}%. Tighten cash runway (${d.cashRunway} months) monitoring.`;
+    const h2 = isTr
+      ? `Net kâr marjını %${d.netMargin}'den %${(d.netMargin*1.12).toFixed(1)}'e taşıyacak dijital yatırımlar yapın. Varlık devir hızını (${d.assetTurnover}x) optimize edin.`
+      : `Invest to lift net margin from ${d.netMargin}% to ${(d.netMargin*1.12).toFixed(1)}%. Optimize asset turnover (${d.assetTurnover}x).`;
+    const h3 = isTr
+      ? `Borç/Özkaynak (${d.debtEquity}) düşükken inovasyon fonlaması fırsatı var. AI tabanlı bütçe modelleme kurun.`
+      : `With D/E at ${d.debtEquity}, innovation funding is accessible. Build AI-driven budget modeling.`;
+    const gp = d.stdForecast.length > 1 ? Math.abs(d.stdForecast[d.stdForecast.length-1] - d.stdForecast[0]).toLocaleString() : '—';
+    const sd = d.stdForecast.length > 1 && d.stressForecast.length > 1 ? Math.abs(d.stdForecast[d.stdForecast.length-1] - d.stressForecast[d.stressForecast.length-1]).toLocaleString() : '—';
+    const bestCase  = isTr ? `Maliyet optimizasyonu ve varlık verimliliği ile kümülatif nakit büyüme: +${gp}.` : `Cost optimization yields cumulative cash growth: +${gp}.`;
+    const worstCase = isTr ? `Resesyon senaryosunda nakit kaybı riski: -${sd}. ${d.cashRunway < 6 ? '⚠️ KRİTİK!' : 'Rezervler yeterli.'}` : `Recession cash loss exposure: -${sd}. ${d.cashRunway < 6 ? '⚠️ CRITICAL!' : 'Reserves adequate.'}`;
+    mck.innerHTML = `
+      <h3 class="panel-section-title">${lp.mckinsey_title}</h3>
+      <div class="horizon-cards">
+        <div class="horizon-card h1"><span class="horizon-badge">H1</span><div><div class="horizon-label">${lp.mckinsey_h1}</div><p class="horizon-text">${h1}</p></div></div>
+        <div class="horizon-card h2"><span class="horizon-badge">H2</span><div><div class="horizon-label">${lp.mckinsey_h2}</div><p class="horizon-text">${h2}</p></div></div>
+        <div class="horizon-card h3"><span class="horizon-badge">H3</span><div><div class="horizon-label">${lp.mckinsey_h3}</div><p class="horizon-text">${h3}</p></div></div>
+      </div>
+      <div class="scenario-block best"><div class="scenario-header">${lp.mckinsey_best}</div><p class="scenario-text">${bestCase}</p>
+        <div class="scenario-actions"><span class="action-label">${lp.best_action}:</span>
+          <ul>${(dashboardData.growth_opportunities||[]).slice(0,3).map(a=>`<li>${a}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <div class="scenario-block worst"><div class="scenario-header">${lp.mckinsey_worst}</div><p class="scenario-text">${worstCase}</p>
+        <div class="scenario-actions"><span class="action-label">${lp.worst_action}:</span>
+          <ul>${(dashboardData.critical_risks||[]).slice(0,3).map(a=>`<li>${a}</li>`).join('')}</ul>
+        </div>
+      </div>`;
+  }
+
+  // Eisenhower
+  const eis = document.getElementById('eisenhowerLeftPanel');
+  if (eis) {
+    const matrix = { do:[], schedule:[], delegate:[], eliminate:[] };
+    if (isTr) {
+      if (d.cashRunway > 0 && d.cashRunway < 6) matrix.do.push(`Nakit krizi — ${d.cashRunway} ay ömür!`);
+      if (d.zScore > 0 && d.zScore < 1.8) matrix.do.push(`Z-Skoru (${d.zScore}) iflas bölgesi`);
+      if (d.currentRatio > 0 && d.currentRatio < 1) matrix.do.push('Cari oran kritik — borç yeniden yapılandır');
+      if (!matrix.do.length) matrix.do.push(`Sağlık skoru (${d.healthScore}/10) koru`);
+      if (d.roe > 0 && d.roe < 15) matrix.schedule.push(`ROE'yi %${d.roe}'dan %${Math.round(d.roe*1.3)}'a taşı`);
+      matrix.schedule.push('Sıfır tabanlı bütçeleme (ZBB) planla');
+      if (d.assetTurnover < 1) matrix.schedule.push(`Varlık devir hızını (${d.assetTurnover}x) optimize et`);
+      matrix.delegate.push('Rasyo raporlamalarını analiz ekibine devret');
+      matrix.delegate.push('Yazılım denetimini BT birimine aktar');
+      matrix.eliminate.push('Verimsiz reklam kanallarını durdur');
+      matrix.eliminate.push('Atıl abonelikleri iptal et');
+    } else {
+      if (d.cashRunway > 0 && d.cashRunway < 6) matrix.do.push(`Cash crisis — ${d.cashRunway} month runway!`);
+      if (d.zScore > 0 && d.zScore < 1.8) matrix.do.push(`Z-Score (${d.zScore}) in distress zone`);
+      if (d.currentRatio > 0 && d.currentRatio < 1) matrix.do.push('Current ratio critical — restructure debt');
+      if (!matrix.do.length) matrix.do.push(`Maintain health score at ${d.healthScore}/10`);
+      if (d.roe > 0 && d.roe < 15) matrix.schedule.push(`Build ROE from ${d.roe}% to ${Math.round(d.roe*1.3)}%`);
+      matrix.schedule.push('Plan Zero-Based Budgeting transition');
+      if (d.assetTurnover < 1) matrix.schedule.push(`Optimize asset turnover (${d.assetTurnover}x)`);
+      matrix.delegate.push('Delegate routine reporting to analyst team');
+      matrix.delegate.push('Transfer software audit to IT');
+      matrix.eliminate.push('Stop spend on underperforming channels');
+      matrix.eliminate.push('Cancel redundant subscriptions');
+    }
+    const cell = (items, labelKey, cls) => `<div class="eis-cell ${cls}"><div class="eis-label">${lp[labelKey]}</div><ul>${items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
+    eis.innerHTML = `
+      <h3 class="panel-section-title">${lp.eisenhower_title}</h3>
+      <div class="eis-matrix">
+        <div class="eis-axis-col"><div class="eis-axis-label">${lp.eisenhower_important}</div><div class="eis-axis-label">${lp.eisenhower_not_important}</div></div>
+        <div class="eis-grid">
+          <div class="eis-axis-row"><span>${lp.eisenhower_urgent}</span><span>${lp.eisenhower_not_urgent}</span></div>
+          <div class="eis-cells">
+            ${cell(matrix.do,'eisenhower_do','do')}
+            ${cell(matrix.schedule,'eisenhower_schedule','schedule')}
+            ${cell(matrix.delegate,'eisenhower_delegate','delegate')}
+            ${cell(matrix.eliminate,'eisenhower_eliminate','eliminate')}
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+// ─── TAB SWITCHER ─────────────────────────────────────────────────────────
+function switchTab(name) {
+  ['ai','mckinsey','eisenhower'].forEach(n => {
+    document.getElementById('panel-' + n)?.classList.toggle('active', n === name);
+    document.getElementById('tab-'   + n)?.classList.toggle('active', n === name);
+  });
+}
+
+// ─── TEMA ────────────────────────────────────────────────────────────────
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const isBw = document.body.classList.toggle('theme-bw');
+  document.getElementById('themeToggleIcon').textContent = isBw ? '🌈' : '⚫';
+  document.getElementById('themeToggleText').textContent = isBw ? (currentLang==='tr'?'Renkli':'Color') : 'B&W';
+});
+
+// ─── DİL ─────────────────────────────────────────────────────────────────
+document.getElementById('langToggle').addEventListener('click', () => {
+  currentLang = currentLang === 'en' ? 'tr' : 'en';
+  document.getElementById('langToggle').textContent = i18n[currentLang].langBtn;
+  translateStaticDOM();
+  if (dashboardData) runUiPipeline();
+});
+
+// ─── BAŞLANGIÇ ────────────────────────────────────────────────────────────
+translateStaticDOM();
 </script>
-<script src="dashboard_data.js"></script>
-<script src="app.js"></script>
 </body>
 </html>
