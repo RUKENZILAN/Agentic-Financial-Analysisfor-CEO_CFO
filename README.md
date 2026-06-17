@@ -1,122 +1,89 @@
-**The Pi Suite Financial Dashboard & Multi-Agent System**
-<img width="706" height="561" alt="LAng selection" src="https://github.com/user-attachments/assets/9c714412-fff0-4de5-b53a-ccb837663583" />
-<img width="1315" height="874" alt="Screenshot_1" src="https://github.com/user-attachments/assets/76b0c24e-691b-42b5-b105-38c32db3f790" />
-<img width="1337" height="855" alt="Screenshot_2" src="https://github.com/user-attachments/assets/a0ee625f-ebf0-4be8-87f4-a140d34742bc" />
-<img width="1279" height="924" alt="Screenshot_3" src="https://github.com/user-attachments/assets/03f3c783-8ae4-4d99-ba2c-038cbc27911b" />
-<img width="1504" height="888" alt="pdf" src="https://github.com/user-attachments/assets/9938dd43-8909-4f6a-b461-e902aca41374" />
+** What's New?** 
+The major update that transforms our application into a completely standalone, smarter, and dynamic ecosystem is now live! With this release, we have streamlined the architecture and fully automated the data analysis workflows from end to end.
+
+ 1. Fully Standalone Single-File Architecture
+What Changed?: index.html is now completely self-sufficient.
+
+The Details: External dependencies like dashboard_data.js and app.js have been removed. All scripts and styles are now bundled inside a single HTML file. Simply double-clicking the file to open it in any browser is now enough to run the entire app!
+
+ 2. Advanced Dynamic "Upload Zone"
+Broad Format Support: You can now drag-and-drop or click to upload .xlsx, .xls, and .csv files directly.
+
+Smart Labeling: Regardless of the original filename, the uploaded file is automatically processed as financial_data.xlsx under the hood and displayed as a visual "pill" badge in the UI.
+
+History Tracking: The last 5 uploads are tracked and displayed at the top as a mini-history timeline.
+
+ 3. 4-Step Visual Progress Bar
+Data loading and processing steps are now completely transparent. The workflow can be tracked in real-time via a color-coded progress bar across 4 distinct steps:
+
+Reading file 2.  Parsing data 3.  AI generating analysis 4.  Updating dashboard
+
+ 4. Embedded "Tabula Rasa" Analysis Engine
+To prevent legacy data from polluting new insights, we have integrated an intelligent reset mechanism for every new upload:
+
+The moment a new file is uploaded, dashboardData is wiped clean (null).
+
+Both existing charts are entirely wiped from memory (destroy()).
+
+The upload counter (uploadCount) increments, triggering a prompt to the Claude API: "Upload #N — TABULA RASA: ground zero analysis" to initiate a fresh, clean-slate evaluation.
+
+Offline Resilience: If there is no API connection, an "Offline Fallback" mechanism seamlessly kicks in to ensure uninterrupted operation.
+
+ 5. All Core Dashboard Features Preserved!
+The new dynamic upload architecture seamlessly feeds into the app's existing robust feature set. The following features now run flawlessly, powered directly by your newly uploaded live data:
+
+Left Panel: AI Analysis, McKinsey 3 Horizons Model, and the Eisenhower Matrix.
+
+Visual Components: KPI rings, Cash Flow charts, and Financial Ratios.
+
+Financial Tools: DuPont Analysis and Historical Comparison tables.
+
+Actionable Insights: Risk, Opportunity, and Action flags.
+
+Utility Features: TR/EN language toggle, Black & White (B&W) theme support, and the PDF export button.
 
 
-**🇬🇧 English Version**
-This repository contains a Multi-Agent Financial AI System architecture designed to standardize, analyze, and visualize corporate financial data.
+**TR**
+**Neler Yeni? (What's New)**
+Uygulamamızı tamamen bağımsız, daha akıllı ve dinamik bir yapıya kavuşturan büyük güncelleme yayında! Bu sürümle birlikte hem altyapıyı sadeleştirdik hem de veri analiz süreçlerini baştan sona otomatikleştirdik.
 
-Led by the CEO Agent as the central orchestrator, the system delegates tasks to specialized sub-agents and compiles the findings into a strategic Executive Summary. With the latest update, the system supports both local LLMs and prominent cloud AI engines with dynamic English/Turkish language support.
+ 1. Tam Bağımsız Tek Dosya Mimarisi (Standalone)
+Ne Değişti?: index.html artık tamamen kendi kendine yeten bağımsız bir yapıya sahip.
 
-**What's New in the Latest Update?**
-Multi-Engine AI Support: You are no longer restricted to local Ollama. You can now use Google Gemini or Anthropic Claude cloud APIs.
+Detay: dashboard_data.js ve app.js gibi dış dosyalar bağımlılık olmaktan çıkarıldı. Tüm scriptler ve stiller tek bir HTML dosyasında birleştirildi. Dosyayı çift tıklayıp tarayıcıda açmanız artık tüm uygulamayı çalıştırmak için yeterli!
 
-Interactive Setup CLI: On the first execution, an interactive menu guides you to configure your language, AI engine, URLs, custom models, and API keys.
+ 2. Gelişmiş Dinamik "Upload Zone"
+Geniş Format Desteği: Sürükle-bırak veya tıklama yöntemiyle .xlsx, .xls ve .csv formatındaki dosyalar doğrudan yüklenebiliyor.
 
-Persistent Configuration: All choices are safely stored in ai_config.json so you only configure the system once.
+Akıllı Etiketleme: Yüklenen dosyanın adı ne olursa olsun arka planda otomatik olarak financial_data.xlsx etiketiyle işleniyor ve bir görsel "pill" (hap buton) olarak arayüzde gösteriliyor.
 
-Architecture Refactor (CORS Fix): The frontend no longer makes direct API calls to Anthropic to avoid browser CORS blocks. The CEO Agent now generates the AI Analysis report in both Turkish and English simultaneously on the backend and streams it straight to the UI cache.
+Geçmiş Takibi: Son yapılan 5 yükleme, üst panelde mini bir tarih şeridi (timeline) olarak listeleniyor.
 
-UI Optimization: The redundant company select dropdown has been removed from the header for a cleaner, unified dashboard experience.
+ 3. 4 Adımlı Görsel İlerleme Süreci (Progress Bar)
+Veri yükleme ve işleme adımları artık tamamen şeffaf. Süreç şu 4 adımda, renk kodlu bir ilerleme çubuğuyla canlı olarak takip edilebiliyor:
 
-Bug Fixes: Resolved the critical AttributeError: 'HistoricalComparison' object has no attribute 'get_history_for_chart' bug by streamlining it with the correct backend method get_timeline().
+Dosya okunuyor 2.  Veri ayrıştırılıyor 3.  AI analiz üretiyor 4.  Dashboard güncelleniyor
 
-**Step-by-Step User Guide**
-Step 1: Preparing the Excel File (financial_data.xlsx)
-For sub-agents to correctly parse the data and calculate financial ratios (Liquidity, Solvency, DuPont, etc.), your Excel file must follow these criteria:
+ 4. "Tabula Rasa" Analiz Motoru
+Her yeni veri yüklemesinde eski verilerin analizi kirletmesini önleyen akıllı bir sıfırlama mekanizması entegre edildi:
 
-File Name: Must be named exactly financial_data.xlsx.
+Yeni dosya yüklendiği an dashboardData sıfırlanıyor (null).
 
-Content: Should contain corporate financial records such as the Trial Balance, Balance Sheet, and Income Statement.
+Mevcut iki grafik de tamamen bellekten uçuruluyor (destroy()).
 
-Location: Place this file directly inside the root project folder, alongside ceo_agent.py and the application binary.
+Yükleme sayacı (uploadCount) tetikleniyor ve Claude API'ye "Yükleme #N — TABULA RASA: sıfır nokta analizi" prompt'u gönderilerek temiz bir analiz başlatılıyor.
 
-Step 2: Running the System & AI Engine Configuration
-Navigate to your project root folder via terminal and trigger the main application:
+Çevrimdışı Güvence: API bağlantısı olmadığı senaryolarda "Offline Fallback" (çevrimdışı yedek mekanizma) devreye girerek kesintisiz çalışma sağlıyor.
 
-Bash
-# For Python environment:
-python ceo_agent.py
+ 5. Mevcut Güçlü Altyapı Aynen Korundu!
+Yeni dinamik yükleme mimarisi, uygulamanın sevilen hiçbir özelliğine zarar vermedi. Artık yüklediğiniz canlı verilerle şu özelliklerin tamamı kusursuz çalışıyor:
 
-# For compiled binary:
-./run_dashboard_exe
-First-Run Interactive Configuration Workflow:
-Language Selection: Choose between [1] Türkçe or [2] English for the CLI menu.
+Sol Panel: Yapay Zeka Analizi, McKinsey 3 Horizons Modeli ve Eisenhower Matrisi.
 
-**Engine Selection: Choose your preferred AI brain:**
-[1] Ollama: Enters a sub-menu asking for your Ollama URL (Default: http://localhost:11434) and dynamically fetches your locally installed models (e.g., llama3, mistral, gemma) using the local tags endpoint.
+Görsel Bileşenler: KPI halkaları (Ring Charts), Nakit Akışı grafiği ve Rasyolar.
 
-[2] Google Gemini: Asks for your Gemini API Key and lets you choose models like gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash, etc.
+Finansal Araçlar: DuPont Analizi ve Tarihsel Karşılaştırma tabloları.
 
-[3] Anthropic Claude: Asks for your Claude API Key and lets you choose models like claude-sonnet-4-6, claude-opus-4-6, etc.
+Yönlendirmeler: Risk, Fırsat ve Aksiyon bayrakları (flags).
 
-Automatic Execution: Your selections are saved to ai_config.json. The next time you run the application, it will bypass the configuration screens and boot up instantly.
-
-Step 3: Viewing the Dashboard
-Once the AI pipeline finishes its heavy lifting, it updates dashboard_data.js and automatically launches your default web browser to display index.html.
-
-Toggle between TR/EN seamlessly in the top right corner. The "AI Analysis" tab will now instantaneous switch translation on the fly without any layout delays or API errors!
-
-**⚖️ Legal Disclaimer
-**IMPORTANT NOTE: All reports, financial ratios, forecasting scenarios, and executive summaries generated by this software are automatically synthesized by Artificial Intelligence models. None of the data, evaluations, or narratives constitute professional investment, financial, tax, or legal advice. LLMs may exhibit hallucinations. Users are strictly advised to verify all automated findings with a certified Public Accountant or licensed Financial Advisor before executing corporate actions.
-
-🇹🇷 Türkçe Versiyon
-Bu depo, kurumsal finansal verileri standartlaştırmak, analiz etmek ve görselleştirmek için tasarlanmış Çoklu Ajanlı (Multi-Agent) Finansal Yapay Zeka Sistemi mimarisini içerir.
-
-Merkezi orkestratör olan CEO Agent liderliğindeki sistem, görevleri uzman alt ajanlara devreder ve bulguları stratejik bir Yönetici Özeti halinde derler. Son güncellemeyle birlikte sistem, dinamik Türkçe/İngilizce dil desteğinin yanı sıra hem yerel LLM'leri hem de popüler bulut yapay zeka motorlarını destekler hale getirilmiştir.
-
-**Son Güncellemede Neler Değişti?** 
-Çoklu Yapay Zeka Motoru Desteği: Yalnızca yerel Ollama modeline bağlı kalma zorunluluğu ortadan kalktı. Artık Google Gemini ve Anthropic Claude bulut API'lerini de kullanabilirsiniz.
-
-İnteraktif Kurulum Sihirbazı (CLI): Uygulama ilk kez çalıştırıldığında; dil tercihinizi, kullanmak istediğiniz yapay zeka motorunu, bağlantı adreslerini ve API anahtarlarınızı adım adım sorarak yapılandırır.
-
-Kalıcı Konfigürasyon: Seçimleriniz ai_config.json dosyasına güvenli bir şekilde kaydedilir. Böylece ayarları yalnızca bir kez yapmanız yeterli olur.
-
-Mimari Revizyon (CORS Çözümü): Tarayıcı tabanlı CORS engellemelerini aşmak için frontend üzerindeki Anthropic API çağrıları tamamen kaldırıldı. CEO Agent artık hem Türkçe hem de İngilizce raporları arka planda (backend) eşzamanlı olarak üretip dashboard_data.js önbelleğine yazar. Dil geçişleri anlık ve hatasız gerçekleşir.
-
-Arayüz Temizliği: Üst menüde yer alan ve işlevsiz kalan "Company Select" (Şirket Seçim) açılır menüsü daha temiz bir dashboard deneyimi için tamamen kaldırıldı.
-
-Kod Optimizasyonu ve Bug Çözümü: Derleme esnasında karşılaşılan AttributeError: 'HistoricalComparison' object has no attribute 'get_history_for_chart' hatası, ceo_agent.py içindeki eski metodun güncel backend fonksiyonu olan get_timeline() ile senkronize edilmesiyle tamamen düzeltildi.
-
-**Adım Adım Kullanım Kılavuzu**
-1. Adım: Excel Dosyasının (financial_data.xlsx) Hazırlanması
-Yapay zeka ajanlarının finansal rasyoları (Likitide, Kaldıraç, DuPont vb.) hatasız hesaplayabilmesi için Excel dosyanızın şu standartlara uygun olması gerekir:
-
-Dosya Adı: Klasörün içindeki Excel dosyasının adı tam olarak financial_data.xlsx olmalıdır.
-
-İçerik: Dosya içerisinde firmanıza ait güncel Mizan, Bilanço ve Gelir Tablosu hesapları yer almalıdır.
-
-Konum: Bu Excel dosyasını ceo_agent.py veya derlenmiş binary uygulamanızın olduğu ana proje klasörüne bırakın.
-
-2. Adım: Sistemin Çalıştırılması ve AI Motoru Seçimi
-Terminalinizden projenin bulunduğu klasör dizinine geçiş yapın ve ana uygulamayı tetikleyin:
-
-Bash
-# Python ortamında çalıştırmak için:
-python ceo_agent.py
-
-# Derlenmiş .exe / binary çalıştırmak için:
-./run_dashboard_exe
-İlk Çalıştırma İnteraktif Seçim Akışı:
-Dil Seçimi: Konsol arayüzünü hangi dilde kullanmak istediğinizi seçin: [1] Türkçe / [2] English.
-
-**Motor Seçimi (AI Engine): Tercih ettiğiniz yapay zeka beynini seçin:
-**
-[1] Ollama (Yerel LLM): Ollama URL adresinizi sorar (Varsayılan: http://localhost:11434). Ardından bilgisayarınızda yüklü olan tüm modelleri (llama3, mistral, gemma vb.) otomatik listeleyerek numaralandırma ile seçtirir.
-
-[2] Google Gemini (Bulut): Gemini API Key'inizi talep eder ve gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash gibi güncel modellerden birini seçmenizi sağlar.
-
-[3] Anthropic Claude (Bulut): Claude API Key'inizi talep eder ve claude-sonnet-4-6, claude-opus-4-6 gibi modelleri listeler.
-
-Otomatik Kayıt: Yapılan tüm seçimler ai_config.json dosyasına yazılır. Sonraki çalıştırmalarda bu sorular sorulmadan sistem direkt analize başlar.
-
-3. Adım: Dashboard Analiz Ekranı
-Analiz saniyeler içinde tamamlandığında, sistem dashboard_data.js dosyasını günceller ve tarayıcınızda otomatik olarak index.html (Financial Dashboard) ekranını açar.
-
-Sağ üst köşedeki TR/EN butonlarını kullanarak arayüzü değiştirebilirsiniz. "Yapay Zeka Analizi" (AI Analysis) sekmesi, arka planda çift dilli üretildiği için artık donma veya API hatası olmaksızın anında dil değiştirir!
-
-**⚖️ Yasal Uyarı**
-ÖNEMLİ NOT: Bu yazılım ve içerisindeki çoklu ajan sistemi tarafından üretilen tüm raporlar, rasyolar ve yönetici özetleri tamamen yapay zeka modelleri tarafından otomatik olarak üretilmektedir. Sunulan hiçbir veri veya yorum, kesinlikle bir yatırım tavsiyesi, finansal danışmanlık veya hukuki yönlendirme niteliği taşımamaktadır. Herhangi bir stratejik karar almadan önce, analizlerin lisanslı bir Mali Müşavir, Bağımsız Denetçi veya Finansal Danışman tarafından doğrulanması kullanıcının kendi sorumluluğundadır.
+Genel Araçlar: TR/EN dil geçişi, Black & White (Siyah/Beyaz) tema desteği ve PDF indirme butonu.
