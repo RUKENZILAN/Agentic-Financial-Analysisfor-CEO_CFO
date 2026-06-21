@@ -1,10 +1,14 @@
 **The Pi Suite Financial Dashboard & Multi-Agent System**
 
-<img width="1854" height="628" alt="PıSuıte3" src="https://github.com/user-attachments/assets/9e5ea81d-a481-4087-8e70-6d320c41dcaa" />
+<img width="692" height="741" alt="PıSuıte99" src="https://github.com/user-attachments/assets/b7dccbc4-4282-4850-b017-90874cec4873" />
+
 <img width="1468" height="914" alt="PıSuıte6" src="https://github.com/user-attachments/assets/a2337e64-19d9-4d37-8a1e-0c4ab4088f11" />
+
 <img width="1237" height="913" alt="PıSuıte55" src="https://github.com/user-attachments/assets/257f51ba-528b-4f2a-b4c2-7430e9710188" />
+
 <img width="1217" height="927" alt="PıSuıte5" src="https://github.com/user-attachments/assets/566215af-f63f-444a-aa31-21c19230f6cd" />
 
+<img width="1854" height="628" alt="PıSuıte3" src="https://github.com/user-attachments/assets/9e5ea81d-a481-4087-8e70-6d320c41dcaa" />
 
 🇬🇧 ENGLISH
 🤖 Connect to 3 Different AI Engines
