@@ -1,122 +1,101 @@
 **The Pi Suite Financial Dashboard & Multi-Agent System**
-<img width="706" height="561" alt="LAng selection" src="https://github.com/user-attachments/assets/9c714412-fff0-4de5-b53a-ccb837663583" />
-<img width="1315" height="874" alt="Screenshot_1" src="https://github.com/user-attachments/assets/76b0c24e-691b-42b5-b105-38c32db3f790" />
-<img width="1337" height="855" alt="Screenshot_2" src="https://github.com/user-attachments/assets/a0ee625f-ebf0-4be8-87f4-a140d34742bc" />
-<img width="1279" height="924" alt="Screenshot_3" src="https://github.com/user-attachments/assets/03f3c783-8ae4-4d99-ba2c-038cbc27911b" />
-<img width="1504" height="888" alt="pdf" src="https://github.com/user-attachments/assets/9938dd43-8909-4f6a-b461-e902aca41374" />
+
+<img width="1856" height="658" alt="PıSuıte" src="https://github.com/user-attachments/assets/c0abd1bb-9d0d-490d-8b5e-d1adbce7bc05" />
+<img width="1862" height="638" alt="PıSuıte2" src="https://github.com/user-attachments/assets/bf17f8e0-2270-4128-ac10-eb07a55290ea" />
+<img width="1854" height="628" alt="PıSuıte3" src="https://github.com/user-attachments/assets/9e5ea81d-a481-4087-8e70-6d320c41dcaa" />
+<img width="1468" height="914" alt="PıSuıte6" src="https://github.com/user-attachments/assets/a2337e64-19d9-4d37-8a1e-0c4ab4088f11" />
+<img width="1237" height="913" alt="PıSuıte55" src="https://github.com/user-attachments/assets/257f51ba-528b-4f2a-b4c2-7430e9710188" />
+<img width="1217" height="927" alt="PıSuıte5" src="https://github.com/user-attachments/assets/566215af-f63f-444a-aa31-21c19230f6cd" />
 
 
-**🇬🇧 English Version**
-This repository contains a Multi-Agent Financial AI System architecture designed to standardize, analyze, and visualize corporate financial data.
+🇬🇧 ENGLISH
+🤖 Connect to 3 Different AI Engines
+PiSuite now works with three different AI engines — you choose which one to use every time you open the app:
+Engine	Where It Runs	When to Choose
+Claude	Anthropic cloud	Most reliable/highest-quality results
+Gemini	Google cloud	Fast, with a free usage tier
+Ollama	Your own computer (local)	When you don't want your data to leave your machine
+How to Connect
+With Claude or Gemini:
+Open the app, select the engine
+Enter the relevant provider's API key (for Claude: console.anthropic.com, for Gemini: aistudio.google.com)
+The connection is verified automatically, then you continue
+With Ollama (local) — works on both Mac and Windows:
+	Mac	Windows
+Install	`brew install ollama` or ollama.com/download/mac	ollama.com/download/windows
+Pull model	`ollama pull qwen3.5:4b`	`ollama pull qwen3.5:4b`
+Persistent CORS permission	`launchctl setenv OLLAMA_ORIGINS "*"`	`[System.Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","*","User")`
+Start the server	`ollama serve`	`ollama serve`
+> ⚠️ Without CORS permission, the browser will block access to your local Ollama server for security reasons. After setting it, fully quit and reopen Ollama (from the system tray/menu-bar icon if present).
+Inside the app, once the engine is selected, you enter the URL (`http://localhost:11434`) and model name (`qwen3.5:4b`), and the connection is tested.
+---
+🔢 Financial Ratios Are Now Calculated From Your File, Not Hardcoded AI Guesses
+Before: Ratios (current ratio, quick ratio, debt-to-equity, net margin, ROE, DuPont decomposition, etc.) were requested from the AI as a "guess" — the model sometimes produced inconsistent or incorrect numbers, and sometimes couldn't compute them at all.
+Now: Every ratio is calculated with deterministic JavaScript math by scanning the actual rows in your uploaded file:
+Column names or order don't matter — works with any Excel/CSV layout
+Insensitive to Turkish character/spelling variations (case, ı/i, ş/s, ğ/g)
+Recognizes numbered row labels too (e.g. "1. Current Assets")
+If an item isn't found directly, it's derived from the accounting identity (e.g. Total Liabilities = Total Assets − Equity)
+The AI now only comments on these pre-calculated numbers — it no longer alters them
+A new 🔍 Ratio Diagnostics button was also added to the panel: see exactly which items were found/not found, and every row label detected in your file.
+---
+🔒 Security Hardening Added
+XSS (code injection) protection: AI outputs and file contents are now sanitized with DOMPurify — a malicious cell value or manipulated AI response can no longer execute code on the page
+API keys are still kept in RAM only — never written to disk, browser storage (localStorage), or cookies; cleared the moment the tab closes
+File names, AI commentary, and error messages are now all rendered safely
+---
+🛠️ Other Improvements
+Automatic JSON repair for truncated responses from local (Ollama) models
+Live progress counter for all engines (previously Ollama-only — now Claude/Gemini also show "X seconds elapsed")
+Larger context window and output token budget (fewer truncated responses on Ollama)
 
-Led by the CEO Agent as the central orchestrator, the system delegates tasks to specialized sub-agents and compiles the findings into a strategic Executive Summary. With the latest update, the system supports both local LLMs and prominent cloud AI engines with dynamic English/Turkish language support.
+⚖️ Legal Disclaimer
+IMPORTANT NOTE: All reports, ratios, and executive summaries generated by this software and its multi-agent system are produced entirely automatically by artificial intelligence models. None of the data or commentary presented constitutes investment advice, financial consulting, or legal guidance of any kind. Before making any strategic decisions, it is the user's own responsibility to have the analyses verified by a licensed Financial Advisor, Independent Auditor, or Financial Consultant.
 
-**What's New in the Latest Update?**
-Multi-Engine AI Support: You are no longer restricted to local Ollama. You can now use Google Gemini or Anthropic Claude cloud APIs.
-
-Interactive Setup CLI: On the first execution, an interactive menu guides you to configure your language, AI engine, URLs, custom models, and API keys.
-
-Persistent Configuration: All choices are safely stored in ai_config.json so you only configure the system once.
-
-Architecture Refactor (CORS Fix): The frontend no longer makes direct API calls to Anthropic to avoid browser CORS blocks. The CEO Agent now generates the AI Analysis report in both Turkish and English simultaneously on the backend and streams it straight to the UI cache.
-
-UI Optimization: The redundant company select dropdown has been removed from the header for a cleaner, unified dashboard experience.
-
-Bug Fixes: Resolved the critical AttributeError: 'HistoricalComparison' object has no attribute 'get_history_for_chart' bug by streamlining it with the correct backend method get_timeline().
-
-**Step-by-Step User Guide**
-Step 1: Preparing the Excel File (financial_data.xlsx)
-For sub-agents to correctly parse the data and calculate financial ratios (Liquidity, Solvency, DuPont, etc.), your Excel file must follow these criteria:
-
-File Name: Must be named exactly financial_data.xlsx.
-
-Content: Should contain corporate financial records such as the Trial Balance, Balance Sheet, and Income Statement.
-
-Location: Place this file directly inside the root project folder, alongside ceo_agent.py and the application binary.
-
-Step 2: Running the System & AI Engine Configuration
-Navigate to your project root folder via terminal and trigger the main application:
-
-Bash
-# For Python environment:
-python ceo_agent.py
-
-# For compiled binary:
-./run_dashboard_exe
-First-Run Interactive Configuration Workflow:
-Language Selection: Choose between [1] Türkçe or [2] English for the CLI menu.
-
-**Engine Selection: Choose your preferred AI brain:**
-[1] Ollama: Enters a sub-menu asking for your Ollama URL (Default: http://localhost:11434) and dynamically fetches your locally installed models (e.g., llama3, mistral, gemma) using the local tags endpoint.
-
-[2] Google Gemini: Asks for your Gemini API Key and lets you choose models like gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash, etc.
-
-[3] Anthropic Claude: Asks for your Claude API Key and lets you choose models like claude-sonnet-4-6, claude-opus-4-6, etc.
-
-Automatic Execution: Your selections are saved to ai_config.json. The next time you run the application, it will bypass the configuration screens and boot up instantly.
-
-Step 3: Viewing the Dashboard
-Once the AI pipeline finishes its heavy lifting, it updates dashboard_data.js and automatically launches your default web browser to display index.html.
-
-Toggle between TR/EN seamlessly in the top right corner. The "AI Analysis" tab will now instantaneous switch translation on the fly without any layout delays or API errors!
-
-**⚖️ Legal Disclaimer
-**IMPORTANT NOTE: All reports, financial ratios, forecasting scenarios, and executive summaries generated by this software are automatically synthesized by Artificial Intelligence models. None of the data, evaluations, or narratives constitute professional investment, financial, tax, or legal advice. LLMs may exhibit hallucinations. Users are strictly advised to verify all automated findings with a certified Public Accountant or licensed Financial Advisor before executing corporate actions.
-
-🇹🇷 Türkçe Versiyon
-Bu depo, kurumsal finansal verileri standartlaştırmak, analiz etmek ve görselleştirmek için tasarlanmış Çoklu Ajanlı (Multi-Agent) Finansal Yapay Zeka Sistemi mimarisini içerir.
-
-Merkezi orkestratör olan CEO Agent liderliğindeki sistem, görevleri uzman alt ajanlara devreder ve bulguları stratejik bir Yönetici Özeti halinde derler. Son güncellemeyle birlikte sistem, dinamik Türkçe/İngilizce dil desteğinin yanı sıra hem yerel LLM'leri hem de popüler bulut yapay zeka motorlarını destekler hale getirilmiştir.
-
-**Son Güncellemede Neler Değişti?** 
-Çoklu Yapay Zeka Motoru Desteği: Yalnızca yerel Ollama modeline bağlı kalma zorunluluğu ortadan kalktı. Artık Google Gemini ve Anthropic Claude bulut API'lerini de kullanabilirsiniz.
-
-İnteraktif Kurulum Sihirbazı (CLI): Uygulama ilk kez çalıştırıldığında; dil tercihinizi, kullanmak istediğiniz yapay zeka motorunu, bağlantı adreslerini ve API anahtarlarınızı adım adım sorarak yapılandırır.
-
-Kalıcı Konfigürasyon: Seçimleriniz ai_config.json dosyasına güvenli bir şekilde kaydedilir. Böylece ayarları yalnızca bir kez yapmanız yeterli olur.
-
-Mimari Revizyon (CORS Çözümü): Tarayıcı tabanlı CORS engellemelerini aşmak için frontend üzerindeki Anthropic API çağrıları tamamen kaldırıldı. CEO Agent artık hem Türkçe hem de İngilizce raporları arka planda (backend) eşzamanlı olarak üretip dashboard_data.js önbelleğine yazar. Dil geçişleri anlık ve hatasız gerçekleşir.
-
-Arayüz Temizliği: Üst menüde yer alan ve işlevsiz kalan "Company Select" (Şirket Seçim) açılır menüsü daha temiz bir dashboard deneyimi için tamamen kaldırıldı.
-
-Kod Optimizasyonu ve Bug Çözümü: Derleme esnasında karşılaşılan AttributeError: 'HistoricalComparison' object has no attribute 'get_history_for_chart' hatası, ceo_agent.py içindeki eski metodun güncel backend fonksiyonu olan get_timeline() ile senkronize edilmesiyle tamamen düzeltildi.
-
-**Adım Adım Kullanım Kılavuzu**
-1. Adım: Excel Dosyasının (financial_data.xlsx) Hazırlanması
-Yapay zeka ajanlarının finansal rasyoları (Likitide, Kaldıraç, DuPont vb.) hatasız hesaplayabilmesi için Excel dosyanızın şu standartlara uygun olması gerekir:
-
-Dosya Adı: Klasörün içindeki Excel dosyasının adı tam olarak financial_data.xlsx olmalıdır.
-
-İçerik: Dosya içerisinde firmanıza ait güncel Mizan, Bilanço ve Gelir Tablosu hesapları yer almalıdır.
-
-Konum: Bu Excel dosyasını ceo_agent.py veya derlenmiş binary uygulamanızın olduğu ana proje klasörüne bırakın.
-
-2. Adım: Sistemin Çalıştırılması ve AI Motoru Seçimi
-Terminalinizden projenin bulunduğu klasör dizinine geçiş yapın ve ana uygulamayı tetikleyin:
-
-Bash
-# Python ortamında çalıştırmak için:
-python ceo_agent.py
-
-# Derlenmiş .exe / binary çalıştırmak için:
-./run_dashboard_exe
-İlk Çalıştırma İnteraktif Seçim Akışı:
-Dil Seçimi: Konsol arayüzünü hangi dilde kullanmak istediğinizi seçin: [1] Türkçe / [2] English.
-
-**Motor Seçimi (AI Engine): Tercih ettiğiniz yapay zeka beynini seçin:
-**
-[1] Ollama (Yerel LLM): Ollama URL adresinizi sorar (Varsayılan: http://localhost:11434). Ardından bilgisayarınızda yüklü olan tüm modelleri (llama3, mistral, gemma vb.) otomatik listeleyerek numaralandırma ile seçtirir.
-
-[2] Google Gemini (Bulut): Gemini API Key'inizi talep eder ve gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash gibi güncel modellerden birini seçmenizi sağlar.
-
-[3] Anthropic Claude (Bulut): Claude API Key'inizi talep eder ve claude-sonnet-4-6, claude-opus-4-6 gibi modelleri listeler.
-
-Otomatik Kayıt: Yapılan tüm seçimler ai_config.json dosyasına yazılır. Sonraki çalıştırmalarda bu sorular sorulmadan sistem direkt analize başlar.
-
-3. Adım: Dashboard Analiz Ekranı
-Analiz saniyeler içinde tamamlandığında, sistem dashboard_data.js dosyasını günceller ve tarayıcınızda otomatik olarak index.html (Financial Dashboard) ekranını açar.
-
-Sağ üst köşedeki TR/EN butonlarını kullanarak arayüzü değiştirebilirsiniz. "Yapay Zeka Analizi" (AI Analysis) sekmesi, arka planda çift dilli üretildiği için artık donma veya API hatası olmaksızın anında dil değiştirir!
+PiSuite — Yenilikler / What's New
+---
+🇹🇷 TÜRKÇE
+🤖 3 Farklı AI Motoruna Bağlanabilirsiniz
+PiSuite artık üç farklı yapay zeka motoruyla çalışabiliyor — hangisini kullanacağınızı her açılışta seçebilirsiniz:
+Motor	Nerede Çalışır	Ne Zaman Tercih Edilmeli
+Claude	Anthropic bulutu	En güvenilir/kaliteli sonuçlar
+Gemini	Google bulutu	Hızlı ve ücretsiz kotalı kullanım
+Ollama	Kendi bilgisayarınız (yerel)	Verinizin hiç internete çıkmasını istemiyorsanız
+Nasıl Bağlanılır?
+Claude veya Gemini ile:
+Uygulamayı açın, motoru seçin
+İlgili sağlayıcının API anahtarını girin (Claude için console.anthropic.com, Gemini için aistudio.google.com)
+Bağlantı otomatik doğrulanır, devam edersiniz
+Ollama (yerel) ile — hem Mac hem Windows'ta çalışır:
+	Mac	Windows
+Kurulum	`brew install ollama` veya ollama.com/download/mac	ollama.com/download/windows
+Model indirme	`ollama pull qwen3.5:4b`	`ollama pull qwen3.5:4b`
+CORS izni (kalıcı)	`launchctl setenv OLLAMA_ORIGINS "*"`	`[System.Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","*","User")`
+Sunucuyu başlatma	`ollama serve`	`ollama serve`
+> ⚠️ CORS izni verilmezse, tarayıcı güvenlik nedeniyle yerel Ollama sunucusuna bağlanamaz. Ayarı verdikten sonra Ollama'yı (varsa sistem tepsisi/menü çubuğu simgesinden) tamamen kapatıp yeniden açmanız gerekir.
+Uygulama içinde motor seçildikten sonra URL (`http://localhost:11434`) ve model adı (`qwen3.5:4b`) girilip bağlantı test edilir.
+---
+🔢 Finansal Rasyolar Artık Sabit Kod Değil, Dosyadan Hesaplanıyor
+Öncesi: Rasyolar (cari oran, asit-test, borç/özkaynak, net kâr marjı, ROE, DuPont ayrıştırması vb.) yapay zekadan "tahmin ederek" isteniyordu — model bazen tutarsız ya da yanlış sayı üretebiliyordu, bazen de hiç hesaplayamıyordu.
+Şimdi: Tüm rasyolar, yüklediğiniz dosyadaki gerçek satırlar taranarak deterministik JavaScript matematiğiyle hesaplanıyor:
+Kolon adı veya sırası önemli değil — herhangi bir Excel/CSV düzeninde çalışır
+Türkçe karakter ve yazım farklılıklarına (büyük/küçük harf, ı/i, ş/s, ğ/g) duyarsız
+Numaralı satır etiketlerini de tanır (örn. "1. Dönen Varlıklar")
+Bir kalem doğrudan bulunamazsa, muhasebe eşitliğinden türetir (örn. Toplam Borç = Toplam Varlık − Özkaynak)
+Yapay zeka artık sadece bu hazır hesaplanmış rakamlar üzerine yorum yazıyor — sayıları değiştirmiyor
+Ayrıca panelde 🔍 Rasyo Tanılama butonu eklendi: hangi kalemlerin bulunduğunu/bulunamadığını ve dosyanızdaki tüm satır etiketlerini görebilirsiniz.
+---
+🔒 Güvenlik Koruması Eklendi
+XSS (kod enjeksiyonu) koruması: Yapay zeka çıktıları ve dosya içerikleri artık DOMPurify ile sanitize ediliyor — kötü amaçlı bir hücre değeri veya manipüle edilmiş AI yanıtı sayfada kod çalıştıramaz
+API anahtarı hâlâ sadece RAM'de tutuluyor — diske, tarayıcı hafızasına (localStorage) veya çerezlere hiç yazılmıyor, sekme kapatıldığında silinir
+Dosya adı, AI yorumları, hata mesajları gibi tüm dinamik içerikler artık güvenli şekilde gösteriliyor
+---
+🛠️ Diğer İyileştirmeler
+Yerel (Ollama) modellerde yanıt kesilmesi nedeniyle oluşan hatalar için otomatik JSON onarımı
+Tüm motorlar için canlı ilerleme sayacı (artık sadece Ollama'da değil, Claude/Gemini'de de "kaç saniye geçti" görünüyor)
+Daha büyük bağlam penceresi ve çıkış token bütçesi (Ollama'da kesilen yanıtlar azaldı)
+<br>
+---
 
 **⚖️ Yasal Uyarı**
 ÖNEMLİ NOT: Bu yazılım ve içerisindeki çoklu ajan sistemi tarafından üretilen tüm raporlar, rasyolar ve yönetici özetleri tamamen yapay zeka modelleri tarafından otomatik olarak üretilmektedir. Sunulan hiçbir veri veya yorum, kesinlikle bir yatırım tavsiyesi, finansal danışmanlık veya hukuki yönlendirme niteliği taşımamaktadır. Herhangi bir stratejik karar almadan önce, analizlerin lisanslı bir Mali Müşavir, Bağımsız Denetçi veya Finansal Danışman tarafından doğrulanması kullanıcının kendi sorumluluğundadır.
