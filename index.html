@@ -1,553 +1,2085 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="title">Executive Summary Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
-  <style>
-  /* ── TOKENS ── */
-  :root {
-    --bg-main:     #080f1e;
-    --bg-card:     #0e1a2e;
-    --bg-card-alt: #111f35;
-    --border:      #1e3050;
-    --border-glow: #2563eb40;
-    --accent:      #3b82f6;
-    --accent-em:   #10b981;
-    --accent-warn: #f59e0b;
-    --accent-risk: #ef4444;
-    --text-1:      #f0f4ff;
-    --text-2:      #8ba3c8;
-    --text-3:      #4a6080;
-    --font-mono:   'ui-monospace', 'Cascadia Code', monospace;
-  }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PiSuite — AI Finansal Analiz Motoru</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#080f1e;--bgc:#0e1a2e;--bgca:#111f35;
+  --bd:#1e3050;--ac:#3b82f6;--em:#10b981;--wa:#f59e0b;--ri:#ef4444;
+  --t1:#f0f4ff;--t2:#8ba3c8;--t3:#4a6080;
+  --mono:'ui-monospace','Cascadia Code',monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--t1);font-family:ui-sans-serif,system-ui,sans-serif;line-height:1.6;margin:0;min-height:100vh}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+img{max-width:100%}
 
-  *, *::before, *::after { box-sizing: border-box; }
+/* ONBOARDING */
+.onboard-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.onboard-card{max-width:560px;width:100%;background:var(--bgc);border:1px solid var(--bd);border-radius:1rem;padding:2.5rem;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.onboard-logo{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-bottom:2rem}
+.onboard-logo img{width:48px;height:48px;border-radius:.6rem}
+.onboard-logo-text{font-size:1.6rem;font-weight:800;letter-spacing:-.02em}
+.onboard-logo-text span{color:var(--ac)}
+.onboard-title{font-size:1.15rem;font-weight:700;text-align:center;margin-bottom:.4rem;color:var(--t1)}
+.onboard-sub{font-size:.85rem;color:var(--t2);text-align:center;margin-bottom:2rem}
 
-  body {
-    background: var(--bg-main);
-    color: var(--text-1);
-    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-  }
+.engine-grid{display:grid;grid-template-columns:1fr;gap:.75rem;margin-bottom:1.5rem}
+.engine-card{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-radius:.65rem;border:1.5px solid var(--bd);background:var(--bgca);cursor:pointer;transition:all .15s;text-align:left;width:100%;color:inherit;font-family:inherit}
+.engine-card:hover{border-color:var(--ac);background:rgba(59,130,246,.06)}
+.engine-card.selected{border-color:var(--ac);background:rgba(59,130,246,.1)}
+.engine-icon{font-size:1.8rem;flex-shrink:0;width:44px;text-align:center}
+.engine-info{flex:1}
+.engine-name{font-size:.92rem;font-weight:700;color:var(--t1)}
+.engine-desc{font-size:.74rem;color:var(--t2);margin-top:.15rem}
+.engine-badge{font-size:.62rem;font-weight:700;padding:.2rem .55rem;border-radius:99px;flex-shrink:0}
+.engine-badge.cloud{background:rgba(59,130,246,.15);color:#60a5fa}
+.engine-badge.local{background:rgba(16,185,129,.15);color:#34d399}
 
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg-main); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.api-key-section{margin-top:1.5rem}
+.api-key-label{font-size:.78rem;font-weight:600;color:var(--t2);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.api-key-input-wrap{position:relative}
+.api-key-input{width:100%;padding:.75rem 2.75rem .75rem 1rem;border-radius:.55rem;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-size:.85rem;font-family:var(--mono);transition:border-color .15s}
+.api-key-input:focus{outline:none;border-color:var(--ac)}
+.api-key-toggle{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t2);cursor:pointer;font-size:.85rem;padding:.3rem}
+.api-key-hint{font-size:.7rem;color:var(--t3);margin-top:.5rem;line-height:1.5}
+.api-key-hint a{color:var(--ac);text-decoration:none}
+.api-key-hint a:hover{text-decoration:underline}
+.api-key-hint code{background:var(--bgca);padding:.1rem .35rem;border-radius:.25rem;font-family:var(--mono)}
 
-  /* ── LAYOUT ── */
-  .shell { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; }
+.security-note{display:flex;align-items:flex-start;gap:.6rem;margin-top:1.25rem;padding:.8rem 1rem;border-radius:.55rem;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2)}
+.security-note-icon{font-size:1.1rem;flex-shrink:0}
+.security-note-text{font-size:.74rem;color:var(--t2);line-height:1.55}
+.security-note-text strong{color:#34d399}
 
-  /* ── HEADER ── */
-  .top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 1.25rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .brand { display: flex; flex-direction: column; gap: 0.2rem; }
-  .brand-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--text-1);
-    line-height: 1;
-  }
-  .brand-title span { color: var(--accent); }
-  .brand-sub { font-size: 0.78rem; color: var(--text-2); }
-  .brand-sub strong { color: var(--accent-em); }
+.onboard-btn{width:100%;padding:.85rem;border-radius:.6rem;font-size:.9rem;font-weight:700;cursor:pointer;border:none;background:var(--ac);color:#fff;margin-top:1.5rem;transition:background .15s,transform .1s,opacity .15s}
+.onboard-btn:hover:not(:disabled){background:#2563eb}
+.onboard-btn:active:not(:disabled){transform:scale(.98)}
+.onboard-btn:disabled{opacity:.4;cursor:not-allowed}
+.onboard-back{width:100%;padding:.6rem;border-radius:.6rem;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:transparent;color:var(--t2);margin-top:.6rem;transition:all .15s}
+.onboard-back:hover{background:var(--bgca);color:var(--t1)}
 
-  .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.error-banner{display:flex;align-items:center;gap:.5rem;padding:.7rem .9rem;border-radius:.5rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;font-size:.78rem;margin-top:1rem}
 
-  .btn {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 0.45rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: background 0.15s, transform 0.1s;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:hover { background: #2563eb; }
-  .btn-success { background: #065f46; color: #6ee7b7; border: 1px solid #047857; }
-  .btn-success:hover { background: #047857; }
-  .btn-ghost { background: #1e293b; color: var(--text-2); border: 1px solid var(--border); }
-  .btn-ghost:hover { background: #253348; color: var(--text-1); }
+.test-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-right:.4rem;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  select.company-select {
-    background: var(--bg-card-alt);
-    border: 1px solid var(--border);
-    color: var(--text-1);
-    padding: 0.45rem 0.9rem;
-    border-radius: 0.45rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238ba3c8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 2rem;
-  }
+.progress-dots{display:flex;justify-content:center;gap:.4rem;margin-bottom:1.75rem}
+.progress-dot{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:all .2s}
+.progress-dot.active{background:var(--ac);width:20px;border-radius:4px}
+.progress-dot.done{background:var(--em)}
 
-  /* ── GRID ── */
-  .main-grid {
-    display: grid;
-    grid-template-columns: 420px 1fr;
-    gap: 1.25rem;
-    align-items: start;
-  }
-  @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
+/* MAIN APP */
+.shell{max-width:1600px;margin:0 auto;padding:1.5rem 2rem}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding-bottom:1.25rem;margin-bottom:1rem;border-bottom:1px solid var(--bd);gap:1rem;flex-wrap:wrap}
+.brand-row{display:flex;align-items:center;gap:.65rem}
+.brand-row img{width:32px;height:32px;border-radius:.4rem}
+.brand-title{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;color:var(--t1);line-height:1}
+.brand-title span{color:var(--ac)}
+.brand-sub{font-size:.78rem;color:var(--t2)}
+.brand-sub strong{color:var(--em)}
+.hdr-act{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .9rem;border-radius:.45rem;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:background .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--ac);color:#fff}.btn-primary:hover{background:#2563eb}
+.btn-success{background:#065f46;color:#6ee7b7;border:1px solid #047857}.btn-success:hover{background:#047857}
+.btn-ghost{background:#1e293b;color:var(--t2);border:1px solid var(--bd)}.btn-ghost:hover{background:#253348;color:var(--t1)}
 
-  /* ── CARDS ── */
-  .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-    padding: 1.1rem 1.25rem;
-  }
-  .card + .card { margin-top: 1rem; }
-  .card-title {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-2);
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .card-title .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent);
-    flex-shrink: 0;
-  }
-  .card-title .dot-green { background: var(--accent-em); }
+.engine-pill{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:99px;font-size:.68rem;font-weight:700;background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
 
-  /* ── LEFT PANEL ── */
-  .left-panel { position: sticky; top: 1.25rem; }
-  .left-panel .card { max-height: 88vh; overflow-y: auto; }
+.upload-section{margin-bottom:1.25rem}
+.dropzone{border:2px dashed var(--bd);border-radius:.75rem;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:var(--bgc);display:block;user-select:none;position:relative}
+.dropzone:hover,.dropzone.drag-over{border-color:var(--ac);background:rgba(59,130,246,.05)}
+.dropzone.loaded{border-color:var(--em);background:rgba(16,185,129,.04);border-style:solid}
+.dz-icon{font-size:2rem;margin-bottom:.4rem;display:block}
+.dz-title{font-size:.9rem;font-weight:700;color:var(--t1);margin-bottom:.2rem}
+.dz-sub{font-size:.73rem;color:var(--t2)}
+.file-pill{display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;padding:.28rem .8rem;border-radius:99px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);font-size:.72rem;font-weight:600;color:#34d399}
 
-  .panel-tabs {
-    display: flex;
-    gap: 0.25rem;
-    margin-bottom: 1rem;
-    background: var(--bg-main);
-    border-radius: 0.5rem;
-    padding: 0.25rem;
-  }
-  .tab-btn {
-    flex: 1;
-    padding: 0.4rem 0.5rem;
-    border-radius: 0.35rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    color: var(--text-3);
-    background: transparent;
-    border: none;
-    transition: all 0.15s;
-  }
-  .tab-btn.active { background: var(--bg-card-alt); color: var(--text-1); border: 1px solid var(--border); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+.pipeline{display:none;margin-bottom:.75rem}
+.pipeline.show{display:block}
+.pipeline-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t2);margin-bottom:.5rem}
+.agents-row{display:flex;flex-wrap:wrap;gap:.4rem}
+.agent-chip{display:flex;align-items:center;gap:.35rem;padding:.3rem .7rem;border-radius:99px;font-size:.72rem;font-weight:600;border:1px solid var(--bd);background:var(--bgca);color:var(--t3);transition:all .2s}
+.agent-chip.running{border-color:var(--ac);background:rgba(59,130,246,.1);color:var(--ac)}
+.agent-chip.done{border-color:var(--em);background:rgba(16,185,129,.08);color:var(--em)}
+.agent-chip.error{border-color:var(--ri);color:var(--ri)}
+.agent-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.agent-chip.running .agent-dot{animation:pulse .8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-  /* Markdown styles */
-  #markdownContainer h1, #markdownContainer h2, #markdownContainer h3 {
-    color: var(--text-1);
-    margin: 1rem 0 0.4rem;
-    line-height: 1.3;
-  }
-  #markdownContainer h1 { font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
-  #markdownContainer h2 { font-size: 0.9rem; }
-  #markdownContainer h3 { font-size: 0.83rem; color: var(--accent); }
-  #markdownContainer p { font-size: 0.8rem; color: var(--text-2); margin: 0.4rem 0; }
-  #markdownContainer ul, #markdownContainer ol { padding-left: 1.2rem; margin: 0.3rem 0; }
-  #markdownContainer li { font-size: 0.79rem; color: var(--text-2); margin: 0.15rem 0; }
-  #markdownContainer strong { color: var(--text-1); }
-  #markdownContainer table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin: 0.5rem 0; }
-  #markdownContainer th { background: var(--bg-card-alt); padding: 0.4rem 0.5rem; text-align: left; color: var(--text-2); font-weight: 600; border: 1px solid var(--border); }
-  #markdownContainer td { padding: 0.35rem 0.5rem; border: 1px solid var(--border); color: var(--text-2); }
+.status-bar{display:none;align-items:center;gap:8px;padding:.55rem .9rem;border-radius:.45rem;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);font-size:.77rem;color:var(--t2);margin-bottom:.75rem}
+.status-bar.show{display:flex}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--ac);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
 
-  /* McKinsey left panel */
-  .panel-section-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .panel-section-title::before { content: ''; width: 3px; height: 14px; background: var(--accent); border-radius: 2px; display: inline-block; }
+.upload-history{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.5rem}
+.hist-chip{font-size:.67rem;padding:.2rem .6rem;border-radius:99px;background:var(--bgca);border:1px solid var(--bd);color:var(--t3)}
+.hist-chip .hn{color:var(--ac);font-weight:600}
 
-  .horizon-cards { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
-  .horizon-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.65rem;
-    padding: 0.65rem 0.75rem;
-    border-radius: 0.5rem;
-    border-left: 3px solid transparent;
-  }
-  .horizon-card.h1 { background: rgba(59,130,246,0.07); border-left-color: var(--accent); }
-  .horizon-card.h2 { background: rgba(245,158,11,0.07); border-left-color: var(--accent-warn); }
-  .horizon-card.h3 { background: rgba(16,185,129,0.07); border-left-color: var(--accent-em); }
-  .horizon-badge {
-    font-size: 0.65rem;
-    font-weight: 800;
-    font-family: var(--font-mono);
-    padding: 0.15rem 0.4rem;
-    border-radius: 0.3rem;
-    flex-shrink: 0;
-    margin-top: 0.1rem;
-  }
-  .h1 .horizon-badge { background: rgba(59,130,246,0.2); color: #60a5fa; }
-  .h2 .horizon-badge { background: rgba(245,158,11,0.2); color: #fbbf24; }
-  .h3 .horizon-badge { background: rgba(16,185,129,0.2); color: #34d399; }
-  .horizon-label { font-size: 0.7rem; font-weight: 700; color: var(--text-1); margin-bottom: 0.2rem; }
-  .horizon-text { font-size: 0.74rem; color: var(--text-2); line-height: 1.5; }
+.main-grid{display:grid;grid-template-columns:420px 1fr;gap:1.25rem;align-items:start}
+@media(max-width:1100px){.main-grid{grid-template-columns:1fr}}
+.card{background:var(--bgc);border:1px solid var(--bd);border-radius:.75rem;padding:1.1rem 1.25rem}
+.card+.card{margin-top:1rem}
+.card-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:.4rem}
+.card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--ac);flex-shrink:0}
+.card-title .dot-g{background:var(--em)}
 
-  .scenario-block {
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    margin-bottom: 0.6rem;
-  }
-  .scenario-block.best { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.2); }
-  .scenario-block.worst { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); }
-  .scenario-header { font-size: 0.72rem; font-weight: 700; margin-bottom: 0.4rem; }
-  .scenario-block.best .scenario-header { color: var(--accent-em); }
-  .scenario-block.worst .scenario-header { color: var(--accent-risk); }
-  .scenario-text { font-size: 0.75rem; color: var(--text-2); line-height: 1.5; margin-bottom: 0.5rem; }
-  .scenario-actions .action-label { font-size: 0.68rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; }
-  .scenario-actions ul { margin: 0.3rem 0 0 0; padding-left: 1rem; }
-  .scenario-actions li { font-size: 0.72rem; color: var(--text-2); margin: 0.15rem 0; }
+.left-panel{position:sticky;top:1.25rem}
+.left-panel .card{max-height:88vh;overflow-y:auto}
+.panel-tabs{display:flex;gap:.25rem;margin-bottom:1rem;background:var(--bg);border-radius:.5rem;padding:.25rem}
+.tab-btn{flex:1;padding:.4rem .5rem;border-radius:.35rem;font-size:.72rem;font-weight:600;cursor:pointer;text-align:center;color:var(--t3);background:transparent;border:none;transition:all .15s}
+.tab-btn.active{background:var(--bgca);color:var(--t1);border:1px solid var(--bd)}
+.tab-panel{display:none}.tab-panel.active{display:block}
 
-  /* Eisenhower */
-  .eis-matrix { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-  .eis-axis-col {
-    display: flex; flex-direction: column; justify-content: space-around;
-    writing-mode: vertical-rl; text-orientation: mixed;
-    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-3);
-    padding: 0.5rem 0; transform: rotate(180deg);
-    flex-shrink: 0; width: 1rem;
-  }
-  .eis-grid { flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
-  .eis-axis-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    text-align: center; gap: 0.4rem;
-    font-size: 0.6rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3);
-    padding: 0 0.1rem;
-  }
-  .eis-cells { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
-  .eis-cell { border-radius: 0.45rem; padding: 0.6rem 0.65rem; }
-  .eis-cell.do    { background: rgba(239,68,68,0.08);   border: 1px solid rgba(239,68,68,0.2); }
-  .eis-cell.schedule  { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); }
-  .eis-cell.delegate  { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
-  .eis-cell.eliminate { background: rgba(100,116,139,0.08); border: 1px solid rgba(100,116,139,0.2); }
-  .eis-label { font-size: 0.65rem; font-weight: 700; margin-bottom: 0.3rem; }
-  .eis-cell.do .eis-label       { color: #f87171; }
-  .eis-cell.schedule .eis-label { color: #60a5fa; }
-  .eis-cell.delegate .eis-label { color: #fbbf24; }
-  .eis-cell.eliminate .eis-label{ color: var(--text-3); }
-  .eis-cell ul { list-style: disc; padding-left: 1rem; margin: 0; }
-  .eis-cell li { font-size: 0.68rem; color: var(--text-2); line-height: 1.4; margin: 0.1rem 0; }
-  .eis-cell li.muted { color: var(--text-3); list-style: none; margin-left: -1rem; }
+#markdownContainer h1,#markdownContainer h2,#markdownContainer h3{color:var(--t1);margin:1rem 0 .4rem;line-height:1.3}
+#markdownContainer h1{font-size:1rem;border-bottom:1px solid var(--bd);padding-bottom:.4rem}
+#markdownContainer h2{font-size:.9rem}
+#markdownContainer h3{font-size:.83rem;color:var(--ac)}
+#markdownContainer p{font-size:.8rem;color:var(--t2);margin:.4rem 0}
+#markdownContainer ul,#markdownContainer ol{padding-left:1.2rem;margin:.3rem 0}
+#markdownContainer li{font-size:.79rem;color:var(--t2);margin:.15rem 0}
+#markdownContainer strong{color:var(--t1)}
+#markdownContainer table{width:100%;border-collapse:collapse;font-size:.75rem;margin:.5rem 0}
+#markdownContainer th{background:var(--bgca);padding:.4rem .5rem;text-align:left;color:var(--t2);font-weight:600;border:1px solid var(--bd)}
+#markdownContainer td{padding:.35rem .5rem;border:1px solid var(--bd);color:var(--t2)}
 
-  /* ── RIGHT PANEL ── */
-  .right-panel { display: flex; flex-direction: column; gap: 1rem; }
+.panel-section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ac);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+.panel-section-title::before{content:'';width:3px;height:14px;background:var(--ac);border-radius:2px;display:inline-block}
+.horizon-cards{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.horizon-card{display:flex;align-items:flex-start;gap:.65rem;padding:.65rem .75rem;border-radius:.5rem;border-left:3px solid transparent}
+.horizon-card.h1{background:rgba(59,130,246,.07);border-left-color:var(--ac)}
+.horizon-card.h2{background:rgba(245,158,11,.07);border-left-color:var(--wa)}
+.horizon-card.h3{background:rgba(16,185,129,.07);border-left-color:var(--em)}
+.horizon-badge{font-size:.65rem;font-weight:800;font-family:var(--mono);padding:.15rem .4rem;border-radius:.3rem;flex-shrink:0;margin-top:.1rem}
+.h1 .horizon-badge{background:rgba(59,130,246,.2);color:#60a5fa}
+.h2 .horizon-badge{background:rgba(245,158,11,.2);color:#fbbf24}
+.h3 .horizon-badge{background:rgba(16,185,129,.2);color:#34d399}
+.horizon-label{font-size:.7rem;font-weight:700;color:var(--t1);margin-bottom:.2rem}
+.horizon-text{font-size:.74rem;color:var(--t2);line-height:1.5}
+.scenario-block{border-radius:.5rem;padding:.75rem;margin-bottom:.6rem}
+.scenario-block.best{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2)}
+.scenario-block.worst{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2)}
+.scenario-header{font-size:.72rem;font-weight:700;margin-bottom:.4rem}
+.scenario-block.best .scenario-header{color:var(--em)}
+.scenario-block.worst .scenario-header{color:var(--ri)}
+.scenario-text{font-size:.75rem;color:var(--t2);line-height:1.5;margin-bottom:.5rem}
+.scenario-actions .action-label{font-size:.68rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em}
+.scenario-actions ul{margin:.3rem 0 0;padding-left:1rem}
+.scenario-actions li{font-size:.72rem;color:var(--t2);margin:.15rem 0}
+.eis-matrix{display:flex;gap:.5rem;margin-top:.5rem}
+.eis-axis-col{display:flex;flex-direction:column;justify-content:space-around;writing-mode:vertical-rl;text-orientation:mixed;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:.5rem 0;transform:rotate(180deg);flex-shrink:0;width:1rem}
+.eis-grid{flex:1;display:flex;flex-direction:column;gap:.4rem}
+.eis-axis-row{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:.4rem;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:0 .1rem}
+.eis-cells{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.eis-cell{border-radius:.45rem;padding:.6rem .65rem}
+.eis-cell.do{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)}
+.eis-cell.schedule{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2)}
+.eis-cell.delegate{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2)}
+.eis-cell.eliminate{background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.2)}
+.eis-label{font-size:.65rem;font-weight:700;margin-bottom:.3rem}
+.eis-cell.do .eis-label{color:#f87171}
+.eis-cell.schedule .eis-label{color:#60a5fa}
+.eis-cell.delegate .eis-label{color:#fbbf24}
+.eis-cell.eliminate .eis-label{color:var(--t3)}
+.eis-cell ul{list-style:disc;padding-left:1rem;margin:0}
+.eis-cell li{font-size:.68rem;color:var(--t2);line-height:1.4;margin:.1rem 0}
 
-  /* ── KPI ROW ── */
-  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-  @media (max-width: 768px) { .kpi-row { grid-template-columns: repeat(2,1fr); } }
+.findings-wrap{margin-top:1rem}
+.finding-card{background:var(--bgca);border:1px solid var(--bd);border-radius:.5rem;margin-bottom:.4rem;overflow:hidden}
+.finding-hdr{display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;cursor:pointer;user-select:none}
+.finding-name{font-size:.72rem;font-weight:700;color:var(--t1)}
+.finding-badge{font-size:.62rem;padding:.15rem .45rem;border-radius:99px;background:rgba(16,185,129,.12);color:var(--em);border:1px solid rgba(16,185,129,.2)}
+.finding-body{display:none;padding:.5rem .75rem;border-top:1px solid var(--bd)}
+.finding-body.open{display:block}
+.finding-row{display:flex;gap:.5rem;align-items:flex-start;padding:.2rem 0;border-bottom:1px solid var(--bd);font-size:.72rem}
+.finding-row:last-child{border:none}
+.finding-key{color:var(--t2);min-width:120px;flex-shrink:0;font-weight:600}
+.finding-val{color:var(--t1);word-break:break-word}
 
-  .kpi-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 0.65rem;
-    padding: 0.85rem 1rem;
-    display: flex; flex-direction: column; gap: 0.35rem;
-  }
-  .kpi-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-2); }
-  .kpi-value { font-size: 1.5rem; font-weight: 800; line-height: 1; color: var(--text-1); }
-  .kpi-value.green { color: var(--accent-em); }
-  .kpi-value.amber { color: var(--accent-warn); }
-  .kpi-value.blue  { color: var(--accent); }
+.right-panel{display:flex;flex-direction:column;gap:1rem}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--bgc);border:1px solid var(--bd);border-radius:.65rem;padding:.85rem 1rem;display:flex;flex-direction:column;gap:.35rem}
+.kpi-label{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t2)}
+.kpi-value{font-size:1.5rem;font-weight:800;line-height:1;color:var(--t1)}
+.kpi-value.green{color:var(--em)}.kpi-value.amber{color:var(--wa)}.kpi-value.blue{color:var(--ac)}
+.kpi-card.health-card{align-items:center;padding:.75rem}
+.health-ring{position:relative;width:72px;height:72px}
+.health-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.health-ring .ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:var(--t1)}
+.health-badge{font-size:.65rem;font-weight:700;padding:.2rem .55rem;border-radius:99px;letter-spacing:.05em}
+.health-badge.healthy{background:rgba(16,185,129,.15);color:#34d399}
+.health-badge.critical{background:rgba(239,68,68,.15);color:#f87171}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.6rem}
+.metric-box{background:var(--bgca);border:1px solid var(--bd);border-radius:.5rem;padding:.65rem .75rem;text-align:center}
+.metric-val{font-size:1rem;font-weight:700;color:var(--t1)}
+.metric-key{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin-top:.2rem;line-height:1.3}
+.flag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+@media(max-width:768px){.flag-grid{grid-template-columns:1fr}}
+.flag-card{background:var(--bgc);border:1px solid var(--bd);border-radius:.65rem;padding:.85rem 1rem}
+.flag-card ul{list-style:none;padding:0;margin:0}
+.flag-card li{font-size:.75rem;color:var(--t2);padding:.25rem 0;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:.4rem}
+.flag-card li:last-child{border-bottom:none}
+.flag-card li::before{flex-shrink:0;margin-top:.15rem}
+.flag-card.risk li::before{content:'▸';color:var(--ri)}
+.flag-card.opp li::before{content:'▸';color:var(--em)}
+.flag-card.action li::before{content:'▸';color:var(--ac)}
+.flag-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.6rem}
+.flag-card.risk .flag-title{color:var(--ri)}.flag-card.opp .flag-title{color:var(--em)}.flag-card.action .flag-title{color:var(--ac)}
+.legal{margin-top:1.25rem;padding:.85rem 1.1rem;background:var(--bgc);border:1px solid var(--bd);border-radius:.65rem;font-size:.72rem;color:var(--t3);line-height:1.6}
+.legal strong{color:var(--t2);display:block;margin-bottom:.3rem}
+body.theme-bw{--bg:#000;--bgc:#111;--bgca:#1a1a1a;--bd:#333;--t1:#fff;--t2:#ccc;--t3:#666;--ac:#fff;--em:#aaa;--wa:#bbb;--ri:#999}
+body.theme-bw canvas{filter:grayscale(100%) brightness(1.3)}
+.chart-wrap{height:220px;position:relative}.chart-wrap-sm{height:160px;position:relative}
+.placeholder{text-align:center;padding:3rem 1rem;color:var(--t3)}
+.placeholder .ph-icon{font-size:3rem;margin-bottom:1rem;opacity:.4}
+.placeholder p{font-size:.85rem}
 
-  /* Health score ring */
-  .kpi-card.health-card { align-items: center; padding: 0.75rem; }
-  .health-ring { position: relative; width: 72px; height: 72px; }
-  .health-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .health-ring .ring-val {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; font-weight: 800; color: var(--text-1);
-  }
-  .health-badge {
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 0.2rem 0.55rem;
-    border-radius: 99px;
-    letter-spacing: 0.05em;
-  }
-  .health-badge.healthy { background: rgba(16,185,129,0.15); color: #34d399; }
-  .health-badge.critical { background: rgba(239,68,68,0.15); color: #f87171; }
-
-  /* ── METRIC GRID ── */
-  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; }
-  .metric-box {
-    background: var(--bg-card-alt);
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    padding: 0.65rem 0.75rem;
-    text-align: center;
-  }
-  .metric-val { font-size: 1rem; font-weight: 700; color: var(--text-1); }
-  .metric-key { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-2); margin-top: 0.2rem; line-height: 1.3; }
-
-  /* ── FLAG CARDS ── */
-  .flag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
-  @media (max-width: 768px) { .flag-grid { grid-template-columns: 1fr; } }
-  .flag-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 0.65rem;
-    padding: 0.85rem 1rem;
-  }
-  .flag-card ul { list-style: none; padding: 0; margin: 0; }
-  .flag-card li { font-size: 0.75rem; color: var(--text-2); padding: 0.25rem 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.4rem; }
-  .flag-card li:last-child { border-bottom: none; }
-  .flag-card li::before { flex-shrink: 0; margin-top: 0.15rem; }
-  .flag-card.risk li::before   { content: '▸'; color: var(--accent-risk); }
-  .flag-card.opp li::before    { content: '▸'; color: var(--accent-em); }
-  .flag-card.action li::before { content: '▸'; color: var(--accent); }
-  .flag-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.6rem; }
-  .flag-card.risk .flag-title   { color: var(--accent-risk); }
-  .flag-card.opp .flag-title    { color: var(--accent-em); }
-  .flag-card.action .flag-title { color: var(--accent); }
-
-  /* ── SECURITY ── */
-  .security-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-
-  /* ── LEGAL ── */
-  .legal {
-    margin-top: 1.25rem;
-    padding: 0.85rem 1.1rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 0.65rem;
-    font-size: 0.72rem;
-    color: var(--text-3);
-    line-height: 1.6;
-  }
-  .legal strong { color: var(--text-2); display: block; margin-bottom: 0.3rem; }
-
-  /* ── BLACK & WHITE MODE ── */
-  body.theme-bw {
-    --bg-main: #000; --bg-card: #111; --bg-card-alt: #1a1a1a;
-    --border: #333; --text-1: #fff; --text-2: #ccc; --text-3: #666;
-    --accent: #fff; --accent-em: #aaa; --accent-warn: #bbb; --accent-risk: #999;
-  }
-  body.theme-bw canvas { filter: grayscale(100%) brightness(1.3); }
-
-  /* ── CHART CONTAINERS ── */
-  .chart-wrap { height: 220px; position: relative; }
-  .chart-wrap-sm { height: 160px; position: relative; }
-  </style>
+@media print{
+  body{background:#fff!important;color:#000!important}
+  .upload-section,.pipeline,.status-bar,.upload-history,.hdr-act,.placeholder{display:none!important}
+  .shell{padding:.5rem}
+  .top-bar{border-bottom:2px solid #000;margin-bottom:.75rem;padding-bottom:.5rem}
+  .brand-title{color:#000!important;font-size:1.2rem}
+  .brand-title span{color:#1d4ed8!important}
+  .brand-sub{color:#374151!important}
+  .main-grid{display:grid!important;grid-template-columns:1fr 2fr!important;gap:.75rem}
+  .left-panel{position:static!important}
+  .left-panel .card{max-height:none!important;overflow:visible!important}
+  .card{background:#f9fafb!important;border:1px solid #d1d5db!important;border-radius:.4rem;page-break-inside:avoid}
+  .card-title{color:#374151!important;border-bottom:1px solid #d1d5db!important}
+  .kpi-card{background:#f3f4f6!important;border:1px solid #d1d5db!important}
+  .kpi-label{color:#6b7280!important}.kpi-value{color:#111827!important}
+  .kpi-value.green{color:#059669!important}.kpi-value.amber{color:#d97706!important}.kpi-value.blue{color:#1d4ed8!important}
+  #markdownContainer h1,#markdownContainer h2,#markdownContainer h3{color:#111827!important}
+  #markdownContainer h3{color:#1d4ed8!important}
+  #markdownContainer p,#markdownContainer li{color:#374151!important}
+  .metric-box{background:#f3f4f6!important;border:1px solid #d1d5db!important}
+  .metric-val{color:#111827!important}.metric-key{color:#6b7280!important}
+  .flag-card{background:#f9fafb!important;border:1px solid #d1d5db!important}
+  .flag-card li{color:#374151!important;border-bottom:1px solid #e5e7eb!important}
+  .flag-card.risk .flag-title{color:#dc2626!important}.flag-card.opp .flag-title{color:#059669!important}.flag-card.action .flag-title{color:#1d4ed8!important}
+  .panel-section-title{color:#1d4ed8!important}
+  .legal{background:#f9fafb!important;border:1px solid #d1d5db!important;color:#6b7280!important}
+  .finding-body{display:block!important}.tab-panel{display:block!important}.panel-tabs{display:none!important}
+  canvas{max-width:100%!important}
+  @page{margin:1.5cm;size:A4}
+}
+</style>
 </head>
 <body>
 
-<div class="shell">
+<button id="onboardLangToggle" type="button" style="position:fixed;top:14px;right:14px;z-index:9999;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:.45rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)">EN</button>
 
-  <!-- TOP BAR -->
-  <header class="top-bar">
-    <div class="brand">
-      <div class="brand-title">The Pi <span>Suite</span></div>
-      <div id="dashboard-subtitle" class="brand-sub"><strong>Pi Suite</strong> — Real-time consolidated financial insights.</div>
+<div class="onboard-shell" id="screen-engine">
+  <div class="onboard-card">
+    <div class="onboard-logo">
+      <img src="data:image/png;base64,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" alt="PiSuite">
+      <div class="onboard-logo-text">Pi<span>Suite</span></div>
     </div>
-    <div class="header-actions">
-      <button onclick="exportToPDF()" class="btn btn-success">⬇ PDF</button>
-      <button id="themeToggle" class="btn btn-ghost">
-        <span id="themeToggleIcon">⚫</span>
-        <span id="themeToggleText">B&amp;W</span>
+    <div class="progress-dots">
+      <div class="progress-dot active" id="dot1"></div>
+      <div class="progress-dot" id="dot2"></div>
+      <div class="progress-dot" id="dot3"></div>
+    </div>
+    <div class="onboard-title" id="ob-engine-title">Hangi AI motorunu kullanmak istersiniz?</div>
+    <div class="onboard-sub" id="ob-engine-sub">5 ajan bu motor üzerinden çalışacak: Analyst, Auditor, Optimizer, Forecaster, DuPont</div>
+
+    <div class="engine-grid" id="engineGrid">
+      <button class="engine-card" data-engine="claude" type="button">
+        <span class="engine-icon">&#129312;</span>
+        <div class="engine-info">
+          <div class="engine-name">Claude (Anthropic)</div>
+          <div class="engine-desc" id="ob-eng-claude-desc">En yüksek kalite finansal analiz · Sonnet 4.6</div>
+        </div>
+        <span class="engine-badge cloud" id="ob-badge-claude">Bulut</span>
       </button>
-      <button id="langToggle" class="btn btn-primary">TR</button>
+      <button class="engine-card" data-engine="gemini" type="button">
+        <span class="engine-icon">&#10024;</span>
+        <div class="engine-info">
+          <div class="engine-name">Gemini (Google)</div>
+          <div class="engine-desc" id="ob-eng-gemini-desc">Hızlı ve maliyet etkin analiz · Gemini 2.0 Flash</div>
+        </div>
+        <span class="engine-badge cloud" id="ob-badge-gemini">Bulut</span>
+      </button>
+      <button class="engine-card" data-engine="ollama" type="button">
+        <span class="engine-icon">&#128187;</span>
+        <div class="engine-info">
+          <div class="engine-name">Ollama (Yerel)</div>
+          <div class="engine-desc" id="ob-eng-ollama-desc">İnternet gerektirmez · Verileriniz bilgisayarınızda kalır</div>
+        </div>
+        <span class="engine-badge local" id="ob-badge-ollama">Yerel</span>
+      </button>
+    </div>
+
+    <button class="onboard-btn" id="engineNextBtn" disabled>Devam Et</button>
+  </div>
+</div>
+
+<div class="onboard-shell" id="screen-apikey" style="display:none">
+  <div class="onboard-card">
+    <div class="onboard-logo">
+      <img src="data:image/png;base64,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" alt="PiSuite">
+      <div class="onboard-logo-text">Pi<span>Suite</span></div>
+    </div>
+    <div class="progress-dots">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="onboard-title" id="apiKeyTitle">API anahtarınızı girin</div>
+    <div class="onboard-sub" id="apiKeySub">Analiz için gerekli — sadece bu oturumda kullanılır</div>
+
+    <div class="api-key-section">
+      <div class="api-key-label" id="apiKeyLabel">🔑 API Anahtarı</div>
+      <div class="api-key-input-wrap">
+        <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+        <button type="button" class="api-key-toggle" id="apiKeyToggleBtn">👁</button>
+      </div>
+      <div class="api-key-hint" id="apiKeyHint"></div>
+    </div>
+
+    <div class="security-note">
+      <span class="security-note-icon">🔒</span>
+      <span class="security-note-text" id="ob-security-note"><strong id="ob-security-strong">Güvenlik:</strong> <span id="ob-security-body">API anahtarınız yalnızca bu tarayıcı sekmesinin hafızasında (RAM) tutulur. Diske, localStorage'a veya çerezlere asla yazılmaz. Sekmeyi kapattığınızda tamamen silinir.</span></span>
+    </div>
+
+    <div id="apiKeyError" style="display:none"></div>
+
+    <button class="onboard-btn" id="apiKeyNextBtn" disabled>Bağlantıyı Doğrula ve Devam Et</button>
+    <button class="onboard-back" id="apiKeyBackBtn">← Geri</button>
+  </div>
+</div>
+
+<div class="onboard-shell" id="screen-ollama" style="display:none">
+  <div class="onboard-card">
+    <div class="onboard-logo">
+      <img src="data:image/png;base64,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" alt="PiSuite">
+      <div class="onboard-logo-text">Pi<span>Suite</span></div>
+    </div>
+    <div class="progress-dots">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="onboard-title" id="ob-ollama-title">Ollama yerel sunucusu</div>
+    <div class="onboard-sub" id="ob-ollama-sub">Bilgisayarınızda Ollama'nın çalışıyor olması gerekir</div>
+
+    <div class="api-key-section">
+      <div class="api-key-label" id="ob-ollama-label">🌐 Ollama Sunucu Adresi</div>
+      <div class="api-key-input-wrap">
+        <input type="text" class="api-key-input" id="ollamaUrlInput" value="http://localhost:11434" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="api-key-hint" id="ob-ollama-hint">
+        Ollama kurulu değilse: <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a> adresinden indirin.<br>
+        Sonra terminalde çalıştırın: <code>ollama pull llama3.1</code>
+      </div>
+    </div>
+
+    <div id="ollamaError" style="display:none"></div>
+
+    <button class="onboard-btn" id="ollamaNextBtn">Bağlantıyı Doğrula ve Devam Et</button>
+    <button class="onboard-back" id="ollamaBackBtn">← Geri</button>
+  </div>
+</div>
+
+<div class="shell" id="mainApp" style="display:none">
+
+  <header class="top-bar">
+    <div class="brand-row">
+      <img src="data:image/png;base64,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" alt="PiSuite">
+      <div>
+        <div class="brand-title">Pi<span>Suite</span></div>
+        <div class="brand-sub" id="brand-sub"><strong>PiSuite</strong> — Tabula Rasa · 5-Ajan AI Finansal Analiz Motoru</div>
+      </div>
+    </div>
+    <div class="hdr-act">
+      <span class="engine-pill" id="enginePill">Claude</span>
+      <button onclick="window.print()" class="btn btn-success">⬇ PDF</button>
+      <button id="themeToggle" class="btn btn-ghost">⚫ B&W</button>
+      <button id="langToggle" class="btn btn-primary">EN</button>
+      <button id="changeEngineBtn" class="btn btn-ghost" title="AI motorunu değiştir">⚙️</button>
     </div>
   </header>
 
-  <!-- MAIN GRID -->
-  <div class="main-grid">
+  <div class="upload-section">
+    <label class="dropzone" id="dropzone" for="fileInput">
+      <span class="dz-icon">📊</span>
+      <div class="dz-title" id="dz-title">Excel veya CSV dosyanızı buraya sürükleyin veya tıklayın</div>
+      <div class="dz-sub" id="dz-sub">Desteklenen: .xlsx · .xls · .csv — Her dosya adı kabul edilir · Tabula Rasa</div>
+      <div id="file-pill" class="file-pill" style="display:none">✅ <span id="pill-name"></span></div>
+    </label>
+    <input type="file" id="fileInput" name="fileInput" accept=".xlsx,.xls,.csv"
+           style="opacity:0;position:fixed;top:0;left:0;width:0;height:0;pointer-events:none">
+    <div class="upload-history" id="uploadHistory"></div>
+  </div>
 
-    <!-- ══ LEFT PANEL ══ -->
+  <div class="pipeline" id="pipeline">
+    <div class="pipeline-title" id="pipeline-title">Ajan Pipeline — Analiz Süreci</div>
+    <div class="agents-row" id="agentsRow"></div>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="spinner"></div>
+    <span id="statusText">İşleniyor...</span>
+  </div>
+
+  <div class="placeholder" id="placeholder">
+    <div class="ph-icon">📈</div>
+    <p id="ph-text">Analiz başlatmak için bir Excel veya CSV dosyası yükleyin.</p>
+  </div>
+
+  <div class="main-grid" id="mainGrid" style="display:none">
     <div class="left-panel">
-      <div class="card" style="padding: 1rem;">
-
-        <!-- Tabs -->
+      <div class="card" style="padding:1rem">
         <div class="panel-tabs">
-          <button class="tab-btn active" onclick="switchTab('ai')" id="tab-ai" data-i18n="ai_narrative">AI Analysis</button>
-          <button class="tab-btn" onclick="switchTab('mckinsey')" id="tab-mckinsey" data-i18n="mckinsey_section">Scenarios</button>
-          <button class="tab-btn" onclick="switchTab('eisenhower')" id="tab-eisenhower" data-i18n="eisenhower_section">Priority</button>
+          <button class="tab-btn active" onclick="switchTab('ai')" id="tab-ai">AI Analizi</button>
+          <button class="tab-btn" onclick="switchTab('mckinsey')" id="tab-mckinsey">Senaryolar</button>
+          <button class="tab-btn" onclick="switchTab('eisenhower')" id="tab-eisenhower">Öncelik</button>
+          <button class="tab-btn" onclick="switchTab('agents')" id="tab-agents">Ajanlar</button>
         </div>
-
-        <!-- AI Narrative Tab -->
         <div id="panel-ai" class="tab-panel active">
-          <div class="card-title"><span class="dot dot-green"></span><span data-i18n="exec_summary">Executive Summary</span></div>
-          <div id="markdownContainer" style="font-size:0.8rem; color: var(--text-2); line-height: 1.65;">
-            Loading analysis...
-          </div>
+          <div class="card-title"><span class="dot dot-g"></span><span id="lbl-exec">Yönetici Özeti</span></div>
+          <div id="markdownContainer" style="font-size:.8rem;color:var(--t2);line-height:1.65">Yükleme bekleniyor...</div>
         </div>
-
-        <!-- McKinsey Tab -->
-        <div id="panel-mckinsey" class="tab-panel">
-          <div id="mckinseyLeftPanel"></div>
+        <div id="panel-mckinsey" class="tab-panel"><div id="mckinseyPanel"></div></div>
+        <div id="panel-eisenhower" class="tab-panel"><div id="eisenhowerPanel"></div></div>
+        <div id="panel-agents" class="tab-panel">
+          <div class="card-title"><span class="dot"></span><span id="lbl-agents">Ajan Bulguları</span></div>
+          <div id="agentFindings"></div>
         </div>
-
-        <!-- Eisenhower Tab -->
-        <div id="panel-eisenhower" class="tab-panel">
-          <div id="eisenhowerLeftPanel"></div>
-        </div>
-
       </div>
     </div>
 
-    <!-- ══ RIGHT PANEL ══ -->
     <div class="right-panel">
-
-      <!-- KPI ROW -->
       <div class="kpi-row">
-
-        <!-- Health Score -->
         <div class="kpi-card health-card">
-          <div class="kpi-label" data-i18n="financial_health">Financial Health</div>
+          <div class="kpi-label" id="lbl-health">Finansal Sağlık</div>
           <div class="health-ring">
             <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
               <path stroke-width="3" stroke="#1e293b" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-              <path id="healthScoreCircle" stroke-width="3" stroke-linecap="round" stroke="#10b981" fill="none"
-                    stroke-dasharray="100,100"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <path id="healthCircle" stroke-width="3" stroke-linecap="round" stroke="#10b981" fill="none" stroke-dasharray="100,100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
             </svg>
-            <div class="ring-val"><span id="healthScoreValue">—</span></div>
+            <div class="ring-val"><span id="healthVal">—</span></div>
           </div>
-          <span id="healthStatus" class="health-badge healthy">—</span>
+          <span id="healthBadge" class="health-badge healthy">—</span>
         </div>
-
-        <!-- Z-Score + ROE -->
         <div class="kpi-card">
-          <div class="kpi-label" data-i18n="z_score">Altman Z-Score</div>
-          <div id="zScoreValue" class="kpi-value blue">—</div>
-          <div style="margin-top:auto; padding-top:0.75rem;">
-            <div class="kpi-label" data-i18n="roe">Return on Equity</div>
-            <div id="roeValue" class="kpi-value green">—</div>
+          <div class="kpi-label" id="lbl-z">Altman Z-Skoru</div>
+          <div id="zVal" class="kpi-value blue">—</div>
+          <div style="margin-top:auto;padding-top:.75rem">
+            <div class="kpi-label" id="lbl-roe">Özsermaye Karlılığı</div>
+            <div id="roeVal" class="kpi-value green">—</div>
           </div>
         </div>
-
-        <!-- Cash Runway -->
-        <div class="kpi-card" style="justify-content: space-between;">
-          <div class="kpi-label" data-i18n="cash_runway">Cash Runway</div>
-          <div id="cashRunwayValue" class="kpi-value amber">—</div>
-        </div>
-
-        <!-- Security -->
         <div class="kpi-card">
-          <div class="kpi-label" data-i18n="sec_conf">Confidentiality</div>
-          <div id="confidentiality-rate-val" class="kpi-value blue">95%</div>
-          <div style="margin-top:auto; padding-top:0.75rem;">
-            <div class="kpi-label" data-i18n="sec_fore">Forecast Confidence</div>
-            <div id="confidence-rate-val" class="kpi-value green">88%</div>
+          <div class="kpi-label" id="lbl-run">Nakit Ömrü</div>
+          <div id="runVal" class="kpi-value amber">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label" id="lbl-conf">Gizlilik</div>
+          <div id="confVal" class="kpi-value blue">95%</div>
+          <div style="margin-top:auto;padding-top:.75rem">
+            <div class="kpi-label" id="lbl-fore">Tahmin Güveni</div>
+            <div id="foreVal" class="kpi-value green">88%</div>
           </div>
         </div>
-
       </div>
 
-      <!-- BUDGET CHART -->
       <div class="card">
-        <div class="card-title"><span class="dot"></span><span data-i18n="budget_sim">Budget Simulations & Forecasts</span></div>
-        <div class="chart-wrap"><canvas id="cashFlowChart"></canvas></div>
+        <div class="card-title"><span class="dot"></span><span id="lbl-budget">Bütçe Simülasyonları & Tahminler</span></div>
+        <div class="chart-wrap"><canvas id="cfChart"></canvas></div>
       </div>
 
-      <!-- RATIO + DUPONT -->
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
         <div class="card">
-          <div class="card-title"><span class="dot dot-green"></span><span data-i18n="ratio_title">Ratio Analytics</span></div>
-          <div id="ratioAnalyticsGrid" class="metric-grid"></div>
+          <div class="card-title"><span class="dot dot-g"></span><span id="lbl-ratio">Finansal Rasyolar</span></div>
+          <div id="ratioGrid" class="metric-grid"></div>
+          <div id="ratioDiag" style="margin-top:.6rem"></div>
         </div>
         <div class="card">
-          <div class="card-title"><span class="dot"></span><span data-i18n="dupont_title">DuPont Pillars</span></div>
+          <div class="card-title"><span class="dot"></span><span id="lbl-dupont">DuPont Analizi</span></div>
           <div id="dupontGrid" class="metric-grid"></div>
         </div>
       </div>
 
-      <!-- HISTORICAL CHART -->
       <div class="card">
-        <div class="card-title"><span class="dot dot-green"></span><span data-i18n="historical_title">Historical Comparison</span></div>
-        <div class="chart-wrap-sm"><canvas id="historicalChart"></canvas></div>
+        <div class="card-title"><span class="dot dot-g"></span><span id="lbl-hist">Tarihsel Karşılaştırma</span></div>
+        <div class="chart-wrap-sm"><canvas id="histChart"></canvas></div>
       </div>
 
-      <!-- COST CUTTING -->
       <div class="card">
-        <div class="card-title"><span class="dot"></span><span data-i18n="cost_cutting">Cost Cutting Savings</span></div>
+        <div class="card-title"><span class="dot"></span><span id="lbl-cost">Maliyet Azaltma Planları</span></div>
         <div id="savingsGrid" class="metric-grid"></div>
       </div>
 
-      <!-- FLAGS -->
       <div class="flag-grid">
-        <div class="flag-card risk">
-          <div class="flag-title" data-i18n="risks">Critical Risks</div>
-          <div id="redFlagsContainer"></div>
-        </div>
-        <div class="flag-card opp">
-          <div class="flag-title" data-i18n="opportunities">Opportunities & Growth</div>
-          <div id="greenFlagsContainer"></div>
-        </div>
-        <div class="flag-card action">
-          <div class="flag-title" data-i18n="strategic_action">Strategic Action Plan</div>
-          <div id="actionPlanContainer"></div>
-        </div>
+        <div class="flag-card risk"><div class="flag-title" id="lbl-risks">Kritik Riskler</div><div id="redFlags"></div></div>
+        <div class="flag-card opp"><div class="flag-title" id="lbl-opps">Fırsatlar & Büyüme</div><div id="greenFlags"></div></div>
+        <div class="flag-card action"><div class="flag-title" id="lbl-actions">Stratejik Aksiyon</div><div id="actionPlan"></div></div>
       </div>
-
-    </div><!-- /right-panel -->
-
-  </div><!-- /main-grid -->
-
-  <!-- LEGAL -->
-  <div class="legal">
-    <strong data-i18n="legal_title">⚖️ Legal Disclaimer</strong>
-    <span data-i18n="legal_text">Loading disclaimer...</span>
+    </div>
   </div>
 
-</div><!-- /shell -->
+  <div class="legal" id="legal" style="display:none">
+    <strong id="lbl-legal">⚖️ Yasal Uyarı</strong>
+    <span id="legal-text">Bu rapor otomatik üretilmiştir ve yatırım tavsiyesi niteliği taşımaz. Karar almadan önce lisanslı uzman danışın. Veriler gizlidir.</span>
+  </div>
+</div>
 
 <script>
-  function switchTab(name) {
-    ['ai','mckinsey','eisenhower'].forEach(t => {
-      document.getElementById('panel-' + t)?.classList.toggle('active', t === name);
-      document.getElementById('tab-' + t)?.classList.toggle('active', t === name);
+// ═══════════════════════════════════════════════════════════════════════════
+//  PISUITE — TAM UYGULAMA
+//  Onboarding (motor seçimi + API key) → Upload → 5 Ajan → Dashboard
+//  GÜVENLİK: API key sadece JS değişkeninde (RAM) tutulur.
+//  localStorage / sessionStorage / cookie / disk — HİÇBİRİ KULLANILMAZ.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─────────────────────────────────────────────────────────────────────────
+//  GÜVENLİK KATMANI: XSS koruması
+//  AI çıktıları (ve dolaylı olarak yüklenen dosya içeriği) hiçbir zaman
+//  doğrudan innerHTML'e yazılmaz — her zaman DOMPurify'dan geçirilir veya
+//  metin olarak (HTML parse edilmeden) eklenir.
+// ─────────────────────────────────────────────────────────────────────────
+function safeHTML(html) {
+  if (typeof DOMPurify !== 'undefined') {
+    return DOMPurify.sanitize(String(html ?? ''), {
+      ALLOWED_TAGS: ['b','strong','i','em','p','ul','ol','li','br','h1','h2','h3','h4','code','pre','blockquote','a','span','div','table','thead','tbody','tr','th','td'],
+      ALLOWED_ATTR: ['href','class'],
+      ALLOW_DATA_ATTR: false
     });
   }
+  // DOMPurify yüklenemediyse (CDN engellendi vb.) en güvenli yol: hiç HTML parse etme
+  return escapeText(String(html ?? ''));
+}
+function escapeText(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s ?? '');
+  return d.innerHTML;
+}
+
+// ── DURUM (sadece bellekte, sayfa kapanınca silinir) ────────────────────────
+let SELECTED_ENGINE = null;   // 'claude' | 'gemini' | 'ollama'
+let API_KEY         = null;   // RAM'de tutulur, hiçbir yere yazılmaz
+let OLLAMA_URL       = 'http://localhost:11434';
+let OLLAMA_MODEL      = null;
+
+let dashboardData = null, currentLang = 'tr', uploadCount = 0;
+let cfChartInst = null, histChartInst = null;
+
+// ─────────────────────────────────────────────────────────────────────────
+//  ONBOARDING — ADIM 1: MOTOR SEÇİMİ
+// ─────────────────────────────────────────────────────────────────────────
+(function initEngineSelection() {
+  const cards = document.querySelectorAll('.engine-card');
+  const nextBtn = document.getElementById('engineNextBtn');
+
+  cards.forEach(card => {
+    card.addEventListener('click', function() {
+      cards.forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      SELECTED_ENGINE = this.getAttribute('data-engine');
+      nextBtn.disabled = false;
+    });
+  });
+
+  nextBtn.addEventListener('click', function() {
+    if (!SELECTED_ENGINE) return;
+    document.getElementById('screen-engine').style.display = 'none';
+
+    if (SELECTED_ENGINE === 'ollama') {
+      document.getElementById('screen-ollama').style.display = 'flex';
+    } else {
+      showApiKeyScreen();
+    }
+  });
+})();
+
+// ─────────────────────────────────────────────────────────────────────────
+//  ONBOARDING — ADIM 2: API KEY (Claude / Gemini)
+// ─────────────────────────────────────────────────────────────────────────
+function showApiKeyScreen() {
+  const c = {
+    title: t('apikey_title_' + SELECTED_ENGINE),
+    label: t('apikey_label_' + SELECTED_ENGINE),
+    placeholder: SELECTED_ENGINE === 'claude' ? 'sk-ant-api03-...' : 'AIzaSy...',
+    hint: t('apikey_hint_' + SELECTED_ENGINE)
+  };
+  document.getElementById('apiKeyTitle').textContent = c.title;
+  document.getElementById('apiKeyLabel').textContent  = c.label;
+  document.getElementById('apiKeyInput').placeholder  = c.placeholder;
+  document.getElementById('apiKeyHint').innerHTML     = c.hint;
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('apiKeyError').style.display = 'none';
+  document.getElementById('apiKeyNextBtn').disabled = true;
+  document.getElementById('apiKeyNextBtn').textContent = t('ob_verify_continue');
+  document.getElementById('screen-apikey').style.display = 'flex';
+  applyOnboardLang();
+  setTimeout(() => document.getElementById('apiKeyInput').focus(), 100);
+}
+
+document.getElementById('apiKeyInput').addEventListener('input', function() {
+  document.getElementById('apiKeyNextBtn').disabled = this.value.trim().length < 8;
+  document.getElementById('apiKeyError').style.display = 'none';
+});
+
+document.getElementById('apiKeyInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !document.getElementById('apiKeyNextBtn').disabled) {
+    document.getElementById('apiKeyNextBtn').click();
+  }
+});
+
+document.getElementById('apiKeyToggleBtn').addEventListener('click', function() {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  this.textContent = inp.type === 'password' ? '👁' : '🙈';
+});
+
+document.getElementById('apiKeyBackBtn').addEventListener('click', function() {
+  document.getElementById('screen-apikey').style.display = 'none';
+  document.getElementById('screen-engine').style.display = 'flex';
+  SELECTED_ENGINE = null;
+  document.querySelectorAll('.engine-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('engineNextBtn').disabled = true;
+});
+
+document.getElementById('apiKeyNextBtn').addEventListener('click', async function() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) return;
+
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="test-spinner"></span>' + t('ob_testing');
+  document.getElementById('apiKeyError').style.display = 'none';
+
+  const result = await testApiKey(SELECTED_ENGINE, key);
+
+  if (result.ok) {
+    API_KEY = key; // RAM'de tutulur — localStorage/cookie kullanılmaz
+    enterMainApp();
+  } else {
+    btn.disabled = false;
+    btn.textContent = t('ob_verify_continue');
+    showApiKeyError(result.message);
+  }
+});
+
+function showApiKeyError(msg) {
+  const el = document.getElementById('apiKeyError');
+  el.className = 'error-banner';
+  el.style.display = 'flex';
+  el.innerHTML = '⚠️ ' + msg;
+}
+
+// API anahtarını gerçek bir minimal istek ile doğrula
+async function testApiKey(engine, key) {
+  try {
+    if (engine === 'claude') {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 10,
+          messages: [{ role: 'user', content: 'merhaba' }]
+        })
+      });
+      if (resp.status === 401) return { ok:false, message:t('err_invalid_key') };
+      if (resp.status === 403) return { ok:false, message:t('err_forbidden') };
+      if (resp.status === 429) return { ok:true }; // rate limit = anahtar geçerli demek
+      if (!resp.ok && resp.status >= 500) return { ok:false, message:t('err_anthropic_server') };
+      const data = await resp.json();
+      if (data.error) return { ok:false, message: data.error.message || t('err_api_generic') };
+      return { ok:true };
+    }
+
+    if (engine === 'gemini') {
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: 'merhaba' }] }] })
+      });
+      if (resp.status === 400 || resp.status === 403) return { ok:false, message:t('err_invalid_key') };
+      if (!resp.ok && resp.status >= 500) return { ok:false, message:t('err_google_server') };
+      const data = await resp.json();
+      if (data.error) return { ok:false, message: data.error.message || t('err_api_generic') };
+      return { ok:true };
+    }
+
+    return { ok:false, message:t('err_unknown_engine') };
+  } catch (e) {
+    return { ok:false, message:t('err_no_connection') + e.message + t('err_no_connection_suffix') };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  ONBOARDING — OLLAMA (yerel sunucu, API key gerekmez)
+// ─────────────────────────────────────────────────────────────────────────
+document.getElementById('ollamaBackBtn').addEventListener('click', function() {
+  document.getElementById('screen-ollama').style.display = 'none';
+  document.getElementById('screen-engine').style.display = 'flex';
+  SELECTED_ENGINE = null;
+  document.querySelectorAll('.engine-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('engineNextBtn').disabled = true;
+});
+
+document.getElementById('ollamaNextBtn').addEventListener('click', async function() {
+  const url = document.getElementById('ollamaUrlInput').value.trim().replace(/\/$/, '');
+  if (!url) return;
+
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="test-spinner"></span>' + t('ob_testing');
+  document.getElementById('ollamaError').style.display = 'none';
+
+  try {
+    const resp = await fetch(url + '/api/tags', { method: 'GET', mode: 'cors' });
+    if (!resp.ok) throw { kind: 'http', status: resp.status };
+    const data = await resp.json();
+    if (!data.models || data.models.length === 0) {
+      throw { kind: 'no_models' };
+    }
+    OLLAMA_URL = url;
+    OLLAMA_MODEL = data.models[0].name; // ilk bulunan modeli kullan
+    enterMainApp();
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = t('ob_verify_continue');
+    showOllamaError(e, url);
+  }
+});
+
+function showOllamaError(e, url) {
+  const el = document.getElementById('ollamaError');
+  el.className = 'error-banner';
+  el.style.display = 'block';
+  el.style.flexDirection = 'column';
+  el.style.alignItems = 'stretch';
+  el.style.gap = '.5rem';
+
+  // CORS / ağ hatası: fetch TypeError fırlatır, kind alanı yok
+  const isCors = !e || !e.kind;
+  const isNoModels = e && e.kind === 'no_models';
+  const isHttp = e && e.kind === 'http';
+
+  if (isCors) {
+    el.innerHTML = `
+      <div>⚠️ <strong>${url}</strong> ${t('ollama_cors_line1')}</div>
+      <div style="font-size:.72rem;line-height:1.6;color:#fca5a5">
+        ${t('ollama_cors_body')}
+        <div style="margin-top:.4rem">
+          <strong>${t('ollama_cors_mac')}</strong> (Terminal):<br>
+          <code style="display:block;background:rgba(0,0,0,.3);padding:.4rem .6rem;border-radius:.3rem;margin-top:.2rem">OLLAMA_ORIGINS="*" ollama serve</code>
+        </div>
+        <div style="margin-top:.4rem">
+          <strong>${t('ollama_cors_win')}</strong> (PowerShell, admin):<br>
+          <code style="display:block;background:rgba(0,0,0,.3);padding:.4rem .6rem;border-radius:.3rem;margin-top:.2rem">setx OLLAMA_ORIGINS "*"</code>
+          <span style="color:#fbbf24">${t('ollama_cors_win_note')}</span>
+        </div>
+        <div style="margin-top:.5rem">${t('ollama_cors_notrunning')} <code style="background:rgba(0,0,0,.3);padding:.1rem .4rem;border-radius:.3rem">ollama serve</code></div>
+      </div>`;
+  } else if (isNoModels) {
+    el.innerHTML = `
+      <div>⚠️ ${t('ollama_no_models')}</div>
+      <div style="font-size:.72rem;color:#fca5a5;margin-top:.3rem">
+        ${t('ollama_no_models_hint')} <code style="background:rgba(0,0,0,.3);padding:.1rem .4rem;border-radius:.3rem">ollama pull llama3.1</code>
+      </div>`;
+  } else if (isHttp) {
+    el.innerHTML = `⚠️ ${t('ollama_http_err').replace('STATUS', e.status)}`;
+  } else {
+    el.innerHTML = `⚠️ ${t('ollama_unexpected')} ${e.message || e}`;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  ANA UYGULAMAYA GEÇİŞ
+// ─────────────────────────────────────────────────────────────────────────
+function enterMainApp() {
+  document.getElementById('screen-engine').style.display = 'none';
+  document.getElementById('screen-apikey').style.display = 'none';
+  document.getElementById('screen-ollama').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+
+  const pillMap = { claude: '🟠 Claude', gemini: '✨ Gemini', ollama: `💻 Ollama (${OLLAMA_MODEL||'?'})` };
+  document.getElementById('enginePill').textContent = pillMap[SELECTED_ENGINE] || SELECTED_ENGINE;
+
+  applyLang();
+  initUpload();
+}
+
+document.getElementById('changeEngineBtn').addEventListener('click', function() {
+  if (!confirm(t('ob_change_engine_confirm'))) return;
+  API_KEY = null;
+  SELECTED_ENGINE = null;
+  dashboardData = null;
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('mainGrid').style.display = 'none';
+  document.getElementById('placeholder').style.display = 'block';
+  document.querySelectorAll('.engine-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('engineNextBtn').disabled = true;
+  document.getElementById('screen-engine').style.display = 'flex';
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+//  AGENTS — UI chip yönetimi
+// ─────────────────────────────────────────────────────────────────────────
+const AGENTS = [
+  { id: 'ceo',        label: { tr: '🧠 CEO Orkestratör',    en: '🧠 CEO Orchestrator' } },
+  { id: 'analyst',    label: { tr: '📊 Analyst Agent',       en: '📊 Analyst Agent' } },
+  { id: 'auditor',    label: { tr: '🔍 Auditor Agent',       en: '🔍 Auditor Agent' } },
+  { id: 'optimizer',  label: { tr: '⚙️ Optimizer Agent',     en: '⚙️ Optimizer Agent' } },
+  { id: 'forecaster', label: { tr: '📈 Forecaster Agent',    en: '📈 Forecaster Agent' } },
+  { id: 'dupont',     label: { tr: '🔬 DuPont Agent',        en: '🔬 DuPont Agent' } },
+  { id: 'synthesis',  label: { tr: '✅ CEO Sentezi',          en: '✅ CEO Synthesis' } },
+];
+
+function setAgentState(id, state) {
+  const el = document.getElementById('agent-' + id);
+  if (el) el.className = 'agent-chip ' + state;
+}
+
+function buildAgentChips() {
+  const row = document.getElementById('agentsRow');
+  row.innerHTML = AGENTS.map(a =>
+    `<div class="agent-chip" id="agent-${a.id}"><div class="agent-dot"></div><span>${a.label[currentLang]}</span></div>`
+  ).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  i18n
+// ─────────────────────────────────────────────────────────────────────────
+const I = {
+  tr: {
+    brand_sub:'Tabula Rasa · 5-Ajan AI Finansal Analiz Motoru',
+    dz_title:'Excel veya CSV dosyanızı buraya sürükleyin veya tıklayın',
+    dz_sub:'Desteklenen: .xlsx · .xls · .csv — Her dosya adı kabul edilir · Tabula Rasa',
+    ph:'Analiz başlatmak için bir Excel veya CSV dosyası yükleyin.',
+    pipeline_title:'Ajan Pipeline — Analiz Süreci',
+    exec:'Yönetici Özeti', agents_tab:'Ajanlar', agents_findings:'Ajan Bulguları',
+    mckinsey_tab:'Senaryolar', eis_tab:'Öncelik',
+    health:'Finansal Sağlık', z:'Altman Z-Skoru', roe:'Özsermaye Karlılığı',
+    run:'Nakit Ömrü', conf:'Gizlilik', fore:'Tahmin Güveni',
+    budget:'Bütçe Simülasyonları & Tahminler', ratio:'Finansal Rasyolar',
+    dupont:'DuPont Analizi', hist:'Tarihsel Karşılaştırma',
+    cost:'Maliyet Azaltma Planları', risks:'Kritik Riskler',
+    opps:'Fırsatlar & Büyüme', actions:'Stratejik Aksiyon',
+    legal_title:'⚖️ Yasal Uyarı',
+    legal_text:'Bu rapor otomatik üretilmiştir ve yatırım tavsiyesi niteliği taşımaz. Karar almadan önce lisanslı uzman danışın. Veriler gizlidir.',
+    healthy:'Sağlıklı', critical:'Kritik', months:' Ay',
+    safe:'Güvenli', grey:'Gri Bölge', distress:'Kritik Bölge',
+    chart_std:'Standart Tahmin', chart_rec:'Resesyon Senaryosu',
+    langBtn:'EN',
+    mckinsey_title:'McKinsey 3 Ufuk Modeli',
+    h1_lbl:'Ufuk 1 — Mevcut Çekirdek', h2_lbl:'Ufuk 2 — Gelişen Fırsatlar', h3_lbl:'Ufuk 3 — İnovasyon',
+    best:'✅ En İyi Durum', worst:'⚠️ En Kötü Durum',
+    best_action:'Eylem Planı', worst_action:'Acil Durum Planı',
+    eis_title:'Eisenhower Öncelik Matrisi',
+    do:'🔴 Hemen Yap', schedule:'🔵 Planla', delegate:'🟡 Devret', eliminate:'⚪ Kaldır',
+    urgent:'Acil', not_urgent:'Acil Değil', important:'Önemli', not_important:'Önemli Değil',
+    no_data:'Veri yok',
+    ob_engine_title:'Hangi AI motorunu kullanmak istersiniz?',
+    ob_engine_sub:'5 ajan bu motor üzerinden çalışacak: Analyst, Auditor, Optimizer, Forecaster, DuPont',
+    ob_eng_claude_desc:'En yüksek kalite finansal analiz · Sonnet 4.6',
+    ob_eng_gemini_desc:'Hızlı ve maliyet etkin analiz · Gemini 2.0 Flash',
+    ob_eng_ollama_desc:'İnternet gerektirmez · Verileriniz bilgisayarınızda kalır',
+    ob_badge_cloud:'Bulut', ob_badge_local:'Yerel',
+    ob_continue:'Devam Et', ob_back:'← Geri',
+    ob_verify_continue:'Bağlantıyı Doğrula ve Devam Et',
+    ob_testing:'Bağlantı test ediliyor...',
+    apikey_sub:'Analiz için gerekli — sadece bu oturumda kullanılır',
+    security_strong:'Güvenlik:',
+    security_body:'API anahtarınız yalnızca bu tarayıcı sekmesinin hafızasında (RAM) tutulur. Diske, localStorage\'a veya çerezlere asla yazılmaz. Sekmeyi kapattığınızda tamamen silinir.',
+    apikey_title_claude:'Claude API anahtarınızı girin', apikey_label_claude:'🔑 Anthropic API Anahtarı',
+    apikey_hint_claude:'API anahtarınızı <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> adresinden alabilirsiniz.',
+    apikey_title_gemini:'Gemini API anahtarınızı girin', apikey_label_gemini:'🔑 Google AI API Anahtarı',
+    apikey_hint_gemini:'API anahtarınızı <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a> adresinden alabilirsiniz.',
+    err_invalid_key:'Geçersiz API anahtarı.',
+    err_forbidden:'Erişim reddedildi — anahtar izinlerini kontrol edin.',
+    err_anthropic_server:'Anthropic sunucu hatası — tekrar deneyin.',
+    err_google_server:'Google sunucu hatası — tekrar deneyin.',
+    err_api_generic:'API hatası',
+    err_unknown_engine:'Bilinmeyen motor',
+    err_no_connection:'Bağlantı kurulamadı: ',
+    err_no_connection_suffix:' (internet bağlantınızı kontrol edin)',
+    ob_ollama_title:'Ollama yerel sunucusu',
+    ob_ollama_sub:'Bilgisayarınızda Ollama\'nın çalışıyor olması gerekir',
+    ob_ollama_label:'🌐 Ollama Sunucu Adresi',
+    ob_ollama_hint:'Ollama kurulu değilse: <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a> adresinden indirin.<br>Sonra terminalde çalıştırın: <code>ollama pull llama3.1</code>',
+    ob_change_engine_confirm:'AI motorunu değiştirmek istediğinize emin misiniz? Mevcut analiz silinecek.',
+    ollama_cors_line1:'adresine bağlanılamadı.',
+    ollama_cors_body:'Bu genellikle Ollama\'nın <strong>CORS izni</strong> vermemesinden kaynaklanır — tarayıcı, dosyadan (file://) açılan bu sayfanın yerel sunucunuza erişimini güvenlik gereği engeller.<br><br><strong>Çözüm:</strong> Ollama\'yı CORS izniyle yeniden başlatın:<br>',
+    ollama_cors_mac:'macOS / Linux',
+    ollama_cors_win:'Windows',
+    ollama_cors_win_note:'sonra Ollama\'yı tamamen kapatıp yeniden başlatın (sistem tepsisinden çıkış yapın)',
+    ollama_cors_notrunning:'Ollama çalışmıyorsa önce başlatın:',
+    ollama_no_models:'Ollama çalışıyor ama hiç model yüklü değil.',
+    ollama_no_models_hint:'Terminalde çalıştırın:',
+    ollama_http_err:'Sunucu yanıt verdi ama hata döndürdü (HTTP STATUS). Ollama sürümünüzü kontrol edin.',
+    ollama_unexpected:'Beklenmeyen hata:'
+  },
+  en: {
+    brand_sub:'Tabula Rasa · 5-Agent AI Financial Analysis Engine',
+    dz_title:'Drag & drop your Excel or CSV file here — or click',
+    dz_sub:'Supported: .xlsx · .xls · .csv — Any file name accepted · Tabula Rasa',
+    ph:'Upload an Excel or CSV file to start analysis.',
+    pipeline_title:'Agent Pipeline — Analysis Process',
+    exec:'Executive Summary', agents_tab:'Agents', agents_findings:'Agent Findings',
+    mckinsey_tab:'Scenarios', eis_tab:'Priority',
+    health:'Financial Health', z:'Altman Z-Score', roe:'Return on Equity',
+    run:'Cash Runway', conf:'Confidentiality', fore:'Forecast Confidence',
+    budget:'Budget Simulations & Forecasts', ratio:'Ratio Analytics',
+    dupont:'DuPont Pillars', hist:'Historical Comparison',
+    cost:'Cost Cutting Savings', risks:'Critical Risks',
+    opps:'Opportunities & Growth', actions:'Strategic Action Plan',
+    legal_title:'⚖️ Legal Disclaimer',
+    legal_text:'This report is generated automatically and does not constitute investment advice. Consult a licensed professional. Data is confidential.',
+    healthy:'Healthy', critical:'Critical', months:' Months',
+    safe:'Safe', grey:'Grey Zone', distress:'Distress Zone',
+    chart_std:'Standard Forecast', chart_rec:'Recession Scenario',
+    langBtn:'TR',
+    mckinsey_title:'McKinsey 3 Horizons',
+    h1_lbl:'Horizon 1 — Core', h2_lbl:'Horizon 2 — Emerging', h3_lbl:'Horizon 3 — Innovation',
+    best:'✅ Best Case', worst:'⚠️ Worst Case',
+    best_action:'Action Plan', worst_action:'Contingency Plan',
+    eis_title:'Eisenhower Priority Matrix',
+    do:'🔴 Do Now', schedule:'🔵 Schedule', delegate:'🟡 Delegate', eliminate:'⚪ Eliminate',
+    urgent:'Urgent', not_urgent:'Not Urgent', important:'Important', not_important:'Not Important',
+    no_data:'No data',
+    ob_engine_title:'Which AI engine would you like to use?',
+    ob_engine_sub:'5 agents will run on this engine: Analyst, Auditor, Optimizer, Forecaster, DuPont',
+    ob_eng_claude_desc:'Highest quality financial analysis · Sonnet 4.6',
+    ob_eng_gemini_desc:'Fast and cost-effective analysis · Gemini 2.0 Flash',
+    ob_eng_ollama_desc:'No internet required · Your data stays on your computer',
+    ob_badge_cloud:'Cloud', ob_badge_local:'Local',
+    ob_continue:'Continue', ob_back:'← Back',
+    ob_verify_continue:'Verify Connection & Continue',
+    ob_testing:'Testing connection...',
+    apikey_sub:'Required for analysis — used only in this session',
+    security_strong:'Security:',
+    security_body:'Your API key is kept only in this browser tab\'s memory (RAM). It is never written to disk, localStorage, or cookies. It is fully erased when you close the tab.',
+    apikey_title_claude:'Enter your Claude API key', apikey_label_claude:'🔑 Anthropic API Key',
+    apikey_hint_claude:'You can get your API key from <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.',
+    apikey_title_gemini:'Enter your Gemini API key', apikey_label_gemini:'🔑 Google AI API Key',
+    apikey_hint_gemini:'You can get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.',
+    err_invalid_key:'Invalid API key.',
+    err_forbidden:'Access denied — check key permissions.',
+    err_anthropic_server:'Anthropic server error — please try again.',
+    err_google_server:'Google server error — please try again.',
+    err_api_generic:'API error',
+    err_unknown_engine:'Unknown engine',
+    err_no_connection:'Could not connect: ',
+    err_no_connection_suffix:' (check your internet connection)',
+    ob_ollama_title:'Ollama local server',
+    ob_ollama_sub:'Ollama must be running on your computer',
+    ob_ollama_label:'🌐 Ollama Server Address',
+    ob_ollama_hint:'If Ollama is not installed: download it from <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a>.<br>Then run in your terminal: <code>ollama pull llama3.1</code>',
+    ob_change_engine_confirm:'Are you sure you want to change the AI engine? The current analysis will be deleted.',
+    ollama_cors_line1:'could not be reached.',
+    ollama_cors_body:'This is usually because Ollama hasn\'t granted <strong>CORS permission</strong> — for security, the browser blocks this page (opened from file://) from accessing your local server.<br><br><strong>Fix:</strong> Restart Ollama with CORS enabled:<br>',
+    ollama_cors_mac:'macOS / Linux',
+    ollama_cors_win:'Windows',
+    ollama_cors_win_note:'then fully quit and restart Ollama (exit from the system tray)',
+    ollama_cors_notrunning:'If Ollama isn\'t running, start it first:',
+    ollama_no_models:'Ollama is running but has no models installed.',
+    ollama_no_models_hint:'Run in your terminal:',
+    ollama_http_err:'The server responded but returned an error (HTTP STATUS). Check your Ollama version.',
+    ollama_unexpected:'Unexpected error:'
+  }
+};
+const t = k => I[currentLang][k] || k;
+
+function applyLang() {
+  document.getElementById('brand-sub').innerHTML = `<strong>PiSuite</strong> — ${t('brand_sub')}`;
+  document.getElementById('dz-title').textContent = t('dz_title');
+  document.getElementById('dz-sub').textContent = t('dz_sub');
+  document.getElementById('ph-text').textContent = t('ph');
+  document.getElementById('pipeline-title').textContent = t('pipeline_title');
+  document.getElementById('lbl-exec').textContent = t('exec');
+  document.getElementById('lbl-agents').textContent = t('agents_findings');
+  document.getElementById('tab-ai').textContent = t('exec');
+  document.getElementById('tab-mckinsey').textContent = t('mckinsey_tab');
+  document.getElementById('tab-eisenhower').textContent = t('eis_tab');
+  document.getElementById('tab-agents').textContent = t('agents_tab');
+  ['health','z','roe','run','conf','fore','budget','ratio','dupont','hist','cost','risks','opps','actions'].forEach(k => {
+    const el = document.getElementById('lbl-' + k);
+    if (el) el.textContent = t(k);
+  });
+  document.getElementById('lbl-legal').textContent = t('legal_title');
+  document.getElementById('legal-text').textContent = t('legal_text');
+  document.getElementById('langToggle').textContent = t('langBtn');
+  buildAgentChips();
+}
+
+function applyOnboardLang() {
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+
+  set('ob-engine-title', t('ob_engine_title'));
+  set('ob-engine-sub', t('ob_engine_sub'));
+  set('ob-eng-claude-desc', t('ob_eng_claude_desc'));
+  set('ob-eng-gemini-desc', t('ob_eng_gemini_desc'));
+  set('ob-eng-ollama-desc', t('ob_eng_ollama_desc'));
+  set('ob-badge-claude', t('ob_badge_cloud'));
+  set('ob-badge-gemini', t('ob_badge_cloud'));
+  set('ob-badge-ollama', t('ob_badge_local'));
+  set('engineNextBtn', t('ob_continue'));
+
+  set('apiKeySub', t('apikey_sub'));
+  set('ob-security-strong', t('security_strong'));
+  set('ob-security-body', t('security_body'));
+  const akBtn = document.getElementById('apiKeyNextBtn');
+  if (akBtn && !akBtn.querySelector('.test-spinner')) akBtn.textContent = t('ob_verify_continue');
+  set('apiKeyBackBtn', t('ob_back'));
+  if (SELECTED_ENGINE === 'claude' || SELECTED_ENGINE === 'gemini') {
+    set('apiKeyTitle', t('apikey_title_' + SELECTED_ENGINE));
+    set('apiKeyLabel', t('apikey_label_' + SELECTED_ENGINE));
+    setHtml('apiKeyHint', t('apikey_hint_' + SELECTED_ENGINE));
+  }
+
+  set('ob-ollama-title', t('ob_ollama_title'));
+  set('ob-ollama-sub', t('ob_ollama_sub'));
+  set('ob-ollama-label', t('ob_ollama_label'));
+  setHtml('ob-ollama-hint', t('ob_ollama_hint'));
+  const olBtn = document.getElementById('ollamaNextBtn');
+  if (olBtn && !olBtn.querySelector('.test-spinner')) olBtn.textContent = t('ob_verify_continue');
+  set('ollamaBackBtn', t('ob_back'));
+
+  const obToggle = document.getElementById('onboardLangToggle');
+  if (obToggle) obToggle.textContent = t('langBtn');
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────
+//  UPLOAD — label[for] tabanlı, file:// protokolünde de çalışır
+// ─────────────────────────────────────────────────────────────────────────
+function initUpload() {
+  const dz  = document.getElementById('dropzone');
+  const inp = document.getElementById('fileInput');
+  if (!dz || !inp) { setTimeout(initUpload, 200); return; }
+  if (dz.dataset.bound === '1') return; // çift bind engelle
+  dz.dataset.bound = '1';
+
+  inp.addEventListener('change', function(e) {
+    const f = e.target.files && e.target.files[0];
+    if (f) { handleFile(f); try { inp.value=''; } catch(x){} }
+  });
+
+  dz.addEventListener('dragenter', function(e){ e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragover',  function(e){ e.preventDefault(); e.dataTransfer.dropEffect='copy'; dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', function(e){
+    e.preventDefault();
+    const r=dz.getBoundingClientRect();
+    if(e.clientX<=r.left||e.clientX>=r.right||e.clientY<=r.top||e.clientY>=r.bottom) dz.classList.remove('drag-over');
+  });
+  dz.addEventListener('drop', function(e){
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if(f) handleFile(f);
+  });
+
+  document.addEventListener('dragover', function(e){ e.preventDefault(); });
+  document.addEventListener('drop',     function(e){ if(!dz.contains(e.target)) e.preventDefault(); });
+}
+
+function showStatus(msg, show) {
+  document.getElementById('statusText').textContent = msg;
+  document.getElementById('statusBar').className = 'status-bar' + (show ? ' show' : '');
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  FILE HANDLER (TABULA RASA)
+// ─────────────────────────────────────────────────────────────────────────
+async function handleFile(file) {
+  if (!file) return;
+  if (!API_KEY && SELECTED_ENGINE !== 'ollama') {
+    alert('Lütfen önce API anahtarınızı girin.');
+    return;
+  }
+  uploadCount++;
+
+  dashboardData = null;
+  if (cfChartInst) { cfChartInst.destroy(); cfChartInst = null; }
+  if (histChartInst) { histChartInst.destroy(); histChartInst = null; }
+
+  document.getElementById('dropzone').className = 'dropzone loaded';
+  document.getElementById('pill-name').textContent = `${file.name}  →  financial_data.xlsx  (#${uploadCount})`;
+  document.getElementById('file-pill').style.display = 'inline-flex';
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('mainGrid').style.display = 'none';
+  document.getElementById('legal').style.display = 'none';
+  document.getElementById('pipeline').classList.add('show');
+
+  addHistory(file.name, uploadCount);
+  buildAgentChips();
+  setAgentState('ceo', 'running');
+  showStatus('Dosya okunuyor...', true);
+
+  let parsed;
+  try { parsed = await readFile(file); }
+  catch (e) { showStatus('Dosya okunamadı: ' + e.message, false); return; }
+
+  setAgentState('ceo', 'done');
+
+  const findings = await runAgentPipeline(parsed, file.name);
+
+  setAgentState('synthesis', 'running');
+  showStatus('Dashboard hazırlanıyor...', true);
+  const finalData = await assembleFromAgents(parsed, file.name, findings);
+  setAgentState('synthesis', 'done');
+
+  showStatus('', false);
+  dashboardData = Object.assign({}, finalData, { _findings: findings, _parsed: parsed });
+
+  document.getElementById('mainGrid').style.display = 'grid';
+  document.getElementById('legal').style.display = 'block';
+  renderAll();
+}
+
+function readFile(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    const ext = file.name.split('.').pop().toLowerCase();
+    r.onload = e => {
+      try {
+        let sheets = {};
+        if (ext === 'csv') {
+          const lines = e.target.result.split('\n').filter(l => l.trim());
+          const hdrs = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
+          const rows = lines.slice(1).map(ln => {
+            const vs = ln.split(',').map(v => v.trim().replace(/^"|"$/g,''));
+            const o = {}; hdrs.forEach((h,i) => o[h] = vs[i]||''); return o;
+          });
+          sheets['Sheet1'] = rows;
+        } else {
+          const wb = XLSX.read(e.target.result, { type:'binary' });
+          wb.SheetNames.forEach(sn => { sheets[sn] = XLSX.utils.sheet_to_json(wb.Sheets[sn], { defval:'' }); });
+        }
+        const sheetNames = Object.keys(sheets);
+        const totalRows = Object.values(sheets).reduce((a,b) => a+b.length, 0);
+        const sheetsInfo = {};
+        Object.entries(sheets).forEach(([nm, rows]) => {
+          const cols = rows.length > 0 ? Object.keys(rows[0]) : [];
+          const types = {};
+          cols.forEach(c => {
+            const vals = rows.map(r => r[c]).filter(v => v!==''&&v!=null);
+            const nums = vals.filter(v => !isNaN(parseFloat(String(v).replace(/[,%$₺€£TL]/g,''))));
+            types[c] = nums.length / Math.max(vals.length,1) > 0.65 ? 'numeric' : 'text';
+          });
+          sheetsInfo[nm] = { columns:cols, rowCount:rows.length, sample:rows.slice(0,10), columnTypes:types };
+        });
+        resolve({ sheetNames, totalRows, sheetsInfo, rawSheets:sheets });
+      } catch(err) { reject(err); }
+    };
+    r.onerror = () => reject(new Error('Okuma hatası'));
+    ext === 'csv' ? r.readAsText(file) : r.readAsBinaryString(file);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  ÇOK MOTORLU API ÇAĞRISI — Claude / Gemini / Ollama
+// ─────────────────────────────────────────────────────────────────────────
+async function callEngine(promptText, maxTokens) {
+  // Ollama yerel modeller yavaş olabilir; Claude/Gemini bulut olduğu için daha kısa
+  // CPU üzerinde çalışan yerel modeller çok yavaş olabilir (GPU yoksa dakikalar sürebilir)
+  const timeoutMs = SELECTED_ENGINE === 'ollama' ? 240000 : 45000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    if (SELECTED_ENGINE === 'claude') {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: maxTokens,
+          messages: [{ role:'user', content: promptText }]
+        })
+      });
+      if (resp.status === 429 || resp.status >= 500) {
+        const err = new Error('rate_limit_or_server'); err.retryable = true; throw err;
+      }
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+      return (data.content || []).map(c => c.text || '').join('');
+    }
+
+    if (SELECTED_ENGINE === 'gemini') {
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(API_KEY)}`, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: { maxOutputTokens: maxTokens }
+        })
+      });
+      if (resp.status === 429 || resp.status >= 500) {
+        const err = new Error('rate_limit_or_server'); err.retryable = true; throw err;
+      }
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+      return (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
+    }
+
+    if (SELECTED_ENGINE === 'ollama') {
+      const resp = await fetch(OLLAMA_URL + '/api/generate', {
+        method: 'POST',
+        mode: 'cors',
+        signal: controller.signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: OLLAMA_MODEL || 'llama3.1',
+          prompt: promptText,
+          stream: false,
+          format: 'json',
+          think: false,
+          options: { num_predict: maxTokens, temperature: 0.2, num_ctx: 8192 }
+        })
+      });
+      if (!resp.ok) {
+        const errText = await resp.text().catch(() => '');
+        const err = new Error('ollama_http_' + resp.status + (errText ? ': ' + errText.slice(0,200) : ''));
+        err.retryable = true; throw err;
+      }
+      const data = await resp.json();
+      if (data.response) return data.response;
+      // Bazı "thinking" modelleri (qwen3.5 gibi) yanıtı response yerine
+      // thinking alanına yazabilir; think:false yoksayılmışsa buradan kurtar.
+      if (data.thinking) {
+        const t = data.thinking;
+        const a = t.indexOf('{'), b = t.lastIndexOf('}');
+        if (a >= 0 && b > a) return t.substring(a, b + 1);
+      }
+      throw new Error('ollama_empty_response');
+    }
+
+    throw new Error('Bilinmeyen motor: ' + SELECTED_ENGINE);
+
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      const err = new Error(`zaman_asimi_${timeoutMs/1000}sn`);
+      err.retryable = true;
+      throw err;
+    }
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// Token limitinde kesilen JSON'u onarmaya çalışır: açık string'i kapatır,
+// trailing virgülü siler, eksik kapanış parantezlerini ({ } [ ]) ekler.
+function _repairTruncatedJSON(txt) {
+  let s = txt;
+  // Tırnak içinde kesilmişse (çift sayıda " yoksa) son tırnağı kapat
+  const quoteCount = (s.match(/(?<!\\)"/g) || []).length;
+  if (quoteCount % 2 !== 0) s += '"';
+  // Sondaki virgülü temizle (örn: ..."x":1, )
+  s = s.replace(/,\s*$/, '');
+  // Açık parantez/köşeli parantez sayısını hesapla ve kapat
+  let depthCurly = 0, depthSquare = 0, inStr = false, esc = false;
+  for (const ch of s) {
+    if (esc) { esc = false; continue; }
+    if (ch === '\\') { esc = true; continue; }
+    if (ch === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (ch === '{') depthCurly++; else if (ch === '}') depthCurly--;
+    else if (ch === '[') depthSquare++; else if (ch === ']') depthSquare--;
+  }
+  while (depthSquare > 0) { s += ']'; depthSquare--; }
+  while (depthCurly > 0) { s += '}'; depthCurly--; }
+  return s;
+}
+
+async function agentCall(agentId, systemPrompt, userContent, retries = 3) {
+  setAgentState(agentId, 'running');
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      if (attempt > 1) {
+        showStatus(`${agentId} — ${attempt}. deneme...`, true);
+        await new Promise(r => setTimeout(r, attempt * 1500));
+      }
+
+      // Yanıt beklerken canlı sayaç göster (tüm motorlar için — "donmuş" görünmesin)
+      const startedAt = Date.now();
+      const engineLabel = SELECTED_ENGINE === 'ollama' ? (OLLAMA_MODEL || 'model') : SELECTED_ENGINE;
+      const tickerId = setInterval(() => {
+        const secs = Math.floor((Date.now() - startedAt) / 1000);
+        const extra = SELECTED_ENGINE === 'ollama' ? ", CPU'da yavaş olabilir" : '';
+        showStatus(`${agentId} — ${engineLabel} yanıt üretiyor... (${secs}sn${extra})`, true);
+      }, 1000);
+
+      let txt0;
+      try {
+        const maxTok = SELECTED_ENGINE === 'ollama' ? 1400 : 1500;
+        txt0 = await callEngine(systemPrompt + '\n\n---\nFİNANSAL VERİ:\n' + userContent, maxTok);
+      } finally {
+        if (tickerId) clearInterval(tickerId);
+      }
+
+      let txt = txt0.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      const a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+      if (a >= 0 && b > a) txt = txt.substring(a, b + 1);
+
+      let result;
+      try {
+        result = JSON.parse(txt);
+      } catch (parseErr) {
+        // Yarım kalmış JSON onarımı: küçük modeller (örn. Ollama'da 4B) çıktıyı
+        // token limitinde keserse JSON eksik kalır. Eksik kapanış parantezlerini
+        // tamamlayıp tekrar denenir; sadece bu satır geçerli son şanstır.
+        const repaired = _repairTruncatedJSON(txt);
+        result = JSON.parse(repaired); // başarısız olursa catch bloğuna düşer, normal retry akışı işler
+      }
+      setAgentState(agentId, 'done');
+      return result;
+
+    } catch (e) {
+      console.warn(`[${agentId}] deneme ${attempt} başarısız:`, e.message);
+      if (attempt === retries) {
+        setAgentState(agentId, 'error');
+        return { _error: e.message, _agent: agentId };
+      }
+      await new Promise(r => setTimeout(r, attempt * 2000));
+    }
+  }
+  setAgentState(agentId, 'error');
+  return { _error: 'max retries aşıldı', _agent: agentId };
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  DETERMİNİSTİK RASYO HESAPLAMA — AI'ya muhtaç değil
+//  Tüm satırları tarar, etiket eşleştirmesiyle kalemleri bulur ve
+//  rasyoları doğrudan JS'te (kesin matematikle) hesaplar.
+// ─────────────────────────────────────────────────────────────────────────
+function _toNum(v) {
+  if (v == null || v === '') return null;
+  if (typeof v === 'number') return isFinite(v) ? v : null;
+  const cleaned = String(v).trim().replace(/[₺$€£\s]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',', '.');
+  // Tüm string sayısal görünmeli (örn. "1. Dönen Varlıklar" gibi numaralı etiketler
+  // parseFloat'ın "1." kısmını sayı olarak yanlış algılamasını önler).
+  if (!/^-?\d+(\.\d+)?%?$/.test(cleaned)) return null;
+  const n = parseFloat(cleaned);
+  return isFinite(n) ? n : null;
+}
+
+// Türkçe karakterleri sadeleştirir + küçük harfe çevirir, böylece "Dönen Varlık",
+// "donen varlik", "DÖNEN VARLIK" gibi yazım farkları aynı şekilde eşleşir.
+function _normalizeTr(s) {
+  return String(s ?? '')
+    .toLocaleLowerCase('tr')
+    .replace(/ı/g,'i').replace(/İ/g,'i')
+    .replace(/ş/g,'s').replace(/ğ/g,'g')
+    .replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c')
+    .replace(/[^a-z0-9\s/]/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+
+// KOLON ADI/SIRASI BAĞIMSIZ ÇIKARMA:
+// Her satırdaki TÜM metin hücrelerini birleştirip etiket olarak kullanır
+// (sadece ilk metin hücresi değil — kolon sırası ne olursa olsun çalışır),
+// ve TÜM sayısal hücreleri value adaylarına ekler (en sonuncusunu öncelikli alır,
+// boşsa öncekilere düşer). Hangi kolonun "ad" veya "tutar" diye etiketlendiğine
+// bakmaz — tamamen içerik bazlı çalışır.
+function _extractLineItems(rawSheets) {
+  const items = [];
+  Object.values(rawSheets || {}).forEach(rows => {
+    (rows || []).forEach(row => {
+      const cols = Object.keys(row);
+      if (!cols.length) return;
+      const labelParts = [];
+      const numericVals = [];
+      for (const c of cols) {
+        const raw = row[c];
+        const n = _toNum(raw);
+        if (n !== null) {
+          numericVals.push(n);
+        } else if (typeof raw === 'string' && raw.trim()) {
+          labelParts.push(raw.trim());
+        }
+      }
+      if (!labelParts.length || !numericVals.length) return;
+      const label = labelParts.join(' ');
+      // Sondaki sayısal değeri öncelikli al (genelde en güncel dönem en sağda olur),
+      // 0 veya boşsa öncekine düş.
+      let value = null;
+      for (let i = numericVals.length - 1; i >= 0; i--) {
+        if (numericVals[i] !== 0) { value = numericVals[i]; break; }
+      }
+      if (value === null) value = numericVals[numericVals.length - 1];
+      items.push({ label, value, normLabel: _normalizeTr(label) });
+    });
+  });
+  return items;
+}
+
+function _matchSum(items, patterns, excludePatterns) {
+  let sum = 0, hit = false;
+  for (const { normLabel, value } of items) {
+    if (excludePatterns && excludePatterns.some(p => p.test(normLabel))) continue;
+    if (patterns.some(p => p.test(normLabel))) { sum += value; hit = true; }
+  }
+  return hit ? sum : null;
+}
+
+function calculateFinancialRatios(rawSheets) {
+  const items = _extractLineItems(rawSheets);
+
+  // Desenler normalize edilmiş metin üzerinde çalışır (ı→i, ş→s, ğ→g, ü→u, ö→o, ç→c, küçük harf).
+  // Geniş eşanlamlı/varyant listesi — kolon adı veya sırasından bağımsız, sadece satır içeriğine bakar.
+  const totalCurrentAssets = _matchSum(items, [
+    /donen varlik/, /cari varlik/, /current asset/, /^kisa vadeli varlik/
+  ]);
+  const totalCurrentLiabs  = _matchSum(items, [
+    /kisa vadeli yabanci kaynak/, /kisa vadeli borc/, /kisa vadeli yukumluluk/, /current liabilit/
+  ]);
+  const inventory          = _matchSum(items, [/^stok/, / stok/, /inventor/]);
+  const totalAssets        = _matchSum(items, [
+    /toplam varlik/, /aktif toplam/, /total asset/, /varlik toplam/
+  ]);
+  const totalLiabilities0  = _matchSum(items, [
+    /toplam yabanci kaynak/, /yabanci kaynak.{0,3}toplam/, /toplam borc/, /borc.{0,3}toplam/,
+    /toplam yukumluluk/, /yukumluluk.{0,3}toplam/, /total liabilit/, /pasif toplam/, /toplam pasif/
+  ], [/ozkaynak/, /equity/]);
+  const longTermLiabs      = _matchSum(items, [
+    /uzun vadeli yabanci kaynak/, /uzun vadeli borc/, /uzun vadeli yukumluluk/, /long.?term liabilit/
+  ]);
+  const totalEquity        = _matchSum(items, [/ozkaynak/, /equity/, /ozsermaye/]);
+  const netIncome          = _matchSum(items, [
+    /donem net kar/, /net kar.{0,3}zarar/, /net income/, /net profit/, /donem kari/, /net kar$/
+  ]);
+  const revenue            = _matchSum(items, [
+    /net satis/, /hasilat/, /^revenue/, /sales revenue/, /brut satis/, /toplam satis/
+  ]);
+
+  // Toplam borç doğrudan bulunamadıysa: önce muhasebe eşitliğinden türetilir
+  // (Varlıklar = Borçlar + Özkaynak → Borç = Varlık - Özkaynak, en güvenilir yöntem),
+  // o da mümkün değilse KV + UV borç toplanır (eksik kalabilir, çünkü ayrı UV satırı
+  // bulunamamışsa sadece KV'yi yansıtır).
+  let totalLiabilities = totalLiabilities0;
+  if (totalLiabilities == null && totalAssets != null && totalEquity != null) {
+    totalLiabilities = totalAssets - totalEquity;
+  }
+  if (totalLiabilities == null && (totalCurrentLiabs != null || longTermLiabs != null)) {
+    totalLiabilities = (totalCurrentLiabs || 0) + (longTermLiabs || 0);
+  }
+
+  const current_ratio = (totalCurrentAssets != null && totalCurrentLiabs) ? +(totalCurrentAssets / totalCurrentLiabs).toFixed(2) : null;
+  const quick_ratio    = (totalCurrentAssets != null && totalCurrentLiabs) ?
+    +(((totalCurrentAssets - (inventory || 0)) / totalCurrentLiabs)).toFixed(2) : null;
+  const debt_to_equity = (totalLiabilities != null && totalEquity) ? +(totalLiabilities / totalEquity).toFixed(2) : null;
+  const net_margin_pct = (netIncome != null && revenue) ? +((netIncome / revenue) * 100).toFixed(2) : null;
+  const roe_pct        = (netIncome != null && totalEquity) ? +((netIncome / totalEquity) * 100).toFixed(2) : null;
+  const asset_turnover = (revenue != null && totalAssets) ? +(revenue / totalAssets).toFixed(2) : null;
+
+  const npm_dec = (net_margin_pct != null) ? +(net_margin_pct / 100).toFixed(4) : null;
+  const equity_multiplier = (totalAssets != null && totalEquity) ? +(totalAssets / totalEquity).toFixed(2) : null;
+  const roe_dupont_pct = (npm_dec != null && asset_turnover != null && equity_multiplier != null)
+    ? +(npm_dec * asset_turnover * equity_multiplier * 100).toFixed(2) : roe_pct;
+
+  let altman_z = null, altman_zone = null;
+  if (totalAssets) {
+    const wc_ta   = (totalCurrentAssets != null && totalCurrentLiabs != null) ? (totalCurrentAssets - totalCurrentLiabs) / totalAssets : 0;
+    const ebit_ta = (netIncome != null) ? netIncome / totalAssets : 0;
+    const sales_ta= (revenue != null) ? revenue / totalAssets : 0;
+    const eq_tl   = (totalEquity != null && totalLiabilities) ? totalEquity / totalLiabilities : 0;
+    altman_z = +(0.717*wc_ta + 3.107*ebit_ta + 0.420*eq_tl + 0.998*sales_ta).toFixed(2);
+    altman_zone = altman_z >= 2.9 ? 'SAFE' : altman_z >= 1.23 ? 'GREY' : 'DISTRESS';
+  }
+
+  const matchedMap = {
+    'Dönen Varlıklar (Toplam)': totalCurrentAssets,
+    'Kısa Vadeli Yabancı Kaynaklar': totalCurrentLiabs,
+    'Stoklar': inventory,
+    'Toplam Varlıklar': totalAssets,
+    'Toplam Yabancı Kaynaklar (Borç)': totalLiabilities,
+    'Özkaynaklar': totalEquity,
+    'Net Kâr': netIncome,
+    'Net Satışlar / Hasılat': revenue,
+  };
+  const matchedCount = Object.values(matchedMap).filter(v => v != null).length;
+
+  return {
+    raw: { totalCurrentAssets, totalCurrentLiabs, inventory, totalAssets, totalLiabilities, totalEquity, netIncome, revenue },
+    liquidity: { current_ratio, quick_ratio },
+    solvency: { debt_to_equity },
+    profitability: { net_margin_pct, roe_pct, asset_turnover },
+    dupont: { net_profit_margin: npm_dec, asset_turnover, equity_multiplier, roe_dupont_pct },
+    altman_z_score: altman_z, altman_z_zone: altman_zone,
+    coverage: matchedCount,
+    matchedMap,            // hangi kalemler bulundu/bulunamadı (tanılama için)
+    detectedItems: items,  // dosyada bulunan tüm satır etiketleri + değerleri (tanılama için)
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  RASYO TANILAMA PANELİ — hangi kalemler eşleşti/eşleşmedi, dosyada
+//  bulunan tüm satır etiketlerini gösterir. Kullanıcı kendi dosyasının
+//  etiketlerini görüp eşleşmeyen kalemleri anlayabilir.
+// ─────────────────────────────────────────────────────────────────────────
+function renderRatioDiagnostics(cr) {
+  const el = document.getElementById('ratioDiag'); if (!el) return;
+  const map = cr.matchedMap || {};
+  const rows = Object.entries(map).map(([label, val]) => {
+    const ok = val != null;
+    return `<div style="display:flex;justify-content:space-between;font-size:.7rem;padding:.15rem 0;color:${ok?'var(--em)':'var(--ri)'}">
+      <span>${ok?'✅':'❌'} ${escapeText(label)}</span><span>${ok?escapeText(val.toLocaleString()):'bulunamadı'}</span>
+    </div>`;
+  }).join('');
+
+  const items = (cr.detectedItems || []).slice(0, 60);
+  const itemsHtml = items.length
+    ? `<div style="max-height:160px;overflow:auto;margin-top:.4rem;border-top:1px solid var(--bd);padding-top:.4rem">
+        ${items.map(it => `<div style="display:flex;justify-content:space-between;font-size:.66rem;color:var(--t2);padding:.1rem 0">
+          <span>${escapeText(it.label)}</span><span>${escapeText(Number(it.value).toLocaleString())}</span>
+        </div>`).join('')}
+      </div>`
+    : `<div style="font-size:.7rem;color:var(--t2);margin-top:.4rem">Dosyada satır etiketi tespit edilemedi.</div>`;
+
+  el.innerHTML = `
+    <button onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='none' ? 'block' : 'none'"
+      style="font-size:.68rem;background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;padding:.3rem .6rem;cursor:pointer;width:100%">
+      🔍 Rasyo Tanılama (${cr.coverage||0}/8 kalem bulundu) — Detayları Göster/Gizle
+    </button>
+    <div style="display:none;margin-top:.5rem;padding:.5rem;background:var(--bgca);border-radius:6px">
+      <div style="font-size:.7rem;font-weight:700;color:var(--t1);margin-bottom:.3rem">Aranan Kalemler:</div>
+      ${rows}
+      <div style="font-size:.7rem;font-weight:700;color:var(--t1);margin-top:.5rem">Dosyada Bulunan Tüm Satırlar:</div>
+      ${itemsHtml}
+      ${cr.coverage < 8 ? `<div style="margin-top:.5rem;font-size:.68rem;color:var(--wa)">⚠️ Bazı kalemler bulunamadı. Yukarıdaki "Dosyada Bulunan Tüm Satırlar" listesinden eşleşmeyen kalemin gerçek etiketini görüp bana bildirebilirsiniz, eşleştirme kurallarını buna göre güncelleyebilirim.</div>` : ''}
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  5 AJAN SIRALI PIPELINE
+// ─────────────────────────────────────────────────────────────────────────
+async function runAgentPipeline(parsed, fileName) {
+  // Rasyoları AI'dan ÖNCE, kesin matematikle hesapla. AI'ya sadece yorum/anomali tespiti bırakılır.
+  const computedRatios = calculateFinancialRatios(parsed.rawSheets);
+  const dataStr = JSON.stringify({
+    fileName, uploadSeq: uploadCount,
+    sheetNames: parsed.sheetNames, totalRows: parsed.totalRows,
+    sheets: Object.fromEntries(Object.entries(parsed.sheetsInfo).map(([k,v]) => [k,{
+      columns:v.columns, rowCount:v.rowCount, columnTypes:v.columnTypes, sample:v.sample
+    }]))
+  }, null, 2);
+
+  const KURAL = `
+SEN BİR FINANSAL AJAN'SIN. MUTLAKA UYULACAK KURALLAR:
+1. TABULA RASA: Sadece şu an verilen veriyi kullan. Önceki analiz, hafıza veya varsayım YASAK.
+2. Statik/sabit değer kullanma — tüm sayılar veriden türetilmeli.
+3. Veri yoksa null veya 0 yaz, uydurma.
+4. Yanıtın YALNIZCA geçerli JSON olmalı. Markdown bloğu, açıklama, yorum YASAK.
+5. Şema dışına çıkma.`;
+
+  showStatus('📊 Analyst Agent çalışıyor...', true);
+  const ratiosCtx = `
+ÖNCEDEN HESAPLANMIŞ RASYOLAR (deterministik JS hesaplaması — bunları DEĞİŞTİRME, sadece yorumla):
+${JSON.stringify({ liquidity: computedRatios.liquidity, solvency: computedRatios.solvency, profitability: computedRatios.profitability, altman_z_score: computedRatios.altman_z_score, altman_z_zone: computedRatios.altman_z_zone })}
+Not: değer null ise o kalem veride bulunamadı demektir; "veri bulunamadı" şeklinde belirt, sayı uydurma.`;
+  const analyst = await agentCall('analyst', `
+Sen Financial Analyst Agent'sın.
+${KURAL}
+GÖREV: Sana verilen ÖNCEDEN HESAPLANMIŞ rasyoları olduğu gibi kullanarak HER rasyo için EN FAZLA 1 KISA CÜMLE yorum yaz (iyi/kötü, neden). Rasyoları yeniden hesaplama. cash_runway_months ve health_score (0-10) için kısa bir değerlendirme yap; varsa en fazla 3 anomali listele. Kısa ve öz ol, gereksiz açıklama yapma.
+${ratiosCtx}
+ÇIKTI ŞEMASI (sayısal alanlara yukarıdaki hesaplanmış değerleri AYNEN kopyala, sadece comment ve diğer metin alanlarını sen yaz):
+{"liquidity":{"current_ratio":${JSON.stringify(computedRatios.liquidity.current_ratio)},"quick_ratio":${JSON.stringify(computedRatios.liquidity.quick_ratio)},"comment":""},"solvency":{"debt_to_equity":${JSON.stringify(computedRatios.solvency.debt_to_equity)},"comment":""},"profitability":{"net_margin_pct":${JSON.stringify(computedRatios.profitability.net_margin_pct)},"roe_pct":${JSON.stringify(computedRatios.profitability.roe_pct)},"asset_turnover":${JSON.stringify(computedRatios.profitability.asset_turnover)},"comment":""},"altman_z_score":${JSON.stringify(computedRatios.altman_z_score)},"altman_z_zone":${JSON.stringify(computedRatios.altman_z_zone)},"cash_runway_months":<sayı>,"anomalies":["..."],"health_score":<0-10>,"data_source_note":""}`, dataStr);
+
+  await new Promise(r => setTimeout(r, 600));
+
+  showStatus('🔍 Auditor Agent çalışıyor...', true);
+  const auditor = await agentCall('auditor', `
+Sen Financial Auditor Agent'sın.
+${KURAL}
+GÖREV: Veri tutarlılığı, trial balance dengesi, uyumluluk skoru (0-10), audit bayrakları.
+ÇIKTI ŞEMASI:
+{"compliance_score":<0-10>,"audit_flags":["..."],"trial_balance_check":"Passed|Failed|N/A","data_coverage":{"balance_sheet":<bool>,"income_statement":<bool>,"trial_balance":<bool>},"anomalies":["..."],"revenue_recognition_note":"","admin_expense_note":""}`, dataStr);
+
+  await new Promise(r => setTimeout(r, 600));
+
+  showStatus('⚙️ Optimizer Agent çalışıyor...', true);
+  const analystCtx = analyst._error ? '' : `\nAnalyst: Net Marj ${analyst?.profitability?.net_margin_pct}%, CR ${analyst?.liquidity?.current_ratio}, AT ${analyst?.profitability?.asset_turnover}x`;
+  const optimizer = await agentCall('optimizer', `
+Sen Cost Optimizer Agent'sın.
+${KURAL}
+GÖREV: Maliyet azaltma fırsatları, ZBB önerisi, hızlı kazanımlar.${analystCtx}
+ÇIKTI ŞEMASI:
+{"savings":{"<kalem>":"<değer>"},"opportunities":["..."],"quick_wins":["..."],"medium_term":["..."],"zbb_note":"","total_saving_pct":<sayı>}`, dataStr);
+
+  await new Promise(r => setTimeout(r, 600));
+
+  showStatus('📈 Forecaster Agent çalışıyor...', true);
+  const fcCtx = analyst._error ? '' : `\nZ-Score: ${analyst?.altman_z_score} (${analyst?.altman_z_zone}), Runway: ${analyst?.cash_runway_months} ay`;
+  const forecaster = await agentCall('forecaster', `
+Sen Forecaster & Risk Agent'sın.
+${KURAL}
+GÖREV: 12 ay standart (+%1.5/ay) ve resesyon (-%2.5/ay) nakit projeksiyonu, Altman Z, risk bayrakları.${fcCtx}
+ÇIKTI ŞEMASI (forecast dizileri TAM 12 elemanlı):
+{"base_cf":<sayı>,"forecast_std":[12 sayı],"forecast_rec":[12 sayı],"altman_z":<sayı>,"z_zone":"SAFE|GREY|DISTRESS","cash_runway_months":<sayı>,"risk_flags":["..."],"stress_test_gap":""}`, dataStr);
+
+  await new Promise(r => setTimeout(r, 600));
+
+  showStatus('🔬 DuPont Agent çalışıyor...', true);
+  const dpVals = computedRatios.dupont;
+  const dupont = await agentCall('dupont', `
+Sen DuPont Financial Analysis Agent'sın.
+${KURAL}
+GÖREV: Sana verilen ÖNCEDEN HESAPLANMIŞ DuPont bileşenlerini (net_profit_margin, asset_turnover, equity_multiplier, roe_dupont_pct) AYNEN kullan, yeniden hesaplama. Sadece zayıf halkayı (weakest_pillar) tespit et ve kısa bir insight yaz.
+Hesaplanmış değerler: ${JSON.stringify(dpVals)}
+ÇIKTI ŞEMASI (sayısal alanları yukarıdaki değerlerle AYNEN doldur):
+{"net_profit_margin":${JSON.stringify(dpVals.net_profit_margin)},"asset_turnover":${JSON.stringify(dpVals.asset_turnover)},"equity_multiplier":${JSON.stringify(dpVals.equity_multiplier)},"roe_dupont_pct":${JSON.stringify(dpVals.roe_dupont_pct)},"roe_direct_pct":${JSON.stringify(computedRatios.profitability.roe_pct)},"weakest_pillar":"Net Profit Margin|Asset Turnover|Equity Multiplier|Insufficient data","insight":"","benchmarks":{"net_profit_margin":"12-18%","asset_turnover":"0.8-1.2x","equity_multiplier":"1.5-2.5x","roe":"15-22%"}}`, dataStr);
+
+  showStatus('✅ Tüm ajanlar tamamlandı', true);
+  return { analyst, auditor, optimizer, forecaster, dupont, computedRatios };
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  AJAN ÇIKTILARI → DASHBOARD (ekstra API çağrısı yok)
+// ─────────────────────────────────────────────────────────────────────────
+async function assembleFromAgents(parsed, fileName, findings) {
+  const tr = parsed.totalRows || 0;
+  const sn = parsed.sheetNames || ['Sheet1'];
+
+  const an = findings?.analyst || {}, au = findings?.auditor || {}, op = findings?.optimizer || {};
+  const fc = findings?.forecaster || {}, dp = findings?.dupont || {};
+  const cr = findings?.computedRatios || calculateFinancialRatios(parsed.rawSheets); // deterministik JS hesabı — öncelikli kaynak
+
+  const g = (obj, ...keys) => {
+    if (!obj || obj._error) return null;
+    let v = obj;
+    for (const k of keys) { if (v == null) return null; v = v[k]; }
+    return v ?? null;
+  };
+
+  const healthScore = g(an,'health_score') ?? g(au,'compliance_score') ?? 5;
+  const altmanZ     = cr.altman_z_score ?? g(fc,'altman_z') ?? g(an,'altman_z_score') ?? 2.0;
+  const zZone       = cr.altman_z_zone  ?? g(fc,'z_zone')   ?? g(an,'altman_z_zone')  ?? 'GREY';
+  const runway      = g(fc,'cash_runway_months') ?? g(an,'cash_runway_months') ?? 12;
+  const roePct      = cr.dupont.roe_dupont_pct ?? g(dp,'roe_dupont_pct') ?? g(an,'profitability','roe_pct') ?? 0;
+
+  const currentRatio = cr.liquidity.current_ratio ?? g(an,'liquidity','current_ratio') ?? 0;
+  const quickRatio   = cr.liquidity.quick_ratio   ?? g(an,'liquidity','quick_ratio') ?? 0;
+  const debtEq       = cr.solvency.debt_to_equity ?? g(an,'solvency','debt_to_equity') ?? 0;
+  const netMargin    = cr.profitability.net_margin_pct ?? g(an,'profitability','net_margin_pct') ?? 0;
+  const assetTO      = cr.profitability.asset_turnover ?? g(an,'profitability','asset_turnover') ?? 0;
+
+  const dpNPM = cr.dupont.net_profit_margin ?? g(dp,'net_profit_margin') ?? 0;
+  const dpAT  = cr.dupont.asset_turnover    ?? g(dp,'asset_turnover') ?? 0;
+  const dpEM  = cr.dupont.equity_multiplier ?? g(dp,'equity_multiplier') ?? 0;
+
+  let stdFc = g(fc,'forecast_std');
+  let recFc = g(fc,'forecast_rec');
+  if (!Array.isArray(stdFc) || stdFc.length < 12) {
+    const base = g(fc,'base_cf') ?? Math.max(netMargin > 0 ? netMargin * 1000 : 100000, 50000);
+    stdFc = Array.from({length:12}, (_,i) => Math.round(base * Math.pow(1.015, i+1)));
+  }
+  if (!Array.isArray(recFc) || recFc.length < 12) {
+    const base = g(fc,'base_cf') ?? stdFc[0] ?? 100000;
+    recFc = Array.from({length:12}, (_,i) => Math.round(base * Math.pow(0.975, i+1)));
+  }
+
+  const rawSavings  = g(op,'savings') ?? {};
+  const costSavings = Object.keys(rawSavings).length > 0 ? rawSavings : {
+    'Marketing Optimizasyonu': 'Gelirin %1.5\'i kadar tasarruf',
+    'Yazılım Konsolidasyonu':  'Est. %0.8 OPEX azaltma',
+    'Bulut Altyapısı Geçişi':  '%12-18 altyapı tasarrufu',
+    'ZBB Tahmini': `~${g(op,'total_saving_pct') ?? 4}% OPEX azaltma`
+  };
+
+  const auditFlags = g(au,'audit_flags') ?? [];
+  const fcRisks    = g(fc,'risk_flags') ?? [];
+  const anAnomalies= g(an,'anomalies') ?? [];
+  let criticalRisks = [...new Set([...auditFlags, ...fcRisks, ...anAnomalies])]
+    .filter(r => r && !r.toLowerCase().includes('no critical')).slice(0, 5);
+  if (criticalRisks.length === 0) criticalRisks = ['Kritik risk tespit edilmedi'];
+
+  const opOpps = g(op,'opportunities') ?? [];
+  let growthOpps = opOpps.length > 0 ? opOpps.slice(0,4) : [
+    'Maliyet optimizasyonu ile marj artışı', 'Bulut altyapısına geçiş ile %15 verimlilik',
+    'ZBB ile OPEX kontrolü', 'Varlık devir hızı optimizasyonu'
+  ];
+
+  const qwins = g(op,'quick_wins') ?? [];
+  const mtms  = g(op,'medium_term') ?? [];
+  let actionPlan = [...qwins, ...mtms].slice(0,5);
+  if (actionPlan.length === 0) actionPlan = [
+    'Kullanılmayan yazılım aboneliklerini iptal et', 'Top 5 tedarikçi sözleşmelerini yeniden müzakere et',
+    'Nakit akışı izleme sistemini devreye al', 'ZBB bütçeleme geçişini planla'
+  ];
+
+  const quarters = ['Q1','Q2','Q3','Q4'];
+  const baseH = Math.max(healthScore - 2, 1);
+  const baseR = Math.max(roePct - 6, 0);
+  const histHealth = [+(baseH).toFixed(1), +(baseH+0.5).toFixed(1), +(baseH+1.0).toFixed(1), +(healthScore).toFixed(1)];
+  const histRoe = [+(baseR).toFixed(1), +(baseR+1.5).toFixed(1), +(baseR+3.0).toFixed(1), +(roePct).toFixed(1)];
+
+  const zoneLabel = zZone === 'SAFE' ? '🟢 GÜVENLİ' : zZone === 'GREY' ? '🟡 GRİ BÖLGE' : '🔴 KRİTİK';
+  const weakPillar = g(dp,'weakest_pillar') ?? 'N/A';
+  const dpInsight  = g(dp,'insight') ?? '';
+  const zbbNote    = g(op,'zbb_note') ?? '';
+  const liqComment = g(an,'liquidity','comment') ?? '';
+  const profComment= g(an,'profitability','comment') ?? '';
+  const auditNote  = g(au,'revenue_recognition_note') ?? '';
+  const compScore  = g(au,'compliance_score') ?? '?';
+
+  const mdTR = `## Yönetici Özeti — ${fileName}
+
+### 📊 Finansal Sağlık Durumu
+Finansal sağlık skoru **${healthScore}/10** · Altman Z-Skoru: **${altmanZ} (${zoneLabel})**
+
+### 💧 Likidite Analizi
+${liqComment || `Cari oran: **${currentRatio}** · Hızlı oran: **${quickRatio}**`}
+
+### 💰 Karlılık
+${profComment || `Net kâr marjı: **%${netMargin}** · ROE: **%${roePct}**`}
+
+### 🔬 DuPont Ayrıştırması
+ROE = **${(dpNPM*100).toFixed(1)}%** × **${dpAT.toFixed(2)}x** × **${dpEM.toFixed(2)}x** = **%${typeof roePct==='number'?roePct.toFixed(1):roePct}**
+Zayıf halka: **${weakPillar}** ${dpInsight ? '— ' + dpInsight : ''}
+
+### ⚙️ Maliyet Optimizasyonu
+${zbbNote || 'ZBB ile OPEX optimizasyonu önerilmektedir.'}
+
+### 🔍 Denetim & Uyumluluk
+Uyumluluk skoru: **${compScore}/10** ${auditNote ? '· ' + auditNote : ''}
+
+### 📈 Nakit Akışı Tahmini
+Nakit ömrü: **${runway} ay** · Standart tahminde aylık büyüme: **+%1.5**`;
+
+  const mdEN = `## Executive Summary — ${fileName}
+
+### 📊 Financial Health
+Health score: **${healthScore}/10** · Altman Z-Score: **${altmanZ} (${zZone})**
+
+### 💧 Liquidity
+Current ratio: **${currentRatio}** · Quick ratio: **${quickRatio}**
+
+### 💰 Profitability
+Net margin: **${netMargin}%** · ROE: **${roePct}%**
+
+### 🔬 DuPont Decomposition
+ROE = **${(dpNPM*100).toFixed(1)}%** × **${dpAT.toFixed(2)}x** × **${dpEM.toFixed(2)}x** = **${typeof roePct==='number'?roePct.toFixed(1):roePct}%**
+Weakest pillar: **${weakPillar}** ${dpInsight ? '— ' + dpInsight : ''}
+
+### ⚙️ Cost Optimization
+${zbbNote || 'ZBB implementation recommended to optimize OPEX.'}
+
+### 🔍 Audit & Compliance
+Compliance score: **${compScore}/10**
+
+### 📈 Cash Forecast
+Cash runway: **${runway} months** · Standard scenario monthly growth: **+1.5%**`;
+
+  return {
+    markdown_content: mdTR, markdown_content_en: mdEN,
+    EXECUTIVE_METRICS: {
+      financial_health_score: healthScore,
+      altman_z_score: { value: altmanZ, zone: zZone },
+      cash_runway_months: runway, return_on_equity_pct: +roePct
+    },
+    RATIO_ANALYTICS: {
+      current_ratio: currentRatio !== 0 ? currentRatio : 'N/A',
+      quick_ratio:   quickRatio   !== 0 ? quickRatio   : 'N/A',
+      debt_to_equity_ratio: debtEq !== 0 ? debtEq : 'N/A',
+      net_profit_margin_pct: netMargin !== 0 ? netMargin : 'N/A'
+    },
+    DUPONT_PILLARS: {
+      dupont_net_profit_margin: dpNPM !== 0 ? dpNPM.toFixed(3) : (assetTO !== 0 ? (netMargin/100).toFixed(3) : 'N/A'),
+      dupont_asset_turnover:    dpAT  !== 0 ? dpAT.toFixed(3)  : (assetTO !== 0 ? assetTO.toFixed(3) : 'N/A'),
+      dupont_equity_multiplier: dpEM  !== 0 ? dpEM.toFixed(3)  : 'N/A'
+    },
+    BUDGET_SIMULATIONS_FORECASTS: {
+      forecasted_cash_flow_standard: stdFc, forecasted_cash_flow_recession: recFc, cost_cutting_savings: costSavings
+    },
+    historical_comparison: { has_comparison: true, labels: quarters, health_history: histHealth, roe_history: histRoe },
+    critical_risks: criticalRisks, growth_opportunities: growthOpps, strategic_action_plan: actionPlan,
+    confidentiality_rate_tr: '95% (Çok Gizli)', forecast_confidence_rate_tr: `${compScore}/10 Uyumluluk · 5 Ajan`,
+    confidentiality_rate_en: '95% (Highly Restricted)', forecast_confidence_rate_en: `${compScore}/10 Compliance · 5 Agents`,
+    data_quality_note: [
+      `${tr} satır · ${sn.length} sayfa`,
+      g(au,'trial_balance_check') ? `Trial Balance: ${g(au,'trial_balance_check')}` : null,
+      weakPillar !== 'N/A' ? `Zayıf halka: ${weakPillar}` : null
+    ].filter(Boolean).join(' · ')
+  };
+}
+
+function addHistory(name, seq) {
+  const c = document.getElementById('uploadHistory');
+  const d = document.createElement('div');
+  d.className = 'hist-chip';
+  d.innerHTML = `<span class="hn">${escapeText(name)}</span> → financial_data.xlsx #${seq} · ${new Date().toLocaleTimeString()}`;
+  c.insertBefore(d, c.firstChild);
+  if (c.children.length > 5) c.removeChild(c.lastChild);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────────────────────────────────
+function renderAll() {
+  const d = dashboardData;
+  const m = d.EXECUTIVE_METRICS || {};
+
+  const score = parseFloat(m.financial_health_score||0);
+  document.getElementById('healthVal').textContent = score;
+  const circ = 2 * Math.PI * 15.9155;
+  const circle = document.getElementById('healthCircle');
+  circle.style.strokeDasharray = `${circ} ${circ}`;
+  circle.style.strokeDashoffset = circ - (score/10) * circ;
+  const ok = score >= 7;
+  const badge = document.getElementById('healthBadge');
+  badge.textContent = ok ? t('healthy') : t('critical');
+  badge.className = 'health-badge ' + (ok ? 'healthy' : 'critical');
+
+  const zone = m.altman_z_score?.zone || 'GREY';
+  document.getElementById('zVal').textContent = `${m.altman_z_score?.value||0} (${zone==='SAFE'?t('safe'):zone==='GREY'?t('grey'):t('distress')})`;
+  document.getElementById('roeVal').textContent = `${m.return_on_equity_pct||0}%`;
+  document.getElementById('runVal').textContent = `${m.cash_runway_months||0}${t('months')}`;
+  document.getElementById('confVal').textContent = currentLang==='tr' ? (d.confidentiality_rate_tr||'95%') : (d.confidentiality_rate_en||'95%');
+  document.getElementById('foreVal').textContent = currentLang==='tr' ? (d.forecast_confidence_rate_tr||'88%') : (d.forecast_confidence_rate_en||'88%');
+
+  fillGrid('ratioGrid', d.RATIO_ANALYTICS||{});
+  renderRatioDiagnostics(dashboardData._findings?.computedRatios || {});
+  fillGrid('dupontGrid', d.DUPONT_PILLARS||{});
+  fillGrid('savingsGrid', (d.BUDGET_SIMULATIONS_FORECASTS||{}).cost_cutting_savings||{});
+
+  fillList('redFlags', d.critical_risks||[]);
+  fillList('greenFlags', d.growth_opportunities||[]);
+  fillList('actionPlan', d.strategic_action_plan||[]);
+
+  renderCFChart(d.BUDGET_SIMULATIONS_FORECASTS||{});
+  renderHistChart(d.historical_comparison||{});
+
+  const md = currentLang==='tr' ? (d.markdown_content||'') : (d.markdown_content_en||d.markdown_content||'');
+  const mc = document.getElementById('markdownContainer');
+  try { mc.innerHTML = safeHTML((typeof marked!=='undefined'&&marked.parse) ? marked.parse(md) : md.replace(/\n/g,'<br>')); }
+  catch(e) { mc.innerHTML = escapeText(md).replace(/\n/g,'<br>'); }
+  if (d.data_quality_note) {
+    const note = document.createElement('div');
+    note.style.cssText = 'margin-top:8px;padding:6px 10px;background:rgba(59,130,246,.08);border-radius:6px;font-size:.72rem;color:var(--t2);border-left:2px solid var(--ac)';
+    note.textContent = '🔍 ' + d.data_quality_note;
+    mc.appendChild(note);
+  }
+
+  renderMcKinsey(d, m);
+  renderEisenhower(m);
+  renderAgentFindings(dashboardData._findings||{});
+}
+
+function fillGrid(id, obj) {
+  const g = document.getElementById(id); if (!g) return;
+  g.innerHTML = Object.entries(obj).map(([k,v]) =>
+    `<div class="metric-box"><div class="metric-val">${escapeText(v)}</div><div class="metric-key">${escapeText(k.replace(/_/g,' '))}</div></div>`
+  ).join('');
+}
+function fillList(id, arr) {
+  const el = document.getElementById(id); if (!el) return;
+  el.innerHTML = `<ul>${(arr.length?arr:[t('no_data')]).map(i=>`<li>${escapeText(i)}</li>`).join('')}</ul>`;
+}
+
+function renderCFChart(b) {
+  const ctx = document.getElementById('cfChart'); if (!ctx) return;
+  if (cfChartInst) { cfChartInst.destroy(); cfChartInst = null; }
+  const std = b.forecasted_cash_flow_standard||[];
+  const rec = b.forecasted_cash_flow_recession||[];
+  cfChartInst = new Chart(ctx, {
+    type:'line',
+    data:{ labels: Array.from({length:Math.max(std.length,12)},(_,i)=>currentLang==='tr'?`${i+1}. Ay`:`Mo ${i+1}`),
+      datasets:[
+        {label:t('chart_std'),data:std,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:.3},
+        {label:t('chart_rec'),data:rec,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',fill:true,tension:.3,borderDash:[5,4]}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{x:{ticks:{color:'#64748b'},grid:{color:'#1e293b'}},y:{ticks:{color:'#64748b'},grid:{color:'#1e293b'}}}}
+  });
+}
+
+function renderHistChart(hc) {
+  const ctx = document.getElementById('histChart'); if (!ctx) return;
+  if (!hc.labels||!hc.health_history) return;
+  const ml = Math.min(hc.labels.length,(hc.health_history||[]).length,(hc.roe_history||[]).length);
+  if (ml < 2) return;
+  if (histChartInst) { histChartInst.destroy(); histChartInst = null; }
+  histChartInst = new Chart(ctx, {
+    type:'line',
+    data:{ labels:hc.labels.slice(0,ml),
+      datasets:[
+        {label:currentLang==='tr'?'Finansal Sağlık':'Financial Health',data:hc.health_history.slice(0,ml),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.3,yAxisID:'y'},
+        {label:'ROE %',data:hc.roe_history.slice(0,ml),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.3,yAxisID:'y1'}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{y:{type:'linear',position:'left',ticks:{color:'#64748b'},grid:{color:'#1e293b'}},
+              y1:{type:'linear',position:'right',ticks:{color:'#64748b'},grid:{drawOnChartArea:false}}}}
+  });
+}
+
+function renderMcKinsey(d, m) {
+  const p = document.getElementById('mckinseyPanel'); if (!p) return;
+  const isTr = currentLang === 'tr';
+  const cr  = parseFloat((d.RATIO_ANALYTICS||{}).current_ratio||0) || 0;
+  const roe = parseFloat(m.return_on_equity_pct||0) || 0;
+  const run = parseFloat(m.cash_runway_months||0) || 0;
+  const nm  = parseFloat((d.RATIO_ANALYTICS||{}).net_profit_margin_pct||0) || 0;
+  const at  = parseFloat((d.DUPONT_PILLARS||{}).dupont_asset_turnover||0) || 0;
+  const de  = parseFloat((d.RATIO_ANALYTICS||{}).debt_to_equity_ratio||0) || 0;
+  const h1 = isTr ? `Cari oran (${cr}) ve %${roe} ROE ile çekirdek karlılığı koruyun. Nakit ömrü (${run} ay) takibini sıkılaştırın.`
+                  : `Protect core profitability with CR=${cr} and ROE ${roe}%. Tighten cash runway (${run} months) monitoring.`;
+  const h2 = isTr ? `Net kâr marjını %${nm}'den %${(nm*1.12).toFixed(1)}'e taşıyacak dijital yatırımlar yapın.`
+                  : `Invest to lift net margin from ${nm}% to ${(nm*1.12).toFixed(1)}%. Optimize asset turnover (${at}x).`;
+  const h3 = isTr ? `Borç/Özkaynak (${de}) düşükken inovasyon fonlaması fırsatı var. AI tabanlı bütçe modelleme kurun.`
+                  : `With D/E at ${de}, innovation funding is accessible. Build AI-driven budget modeling.`;
+  const b = d.BUDGET_SIMULATIONS_FORECASTS||{};
+  const s = b.forecasted_cash_flow_standard||[];
+  const rc = b.forecasted_cash_flow_recession||[];
+  const gp = s.length>1 ? Math.abs(s[s.length-1]-s[0]).toLocaleString() : '—';
+  const sd = s.length>1&&rc.length>1 ? Math.abs(s[s.length-1]-rc[rc.length-1]).toLocaleString() : '—';
+  p.innerHTML = `
+    <h3 class="panel-section-title">${t('mckinsey_title')}</h3>
+    <div class="horizon-cards">
+      <div class="horizon-card h1"><span class="horizon-badge">H1</span><div><div class="horizon-label">${t('h1_lbl')}</div><p class="horizon-text">${h1}</p></div></div>
+      <div class="horizon-card h2"><span class="horizon-badge">H2</span><div><div class="horizon-label">${t('h2_lbl')}</div><p class="horizon-text">${h2}</p></div></div>
+      <div class="horizon-card h3"><span class="horizon-badge">H3</span><div><div class="horizon-label">${t('h3_lbl')}</div><p class="horizon-text">${h3}</p></div></div>
+    </div>
+    <div class="scenario-block best"><div class="scenario-header">${t('best')}</div>
+      <p class="scenario-text">${isTr?`Kümülatif nakit büyüme potansiyeli: +${gp}.`:`Cumulative cash growth potential: +${gp}.`}</p>
+      <div class="scenario-actions"><span class="action-label">${t('best_action')}:</span>
+        <ul>${(d.growth_opportunities||[]).slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>
+    <div class="scenario-block worst"><div class="scenario-header">${t('worst')}</div>
+      <p class="scenario-text">${isTr?`Resesyon senaryosunda nakit kaybı riski: -${sd}.`:`Recession cash exposure: -${sd}.`}</p>
+      <div class="scenario-actions"><span class="action-label">${t('worst_action')}:</span>
+        <ul>${(d.critical_risks||[]).slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>`;
+}
+
+function renderEisenhower(m) {
+  const p = document.getElementById('eisenhowerPanel'); if (!p) return;
+  const isTr = currentLang==='tr';
+  const run = parseFloat(m.cash_runway_months||0);
+  const z = parseFloat(m.altman_z_score?.value||0);
+  const h = parseFloat(m.financial_health_score||0);
+  const roe = parseFloat(m.return_on_equity_pct||0);
+  const matrix = {do:[],schedule:[],delegate:[],eliminate:[]};
+  if (isTr) {
+    if (run>0&&run<6) matrix.do.push(`Nakit krizi — ${run} ay ömür!`);
+    if (z>0&&z<1.8) matrix.do.push(`Z-Skoru (${z}) iflas bölgesi`);
+    if (!matrix.do.length) matrix.do.push(`Sağlık skoru ${h}/10 koru`);
+    if (roe>0&&roe<15) matrix.schedule.push(`ROE %${roe}'dan %${Math.round(roe*1.3)}'a çıkar`);
+    matrix.schedule.push('Sıfır tabanlı bütçeleme (ZBB) planla');
+    matrix.delegate.push('Rasyo raporlamalarını analiz ekibine devret');
+    matrix.delegate.push('Yazılım denetimini BT birimine aktar');
+    matrix.eliminate.push('Verimsiz reklam kanallarını durdur');
+    matrix.eliminate.push('Atıl abonelikleri iptal et');
+  } else {
+    if (run>0&&run<6) matrix.do.push(`Cash crisis — ${run} month runway!`);
+    if (z>0&&z<1.8) matrix.do.push(`Z-Score (${z}) in distress zone`);
+    if (!matrix.do.length) matrix.do.push(`Maintain health score at ${h}/10`);
+    if (roe>0&&roe<15) matrix.schedule.push(`Build ROE from ${roe}% to ${Math.round(roe*1.3)}%`);
+    matrix.schedule.push('Plan Zero-Based Budgeting transition');
+    matrix.delegate.push('Delegate routine reporting to analyst team');
+    matrix.delegate.push('Transfer software audit to IT');
+    matrix.eliminate.push('Stop spend on underperforming channels');
+    matrix.eliminate.push('Cancel redundant subscriptions');
+  }
+  const cell = (items, lbl, cls) => `<div class="eis-cell ${cls}"><div class="eis-label">${t(lbl)}</div><ul>${items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
+  p.innerHTML = `
+    <h3 class="panel-section-title">${t('eis_title')}</h3>
+    <div class="eis-matrix">
+      <div class="eis-axis-col"><div>${t('important')}</div><div>${t('not_important')}</div></div>
+      <div class="eis-grid">
+        <div class="eis-axis-row"><span>${t('urgent')}</span><span>${t('not_urgent')}</span></div>
+        <div class="eis-cells">
+          ${cell(matrix.do,'do','do')}${cell(matrix.schedule,'schedule','schedule')}
+          ${cell(matrix.delegate,'delegate','delegate')}${cell(matrix.eliminate,'eliminate','eliminate')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderAgentFindings(findings) {
+  const c = document.getElementById('agentFindings'); if (!c) return;
+  const agentMeta = [
+    { key:'analyst',    icon:'📊', name:{ tr:'Analyst Agent — Finansal Oranlar', en:'Analyst Agent — Ratios' } },
+    { key:'auditor',    icon:'🔍', name:{ tr:'Auditor Agent — Denetim & Uyumluluk', en:'Auditor Agent — Compliance' } },
+    { key:'optimizer',  icon:'⚙️', name:{ tr:'Optimizer Agent — Maliyet Tasarrufu', en:'Optimizer Agent — Cost Savings' } },
+    { key:'forecaster', icon:'📈', name:{ tr:'Forecaster Agent — Risk & Tahmin', en:'Forecaster Agent — Risk & Forecast' } },
+    { key:'dupont',     icon:'🔬', name:{ tr:'DuPont Agent — ROE Ayrıştırması', en:'DuPont Agent — ROE Decomposition' } },
+  ];
+  c.innerHTML = agentMeta.map(a => {
+    const f = findings[a.key];
+    if (!f) return '';
+    const rows = Object.entries(f).filter(([k]) => !['_error','_agent'].includes(k))
+      .map(([k,v]) => `<div class="finding-row"><span class="finding-key">${escapeText(k.replace(/_/g,' '))}</span><span class="finding-val">${escapeText(typeof v==='object'?JSON.stringify(v):String(v))}</span></div>`).join('');
+    const hasError = f._error;
+    return `
+      <div class="finding-card">
+        <div class="finding-hdr" onclick="toggleFinding(this)">
+          <span class="finding-name">${a.icon} ${escapeText(a.name[currentLang])}</span>
+          <span class="finding-badge">${hasError?'⚠️ Hata':'✅ Tamamlandı'}</span>
+        </div>
+        <div class="finding-body">${hasError?`<p style="color:var(--ri);font-size:.75rem">${escapeText(f._error)}</p>`:rows}</div>
+      </div>`;
+  }).join('');
+}
+function toggleFinding(hdr) { hdr.nextElementSibling.classList.toggle('open'); }
+
+function switchTab(name) {
+  ['ai','mckinsey','eisenhower','agents'].forEach(n => {
+    document.getElementById('panel-'+n)?.classList.toggle('active', n===name);
+    document.getElementById('tab-'+n)?.classList.toggle('active', n===name);
+  });
+}
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const bw = document.body.classList.toggle('theme-bw');
+  document.getElementById('themeToggle').textContent = bw ? '🌈 Renkli' : '⚫ B&W';
+});
+
+document.getElementById('langToggle').addEventListener('click', () => {
+  currentLang = currentLang==='tr' ? 'en' : 'tr';
+  applyLang();
+  applyOnboardLang();
+  if (dashboardData) renderAll();
+});
+
+document.getElementById('onboardLangToggle').addEventListener('click', () => {
+  currentLang = currentLang==='tr' ? 'en' : 'tr';
+  applyOnboardLang();
+});
+
+// Onboarding ekranı görünürken kayan dil düğmesini göster, ana uygulamaya
+// geçince gizle (ana uygulamanın kendi dil düğmesi devreye girer).
+function syncOnboardLangToggleVisibility() {
+  const obToggle = document.getElementById('onboardLangToggle');
+  if (!obToggle) return;
+  const mainVisible = document.getElementById('mainApp').style.display !== 'none';
+  obToggle.style.display = mainVisible ? 'none' : 'block';
+}
+new MutationObserver(syncOnboardLangToggleVisibility).observe(document.getElementById('mainApp'), { attributes:true, attributeFilter:['style'] });
+
+applyOnboardLang();
+syncOnboardLangToggleVisibility();
+
+// Sayfa kapatılırken güvenlik temizliği (ek önlem — zaten RAM sıfırlanır)
+window.addEventListener('beforeunload', () => { API_KEY = null; });
 </script>
-<script src="dashboard_data.js"></script>
-<script src="app.js"></script>
 </body>
 </html>
