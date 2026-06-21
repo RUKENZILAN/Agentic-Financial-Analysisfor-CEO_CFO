@@ -1,6 +1,5 @@
 **The Pi Suite Financial Dashboard & Multi-Agent System**
 
-<img width="1862" height="638" alt="PıSuıte2" src="https://github.com/user-attachments/assets/bf17f8e0-2270-4128-ac10-eb07a55290ea" />
 <img width="1854" height="628" alt="PıSuıte3" src="https://github.com/user-attachments/assets/9e5ea81d-a481-4087-8e70-6d320c41dcaa" />
 <img width="1468" height="914" alt="PıSuıte6" src="https://github.com/user-attachments/assets/a2337e64-19d9-4d37-8a1e-0c4ab4088f11" />
 <img width="1237" height="913" alt="PıSuıte55" src="https://github.com/user-attachments/assets/257f51ba-528b-4f2a-b4c2-7430e9710188" />
@@ -36,7 +35,8 @@ Insensitive to Turkish character/spelling variations (case, ı/i, ş/s, ğ/g)
 Recognizes numbered row labels too (e.g. "1. Current Assets")
 If an item isn't found directly, it's derived from the accounting identity (e.g. Total Liabilities = Total Assets − Equity)
 The AI now only comments on these pre-calculated numbers — it no longer alters them
-A new 🔍 Ratio Diagnostics button was also added to the panel: see exactly which items were found/not found, and every row label detected in your file.
+A new 
+🔍 Ratio Diagnostics button was also added to the panel: see exactly which items were found/not found, and every row label detected in your file.
 ---
 🔒 Security Hardening Added
 XSS (code injection) protection: AI outputs and file contents are now sanitized with DOMPurify — a malicious cell value or manipulated AI response can no longer execute code on the page
@@ -82,7 +82,8 @@ Türkçe karakter ve yazım farklılıklarına (büyük/küçük harf, ı/i, ş/
 Numaralı satır etiketlerini de tanır (örn. "1. Dönen Varlıklar")
 Bir kalem doğrudan bulunamazsa, muhasebe eşitliğinden türetir (örn. Toplam Borç = Toplam Varlık − Özkaynak)
 Yapay zeka artık sadece bu hazır hesaplanmış rakamlar üzerine yorum yazıyor — sayıları değiştirmiyor
-Ayrıca panelde 🔍 Rasyo Tanılama butonu eklendi: hangi kalemlerin bulunduğunu/bulunamadığını ve dosyanızdaki tüm satır etiketlerini görebilirsiniz.
+Ayrıca panelde 
+🔍 Rasyo Tanılama butonu eklendi: hangi kalemlerin bulunduğunu/bulunamadığını ve dosyanızdaki tüm satır etiketlerini görebilirsiniz.
 ---
 🔒 Güvenlik Koruması Eklendi
 XSS (kod enjeksiyonu) koruması: Yapay zeka çıktıları ve dosya içerikleri artık DOMPurify ile sanitize ediliyor — kötü amaçlı bir hücre değeri veya manipüle edilmiş AI yanıtı sayfada kod çalıştıramaz
