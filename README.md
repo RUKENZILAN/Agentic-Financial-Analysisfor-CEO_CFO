@@ -1,6 +1,6 @@
 **The Pi Suite Financial Dashboard & Multi-Agent System**
 
-<img width="692" height="741" alt="PıSuıte99" src="https://github.com/user-attachments/assets/b7dccbc4-4282-4850-b017-90874cec4873" />
+<img width="692" height="741" alt="PıSuıte99" src="https://github.com/user-attachments/assets/0ef649d9-864c-4617-9048-a1f5762222dc" />
 
 <img width="1468" height="914" alt="PıSuıte6" src="https://github.com/user-attachments/assets/a2337e64-19d9-4d37-8a1e-0c4ab4088f11" />
 
