@@ -1,4 +1,5 @@
 **The Pi Suite Financial Dashboard & Multi-Agent System**
+<img width="1280" height="827" alt="PiSuıteLogin" src="https://github.com/user-attachments/assets/6b202420-7bb4-40d9-839c-dbb599e7a742" />
 
 <img width="692" height="741" alt="PıSuıte99" src="https://github.com/user-attachments/assets/0ef649d9-864c-4617-9048-a1f5762222dc" />
 
