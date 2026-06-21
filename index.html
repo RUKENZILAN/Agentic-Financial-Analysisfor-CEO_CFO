@@ -276,6 +276,8 @@ body.theme-bw canvas{filter:grayscale(100%) brightness(1.3)}
 </head>
 <body>
 
+<button id="onboardLangToggle" type="button" style="position:fixed;top:14px;right:14px;z-index:9999;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:.45rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)">EN</button>
+
 <div class="onboard-shell" id="screen-engine">
   <div class="onboard-card">
     <div class="onboard-logo">
@@ -287,33 +289,33 @@ body.theme-bw canvas{filter:grayscale(100%) brightness(1.3)}
       <div class="progress-dot" id="dot2"></div>
       <div class="progress-dot" id="dot3"></div>
     </div>
-    <div class="onboard-title">Hangi AI motorunu kullanmak istersiniz?</div>
-    <div class="onboard-sub">5 ajan bu motor üzerinden çalışacak: Analyst, Auditor, Optimizer, Forecaster, DuPont</div>
+    <div class="onboard-title" id="ob-engine-title">Hangi AI motorunu kullanmak istersiniz?</div>
+    <div class="onboard-sub" id="ob-engine-sub">5 ajan bu motor üzerinden çalışacak: Analyst, Auditor, Optimizer, Forecaster, DuPont</div>
 
     <div class="engine-grid" id="engineGrid">
       <button class="engine-card" data-engine="claude" type="button">
         <span class="engine-icon">&#129312;</span>
         <div class="engine-info">
           <div class="engine-name">Claude (Anthropic)</div>
-          <div class="engine-desc">En yüksek kalite finansal analiz · Sonnet 4.6</div>
+          <div class="engine-desc" id="ob-eng-claude-desc">En yüksek kalite finansal analiz · Sonnet 4.6</div>
         </div>
-        <span class="engine-badge cloud">Bulut</span>
+        <span class="engine-badge cloud" id="ob-badge-claude">Bulut</span>
       </button>
       <button class="engine-card" data-engine="gemini" type="button">
         <span class="engine-icon">&#10024;</span>
         <div class="engine-info">
           <div class="engine-name">Gemini (Google)</div>
-          <div class="engine-desc">Hızlı ve maliyet etkin analiz · Gemini 2.0 Flash</div>
+          <div class="engine-desc" id="ob-eng-gemini-desc">Hızlı ve maliyet etkin analiz · Gemini 2.0 Flash</div>
         </div>
-        <span class="engine-badge cloud">Bulut</span>
+        <span class="engine-badge cloud" id="ob-badge-gemini">Bulut</span>
       </button>
       <button class="engine-card" data-engine="ollama" type="button">
         <span class="engine-icon">&#128187;</span>
         <div class="engine-info">
           <div class="engine-name">Ollama (Yerel)</div>
-          <div class="engine-desc">İnternet gerektirmez · Verileriniz bilgisayarınızda kalır</div>
+          <div class="engine-desc" id="ob-eng-ollama-desc">İnternet gerektirmez · Verileriniz bilgisayarınızda kalır</div>
         </div>
-        <span class="engine-badge local">Yerel</span>
+        <span class="engine-badge local" id="ob-badge-ollama">Yerel</span>
       </button>
     </div>
 
@@ -346,7 +348,7 @@ body.theme-bw canvas{filter:grayscale(100%) brightness(1.3)}
 
     <div class="security-note">
       <span class="security-note-icon">🔒</span>
-      <span class="security-note-text"><strong>Güvenlik:</strong> API anahtarınız yalnızca bu tarayıcı sekmesinin hafızasında (RAM) tutulur. Diske, localStorage'a veya çerezlere asla yazılmaz. Sekmeyi kapattığınızda tamamen silinir.</span>
+      <span class="security-note-text" id="ob-security-note"><strong id="ob-security-strong">Güvenlik:</strong> <span id="ob-security-body">API anahtarınız yalnızca bu tarayıcı sekmesinin hafızasında (RAM) tutulur. Diske, localStorage'a veya çerezlere asla yazılmaz. Sekmeyi kapattığınızda tamamen silinir.</span></span>
     </div>
 
     <div id="apiKeyError" style="display:none"></div>
@@ -367,15 +369,15 @@ body.theme-bw canvas{filter:grayscale(100%) brightness(1.3)}
       <div class="progress-dot active"></div>
       <div class="progress-dot"></div>
     </div>
-    <div class="onboard-title">Ollama yerel sunucusu</div>
-    <div class="onboard-sub">Bilgisayarınızda Ollama'nın çalışıyor olması gerekir</div>
+    <div class="onboard-title" id="ob-ollama-title">Ollama yerel sunucusu</div>
+    <div class="onboard-sub" id="ob-ollama-sub">Bilgisayarınızda Ollama'nın çalışıyor olması gerekir</div>
 
     <div class="api-key-section">
-      <div class="api-key-label">🌐 Ollama Sunucu Adresi</div>
+      <div class="api-key-label" id="ob-ollama-label">🌐 Ollama Sunucu Adresi</div>
       <div class="api-key-input-wrap">
         <input type="text" class="api-key-input" id="ollamaUrlInput" value="http://localhost:11434" autocomplete="off" spellcheck="false">
       </div>
-      <div class="api-key-hint">
+      <div class="api-key-hint" id="ob-ollama-hint">
         Ollama kurulu değilse: <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a> adresinden indirin.<br>
         Sonra terminalde çalıştırın: <code>ollama pull llama3.1</code>
       </div>
@@ -604,21 +606,12 @@ let cfChartInst = null, histChartInst = null;
 //  ONBOARDING — ADIM 2: API KEY (Claude / Gemini)
 // ─────────────────────────────────────────────────────────────────────────
 function showApiKeyScreen() {
-  const cfg = {
-    claude: {
-      title: 'Claude API anahtarınızı girin',
-      label: '🔑 Anthropic API Anahtarı',
-      placeholder: 'sk-ant-api03-...',
-      hint: 'API anahtarınızı <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> adresinden alabilirsiniz.'
-    },
-    gemini: {
-      title: 'Gemini API anahtarınızı girin',
-      label: '🔑 Google AI API Anahtarı',
-      placeholder: 'AIzaSy...',
-      hint: 'API anahtarınızı <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a> adresinden alabilirsiniz.'
-    }
+  const c = {
+    title: t('apikey_title_' + SELECTED_ENGINE),
+    label: t('apikey_label_' + SELECTED_ENGINE),
+    placeholder: SELECTED_ENGINE === 'claude' ? 'sk-ant-api03-...' : 'AIzaSy...',
+    hint: t('apikey_hint_' + SELECTED_ENGINE)
   };
-  const c = cfg[SELECTED_ENGINE];
   document.getElementById('apiKeyTitle').textContent = c.title;
   document.getElementById('apiKeyLabel').textContent  = c.label;
   document.getElementById('apiKeyInput').placeholder  = c.placeholder;
@@ -626,8 +619,9 @@ function showApiKeyScreen() {
   document.getElementById('apiKeyInput').value = '';
   document.getElementById('apiKeyError').style.display = 'none';
   document.getElementById('apiKeyNextBtn').disabled = true;
-  document.getElementById('apiKeyNextBtn').textContent = 'Bağlantıyı Doğrula ve Devam Et';
+  document.getElementById('apiKeyNextBtn').textContent = t('ob_verify_continue');
   document.getElementById('screen-apikey').style.display = 'flex';
+  applyOnboardLang();
   setTimeout(() => document.getElementById('apiKeyInput').focus(), 100);
 }
 
@@ -662,7 +656,7 @@ document.getElementById('apiKeyNextBtn').addEventListener('click', async functio
 
   const btn = this;
   btn.disabled = true;
-  btn.innerHTML = '<span class="test-spinner"></span>Bağlantı test ediliyor...';
+  btn.innerHTML = '<span class="test-spinner"></span>' + t('ob_testing');
   document.getElementById('apiKeyError').style.display = 'none';
 
   const result = await testApiKey(SELECTED_ENGINE, key);
@@ -672,7 +666,7 @@ document.getElementById('apiKeyNextBtn').addEventListener('click', async functio
     enterMainApp();
   } else {
     btn.disabled = false;
-    btn.textContent = 'Bağlantıyı Doğrula ve Devam Et';
+    btn.textContent = t('ob_verify_continue');
     showApiKeyError(result.message);
   }
 });
@@ -702,12 +696,12 @@ async function testApiKey(engine, key) {
           messages: [{ role: 'user', content: 'merhaba' }]
         })
       });
-      if (resp.status === 401) return { ok:false, message:'Geçersiz API anahtarı.' };
-      if (resp.status === 403) return { ok:false, message:'Erişim reddedildi — anahtar izinlerini kontrol edin.' };
+      if (resp.status === 401) return { ok:false, message:t('err_invalid_key') };
+      if (resp.status === 403) return { ok:false, message:t('err_forbidden') };
       if (resp.status === 429) return { ok:true }; // rate limit = anahtar geçerli demek
-      if (!resp.ok && resp.status >= 500) return { ok:false, message:'Anthropic sunucu hatası — tekrar deneyin.' };
+      if (!resp.ok && resp.status >= 500) return { ok:false, message:t('err_anthropic_server') };
       const data = await resp.json();
-      if (data.error) return { ok:false, message: data.error.message || 'API hatası' };
+      if (data.error) return { ok:false, message: data.error.message || t('err_api_generic') };
       return { ok:true };
     }
 
@@ -717,16 +711,16 @@ async function testApiKey(engine, key) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: 'merhaba' }] }] })
       });
-      if (resp.status === 400 || resp.status === 403) return { ok:false, message:'Geçersiz API anahtarı.' };
-      if (!resp.ok && resp.status >= 500) return { ok:false, message:'Google sunucu hatası — tekrar deneyin.' };
+      if (resp.status === 400 || resp.status === 403) return { ok:false, message:t('err_invalid_key') };
+      if (!resp.ok && resp.status >= 500) return { ok:false, message:t('err_google_server') };
       const data = await resp.json();
-      if (data.error) return { ok:false, message: data.error.message || 'API hatası' };
+      if (data.error) return { ok:false, message: data.error.message || t('err_api_generic') };
       return { ok:true };
     }
 
-    return { ok:false, message:'Bilinmeyen motor' };
+    return { ok:false, message:t('err_unknown_engine') };
   } catch (e) {
-    return { ok:false, message:'Bağlantı kurulamadı: ' + e.message + ' (internet bağlantınızı kontrol edin)' };
+    return { ok:false, message:t('err_no_connection') + e.message + t('err_no_connection_suffix') };
   }
 }
 
@@ -747,7 +741,7 @@ document.getElementById('ollamaNextBtn').addEventListener('click', async functio
 
   const btn = this;
   btn.disabled = true;
-  btn.innerHTML = '<span class="test-spinner"></span>Bağlantı test ediliyor...';
+  btn.innerHTML = '<span class="test-spinner"></span>' + t('ob_testing');
   document.getElementById('ollamaError').style.display = 'none';
 
   try {
@@ -762,7 +756,7 @@ document.getElementById('ollamaNextBtn').addEventListener('click', async functio
     enterMainApp();
   } catch (e) {
     btn.disabled = false;
-    btn.textContent = 'Bağlantıyı Doğrula ve Devam Et';
+    btn.textContent = t('ob_verify_continue');
     showOllamaError(e, url);
   }
 });
@@ -782,31 +776,30 @@ function showOllamaError(e, url) {
 
   if (isCors) {
     el.innerHTML = `
-      <div>⚠️ <strong>${url}</strong> adresine bağlanılamadı.</div>
+      <div>⚠️ <strong>${url}</strong> ${t('ollama_cors_line1')}</div>
       <div style="font-size:.72rem;line-height:1.6;color:#fca5a5">
-        Bu genellikle Ollama'nın <strong>CORS izni</strong> vermemesinden kaynaklanır — tarayıcı, dosyadan (file://) açılan bu sayfanın yerel sunucunuza erişimini güvenlik gereği engeller.<br><br>
-        <strong>Çözüm:</strong> Ollama'yı CORS izniyle yeniden başlatın:<br>
+        ${t('ollama_cors_body')}
         <div style="margin-top:.4rem">
-          <strong>macOS / Linux</strong> (Terminal):<br>
+          <strong>${t('ollama_cors_mac')}</strong> (Terminal):<br>
           <code style="display:block;background:rgba(0,0,0,.3);padding:.4rem .6rem;border-radius:.3rem;margin-top:.2rem">OLLAMA_ORIGINS="*" ollama serve</code>
         </div>
         <div style="margin-top:.4rem">
-          <strong>Windows</strong> (PowerShell, yönetici):<br>
+          <strong>${t('ollama_cors_win')}</strong> (PowerShell, admin):<br>
           <code style="display:block;background:rgba(0,0,0,.3);padding:.4rem .6rem;border-radius:.3rem;margin-top:.2rem">setx OLLAMA_ORIGINS "*"</code>
-          <span style="color:#fbbf24">sonra Ollama'yı tamamen kapatıp yeniden başlatın (sistem tepsisinden çıkış yapın)</span>
+          <span style="color:#fbbf24">${t('ollama_cors_win_note')}</span>
         </div>
-        <div style="margin-top:.5rem">Ollama çalışmıyorsa önce başlatın: <code style="background:rgba(0,0,0,.3);padding:.1rem .4rem;border-radius:.3rem">ollama serve</code></div>
+        <div style="margin-top:.5rem">${t('ollama_cors_notrunning')} <code style="background:rgba(0,0,0,.3);padding:.1rem .4rem;border-radius:.3rem">ollama serve</code></div>
       </div>`;
   } else if (isNoModels) {
     el.innerHTML = `
-      <div>⚠️ Ollama çalışıyor ama hiç model yüklü değil.</div>
+      <div>⚠️ ${t('ollama_no_models')}</div>
       <div style="font-size:.72rem;color:#fca5a5;margin-top:.3rem">
-        Terminalde çalıştırın: <code style="background:rgba(0,0,0,.3);padding:.1rem .4rem;border-radius:.3rem">ollama pull llama3.1</code>
+        ${t('ollama_no_models_hint')} <code style="background:rgba(0,0,0,.3);padding:.1rem .4rem;border-radius:.3rem">ollama pull llama3.1</code>
       </div>`;
   } else if (isHttp) {
-    el.innerHTML = `⚠️ Sunucu yanıt verdi ama hata döndürdü (HTTP ${e.status}). Ollama sürümünüzü kontrol edin.`;
+    el.innerHTML = `⚠️ ${t('ollama_http_err').replace('STATUS', e.status)}`;
   } else {
-    el.innerHTML = `⚠️ Beklenmeyen hata: ${e.message || e}`;
+    el.innerHTML = `⚠️ ${t('ollama_unexpected')} ${e.message || e}`;
   }
 }
 
@@ -827,7 +820,7 @@ function enterMainApp() {
 }
 
 document.getElementById('changeEngineBtn').addEventListener('click', function() {
-  if (!confirm('AI motorunu değiştirmek istediğinize emin misiniz? Mevcut analiz silinecek.')) return;
+  if (!confirm(t('ob_change_engine_confirm'))) return;
   API_KEY = null;
   SELECTED_ENGINE = null;
   dashboardData = null;
@@ -895,7 +888,46 @@ const I = {
     eis_title:'Eisenhower Öncelik Matrisi',
     do:'🔴 Hemen Yap', schedule:'🔵 Planla', delegate:'🟡 Devret', eliminate:'⚪ Kaldır',
     urgent:'Acil', not_urgent:'Acil Değil', important:'Önemli', not_important:'Önemli Değil',
-    no_data:'Veri yok'
+    no_data:'Veri yok',
+    ob_engine_title:'Hangi AI motorunu kullanmak istersiniz?',
+    ob_engine_sub:'5 ajan bu motor üzerinden çalışacak: Analyst, Auditor, Optimizer, Forecaster, DuPont',
+    ob_eng_claude_desc:'En yüksek kalite finansal analiz · Sonnet 4.6',
+    ob_eng_gemini_desc:'Hızlı ve maliyet etkin analiz · Gemini 2.0 Flash',
+    ob_eng_ollama_desc:'İnternet gerektirmez · Verileriniz bilgisayarınızda kalır',
+    ob_badge_cloud:'Bulut', ob_badge_local:'Yerel',
+    ob_continue:'Devam Et', ob_back:'← Geri',
+    ob_verify_continue:'Bağlantıyı Doğrula ve Devam Et',
+    ob_testing:'Bağlantı test ediliyor...',
+    apikey_sub:'Analiz için gerekli — sadece bu oturumda kullanılır',
+    security_strong:'Güvenlik:',
+    security_body:'API anahtarınız yalnızca bu tarayıcı sekmesinin hafızasında (RAM) tutulur. Diske, localStorage\'a veya çerezlere asla yazılmaz. Sekmeyi kapattığınızda tamamen silinir.',
+    apikey_title_claude:'Claude API anahtarınızı girin', apikey_label_claude:'🔑 Anthropic API Anahtarı',
+    apikey_hint_claude:'API anahtarınızı <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> adresinden alabilirsiniz.',
+    apikey_title_gemini:'Gemini API anahtarınızı girin', apikey_label_gemini:'🔑 Google AI API Anahtarı',
+    apikey_hint_gemini:'API anahtarınızı <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a> adresinden alabilirsiniz.',
+    err_invalid_key:'Geçersiz API anahtarı.',
+    err_forbidden:'Erişim reddedildi — anahtar izinlerini kontrol edin.',
+    err_anthropic_server:'Anthropic sunucu hatası — tekrar deneyin.',
+    err_google_server:'Google sunucu hatası — tekrar deneyin.',
+    err_api_generic:'API hatası',
+    err_unknown_engine:'Bilinmeyen motor',
+    err_no_connection:'Bağlantı kurulamadı: ',
+    err_no_connection_suffix:' (internet bağlantınızı kontrol edin)',
+    ob_ollama_title:'Ollama yerel sunucusu',
+    ob_ollama_sub:'Bilgisayarınızda Ollama\'nın çalışıyor olması gerekir',
+    ob_ollama_label:'🌐 Ollama Sunucu Adresi',
+    ob_ollama_hint:'Ollama kurulu değilse: <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a> adresinden indirin.<br>Sonra terminalde çalıştırın: <code>ollama pull llama3.1</code>',
+    ob_change_engine_confirm:'AI motorunu değiştirmek istediğinize emin misiniz? Mevcut analiz silinecek.',
+    ollama_cors_line1:'adresine bağlanılamadı.',
+    ollama_cors_body:'Bu genellikle Ollama\'nın <strong>CORS izni</strong> vermemesinden kaynaklanır — tarayıcı, dosyadan (file://) açılan bu sayfanın yerel sunucunuza erişimini güvenlik gereği engeller.<br><br><strong>Çözüm:</strong> Ollama\'yı CORS izniyle yeniden başlatın:<br>',
+    ollama_cors_mac:'macOS / Linux',
+    ollama_cors_win:'Windows',
+    ollama_cors_win_note:'sonra Ollama\'yı tamamen kapatıp yeniden başlatın (sistem tepsisinden çıkış yapın)',
+    ollama_cors_notrunning:'Ollama çalışmıyorsa önce başlatın:',
+    ollama_no_models:'Ollama çalışıyor ama hiç model yüklü değil.',
+    ollama_no_models_hint:'Terminalde çalıştırın:',
+    ollama_http_err:'Sunucu yanıt verdi ama hata döndürdü (HTTP STATUS). Ollama sürümünüzü kontrol edin.',
+    ollama_unexpected:'Beklenmeyen hata:'
   },
   en: {
     brand_sub:'Tabula Rasa · 5-Agent AI Financial Analysis Engine',
@@ -924,7 +956,46 @@ const I = {
     eis_title:'Eisenhower Priority Matrix',
     do:'🔴 Do Now', schedule:'🔵 Schedule', delegate:'🟡 Delegate', eliminate:'⚪ Eliminate',
     urgent:'Urgent', not_urgent:'Not Urgent', important:'Important', not_important:'Not Important',
-    no_data:'No data'
+    no_data:'No data',
+    ob_engine_title:'Which AI engine would you like to use?',
+    ob_engine_sub:'5 agents will run on this engine: Analyst, Auditor, Optimizer, Forecaster, DuPont',
+    ob_eng_claude_desc:'Highest quality financial analysis · Sonnet 4.6',
+    ob_eng_gemini_desc:'Fast and cost-effective analysis · Gemini 2.0 Flash',
+    ob_eng_ollama_desc:'No internet required · Your data stays on your computer',
+    ob_badge_cloud:'Cloud', ob_badge_local:'Local',
+    ob_continue:'Continue', ob_back:'← Back',
+    ob_verify_continue:'Verify Connection & Continue',
+    ob_testing:'Testing connection...',
+    apikey_sub:'Required for analysis — used only in this session',
+    security_strong:'Security:',
+    security_body:'Your API key is kept only in this browser tab\'s memory (RAM). It is never written to disk, localStorage, or cookies. It is fully erased when you close the tab.',
+    apikey_title_claude:'Enter your Claude API key', apikey_label_claude:'🔑 Anthropic API Key',
+    apikey_hint_claude:'You can get your API key from <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.',
+    apikey_title_gemini:'Enter your Gemini API key', apikey_label_gemini:'🔑 Google AI API Key',
+    apikey_hint_gemini:'You can get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.',
+    err_invalid_key:'Invalid API key.',
+    err_forbidden:'Access denied — check key permissions.',
+    err_anthropic_server:'Anthropic server error — please try again.',
+    err_google_server:'Google server error — please try again.',
+    err_api_generic:'API error',
+    err_unknown_engine:'Unknown engine',
+    err_no_connection:'Could not connect: ',
+    err_no_connection_suffix:' (check your internet connection)',
+    ob_ollama_title:'Ollama local server',
+    ob_ollama_sub:'Ollama must be running on your computer',
+    ob_ollama_label:'🌐 Ollama Server Address',
+    ob_ollama_hint:'If Ollama is not installed: download it from <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a>.<br>Then run in your terminal: <code>ollama pull llama3.1</code>',
+    ob_change_engine_confirm:'Are you sure you want to change the AI engine? The current analysis will be deleted.',
+    ollama_cors_line1:'could not be reached.',
+    ollama_cors_body:'This is usually because Ollama hasn\'t granted <strong>CORS permission</strong> — for security, the browser blocks this page (opened from file://) from accessing your local server.<br><br><strong>Fix:</strong> Restart Ollama with CORS enabled:<br>',
+    ollama_cors_mac:'macOS / Linux',
+    ollama_cors_win:'Windows',
+    ollama_cors_win_note:'then fully quit and restart Ollama (exit from the system tray)',
+    ollama_cors_notrunning:'If Ollama isn\'t running, start it first:',
+    ollama_no_models:'Ollama is running but has no models installed.',
+    ollama_no_models_hint:'Run in your terminal:',
+    ollama_http_err:'The server responded but returned an error (HTTP STATUS). Check your Ollama version.',
+    ollama_unexpected:'Unexpected error:'
   }
 };
 const t = k => I[currentLang][k] || k;
@@ -950,6 +1021,45 @@ function applyLang() {
   document.getElementById('langToggle').textContent = t('langBtn');
   buildAgentChips();
 }
+
+function applyOnboardLang() {
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+
+  set('ob-engine-title', t('ob_engine_title'));
+  set('ob-engine-sub', t('ob_engine_sub'));
+  set('ob-eng-claude-desc', t('ob_eng_claude_desc'));
+  set('ob-eng-gemini-desc', t('ob_eng_gemini_desc'));
+  set('ob-eng-ollama-desc', t('ob_eng_ollama_desc'));
+  set('ob-badge-claude', t('ob_badge_cloud'));
+  set('ob-badge-gemini', t('ob_badge_cloud'));
+  set('ob-badge-ollama', t('ob_badge_local'));
+  set('engineNextBtn', t('ob_continue'));
+
+  set('apiKeySub', t('apikey_sub'));
+  set('ob-security-strong', t('security_strong'));
+  set('ob-security-body', t('security_body'));
+  const akBtn = document.getElementById('apiKeyNextBtn');
+  if (akBtn && !akBtn.querySelector('.test-spinner')) akBtn.textContent = t('ob_verify_continue');
+  set('apiKeyBackBtn', t('ob_back'));
+  if (SELECTED_ENGINE === 'claude' || SELECTED_ENGINE === 'gemini') {
+    set('apiKeyTitle', t('apikey_title_' + SELECTED_ENGINE));
+    set('apiKeyLabel', t('apikey_label_' + SELECTED_ENGINE));
+    setHtml('apiKeyHint', t('apikey_hint_' + SELECTED_ENGINE));
+  }
+
+  set('ob-ollama-title', t('ob_ollama_title'));
+  set('ob-ollama-sub', t('ob_ollama_sub'));
+  set('ob-ollama-label', t('ob_ollama_label'));
+  setHtml('ob-ollama-hint', t('ob_ollama_hint'));
+  const olBtn = document.getElementById('ollamaNextBtn');
+  if (olBtn && !olBtn.querySelector('.test-spinner')) olBtn.textContent = t('ob_verify_continue');
+  set('ollamaBackBtn', t('ob_back'));
+
+  const obToggle = document.getElementById('onboardLangToggle');
+  if (obToggle) obToggle.textContent = t('langBtn');
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────
 //  UPLOAD — label[for] tabanlı, file:// protokolünde de çalışır
@@ -1946,8 +2056,27 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 document.getElementById('langToggle').addEventListener('click', () => {
   currentLang = currentLang==='tr' ? 'en' : 'tr';
   applyLang();
+  applyOnboardLang();
   if (dashboardData) renderAll();
 });
+
+document.getElementById('onboardLangToggle').addEventListener('click', () => {
+  currentLang = currentLang==='tr' ? 'en' : 'tr';
+  applyOnboardLang();
+});
+
+// Onboarding ekranı görünürken kayan dil düğmesini göster, ana uygulamaya
+// geçince gizle (ana uygulamanın kendi dil düğmesi devreye girer).
+function syncOnboardLangToggleVisibility() {
+  const obToggle = document.getElementById('onboardLangToggle');
+  if (!obToggle) return;
+  const mainVisible = document.getElementById('mainApp').style.display !== 'none';
+  obToggle.style.display = mainVisible ? 'none' : 'block';
+}
+new MutationObserver(syncOnboardLangToggleVisibility).observe(document.getElementById('mainApp'), { attributes:true, attributeFilter:['style'] });
+
+applyOnboardLang();
+syncOnboardLangToggleVisibility();
 
 // Sayfa kapatılırken güvenlik temizliği (ek önlem — zaten RAM sıfırlanır)
 window.addEventListener('beforeunload', () => { API_KEY = null; });
