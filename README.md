@@ -64,6 +64,7 @@ Automatic JSON repair for truncated responses from local (Ollama) models
 Live progress counter for all engines (previously Ollama-only — now Claude/Gemini also show "X seconds elapsed")
 Larger context window and output token budget (fewer truncated responses on Ollama)
 
+**If you would like to buy the product, please visit our checkout page: https://pi314.lemonsqueezy.com/checkout/buy/5b270c7f-84ea-4eb0-a55a-c0b5fe92dff3**
 
 ⚠️ For accurate ratio calculation, it is essential that the row labels in your file (e.g. "Current Assets," "Equity," "Net Sales") use common, generally accepted financial terminology similar to the example file. Company-specific codes, abbreviations, or highly unconventional terminology may not be recognized.
 
@@ -99,6 +100,8 @@ Kurulum	`brew install ollama` veya ollama.com/download/mac	ollama.com/download/w
 Model indirme	`ollama pull qwen3.5:4b`	`ollama pull qwen3.5:4b`
 CORS izni (kalıcı)	`launchctl setenv OLLAMA_ORIGINS "*"`	`[System.Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","*","User")`
 Sunucuyu başlatma	`ollama serve`	`ollama serve`
+
+**Ürünü satın almak istiyorsanız, lütfen ödeme sayfamızı ziyaret ediniz: https://pi314.lemonsqueezy.com/checkout/buy/5b270c7f-84ea-4eb0-a55a-c0b5fe92dff3**
 
 > ⚠️ CORS izni verilmezse, tarayıcı güvenlik nedeniyle yerel Ollama sunucusuna bağlanamaz. Ayarı verdikten sonra Ollama'yı (varsa sistem tepsisi/menü çubuğu simgesinden) tamamen kapatıp yeniden açmanız gerekir.
 Uygulama içinde motor seçildikten sonra URL (`http://localhost:11434`) ve model adı (`qwen3.5:4b`) girilip bağlantı test edilir.
