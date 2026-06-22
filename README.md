@@ -1,16 +1,6 @@
 **The Pi Suite AI Financial Analysis Engine for C-Level& Multi-Agent System**
 
-<img width="1280" height="827" alt="PiSuıteLogin" src="https://github.com/user-attachments/assets/44877c15-b032-433f-8aa1-eac08a3df7d8" />
 
-<img width="692" height="741" alt="PıSuıte99" src="https://github.com/user-attachments/assets/0ef649d9-864c-4617-9048-a1f5762222dc" />
-
-<img width="1468" height="914" alt="PıSuıte6" src="https://github.com/user-attachments/assets/a2337e64-19d9-4d37-8a1e-0c4ab4088f11" />
-
-<img width="1237" height="913" alt="PıSuıte55" src="https://github.com/user-attachments/assets/257f51ba-528b-4f2a-b4c2-7430e9710188" />
-
-<img width="1217" height="927" alt="PıSuıte5" src="https://github.com/user-attachments/assets/566215af-f63f-444a-aa31-21c19230f6cd" />
-
-<img width="1854" height="628" alt="PıSuıte3" src="https://github.com/user-attachments/assets/9e5ea81d-a481-4087-8e70-6d320c41dcaa" />
 # PiSuite
 
 PiSuite is an advanced multi-agent AI financial analysis platform. It processes uploaded financial statements, extracts line items deterministically, computes accurate financial ratios via JavaScript, and delivers professional executive commentary using cloud or local LLMs.
@@ -154,3 +144,15 @@ Bu yazılım ve entegre çoklu ajan sistemleri tarafından üretilen tüm raporl
 ---
 
 👉 **[Uygulamayı Satın Almak İçin Ödeme Sayfamızı Ziyaret Edin](https://pi314.lemonsqueezy.com/checkout/buy/5b270c7f-84ea-4eb0-a55a-c0b5fe92dff3)**
+
+<img width="1280" height="827" alt="PiSuıteLogin" src="https://github.com/user-attachments/assets/44877c15-b032-433f-8aa1-eac08a3df7d8" />
+
+<img width="692" height="741" alt="PıSuıte99" src="https://github.com/user-attachments/assets/0ef649d9-864c-4617-9048-a1f5762222dc" />
+
+<img width="1468" height="914" alt="PıSuıte6" src="https://github.com/user-attachments/assets/a2337e64-19d9-4d37-8a1e-0c4ab4088f11" />
+
+<img width="1237" height="913" alt="PıSuıte55" src="https://github.com/user-attachments/assets/257f51ba-528b-4f2a-b4c2-7430e9710188" />
+
+<img width="1217" height="927" alt="PıSuıte5" src="https://github.com/user-attachments/assets/566215af-f63f-444a-aa31-21c19230f6cd" />
+
+<img width="1854" height="628" alt="PıSuıte3" src="https://github.com/user-attachments/assets/9e5ea81d-a481-4087-8e70-6d320c41dcaa" />
