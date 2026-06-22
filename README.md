@@ -1,4 +1,4 @@
-**The Pi Suite Financial Dashboard & Multi-Agent System**
+**The Pi Suite AI Financial Analysis Engine for C-Level& Multi-Agent System**
 
 <img width="1280" height="827" alt="PiSuıteLogin" src="https://github.com/user-attachments/assets/44877c15-b032-433f-8aa1-eac08a3df7d8" />
 
