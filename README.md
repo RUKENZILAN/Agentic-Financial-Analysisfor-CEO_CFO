@@ -45,7 +45,7 @@ Compatible with macOS and Windows environments.
 ### 🔢 Deterministic Financial Ratio Engine
 *No more hallucinated financial metrics.* Older AI systems estimated numbers, resulting in critical mathematical errors. PiSuite uses a deterministic JavaScript parsing pipeline to guarantee exact figures.
 
-* **Layout Agnostic:** Parses tabular data accurately regardless of column placement or order in your Excel or CSV files. However the data file must be aligned with the sample file.
+* **Layout Agnostic:** Parses tabular data accurately regardless of column placement or order in your Excel or CSV files. However the data file must be aligned with the sample files. We provide two sample files: a simple one and a complex financial one. Both function correctly.
 * **Localization Robustness:** Normalizes Turkish character variations automatically (case, ı/i, ş/s, ğ/g).
 * **Regex Label Matching:** Automatically detects numbered accounting rows, such as "1. Current Assets".
 * **Accounting Identity Fallbacks:** Reconstructs missing core data points using strict balance sheet identities, such as `Total Liabilities = Total Assets - Equity`.
@@ -112,7 +112,7 @@ macOS ve Windows işletim sistemleriyle tam uyumludur.
 ### 🔢 Deterministik Finansal Rasyo Motoru
 *Yapay zeka kaynaklı hatalı hesaplamalara son.* Eski sistemler finansal oranları yapay zekanın tahmin etmesine bırakıyordu, bu da matematiksel hatalara yol açıyordu. PiSuite, deterministik JavaScript matematik motoru kullanarak kesin sonuçlar üretir.
 
-* **Tablo Düzeninden Bağımsız:** Excel veya CSV dosyanızdaki sütun sıralaması nasıl olursa olsun verileri başarıyla analiz eder. Ancak veri dosyası, örnek dosya ile paralellik arz etmelidir.
+* **Tablo Düzeninden Bağımsız:** Excel veya CSV dosyanızdaki sütun sıralaması nasıl olursa olsun verileri başarıyla analiz eder. Ancak veri dosyası, örnek dosyalar ile paralellik arz etmelidir.Biri basit, diğeri ise karmaşık finansal yapıya sahip iki örnek dosya sunuyoruz. İkisi de sorunsuz çalışıyor.
 * **Türkçe Karakter Standardizasyonu:** Türkçe karakter farklılıklarını (büyük/küçük harf, ı/i, ş/s, ğ/g) otomatik olarak algılar ve normalize eder.
 * **Gelişmiş Etiket Yakalama:** "1. Dönen Varlıklar" gibi numaralandırılmış muhasebe satırlarını doğrudan tanır.
 * **Muhasebe Eşitliği Desteği:** Dosyada doğrudan bulunamayan temel kalemleri, `Toplam Borç = Toplam Varlık - Özkaynak` gibi finansal eşitlikler üzerinden otomatik olarak türetir.
