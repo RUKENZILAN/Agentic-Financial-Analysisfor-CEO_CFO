@@ -4,7 +4,7 @@ A standalone, browser-based AI-powered financial analysis engine that generates 
 
 
 
-**Ready to automate your financial workflows? Purchase PiSuite Here[(https://app.lemonsqueezy.com/products/1176193)] or Here [(https://pi314.lemonsqueezy.com/)] **
+**Ready to automate your financial workflows? Purchase PiSuite Here [https://pi314.lemonsqueezy.com/checkout/buy/26a1a2c9-2ac3-4d42-8011-02dcae29e09d]**
 
 ---
 
