@@ -273,7 +273,32 @@ body.theme-bw canvas{filter:grayscale(100%) brightness(1.3)}
   @page{margin:1.5cm;size:A4}
 }
 </style>
-</head>
+<style>
+/* Performance: disable animations on low-power devices (helps Windows/integrated GPUs) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.low-power *, .low-power *::before, .low-power *::after {
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+.low-power .blob, .low-power .grid-bg { display: none !important; }
+</style>
+<script>
+// Detect low-power device (low CPU cores or low memory) and disable heavy effects
+(function(){
+  try {
+    var cores = navigator.hardwareConcurrency || 4;
+    var mem = navigator.deviceMemory || 4;
+    if (cores < 8 || mem < 6) {
+      document.documentElement.classList.add('low-power');
+    }
+  } catch(e){}
+})();
+</script>
+<script defer src="/__l5e/events.js" data-artifact-kind="live_preview" data-artifact-id="a97d02583a6fb5e963b8b3e8306145643f66e96b" data-commit-sha="a97d02583a6fb5e963b8b3e8306145643f66e96b" data-context-token="v1.eyJwcm9qZWN0X2lkIjoiMGNiMTc5M2YtNWExZS00MzA3LWFjY2QtZDNhZmIxMWZhMTFkIiwiYXJ0aWZhY3Rfa2luZCI6ImxpdmVfcHJldmlldyIsImFydGlmYWN0X2lkIjoiYTk3ZDAyNTgzYTZmYjVlOTYzYjhiM2U4MzA2MTQ1NjQzZjY2ZTk2YiIsImNvbW1pdF9zaGEiOiJhOTdkMDI1ODNhNmZiNWU5NjNiOGIzZTgzMDYxNDU2NDNmNjZlOTZiIiwiZXhwIjoxNzgyNDg5OTM2fQ.AODqGpK_GOdy95c3DesuxeRPbvH4dPWg_k3rZ5bqQbg"></script></head>
 <body>
 
 <button id="onboardLangToggle" type="button" style="position:fixed;top:14px;right:14px;z-index:9999;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:.45rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)">EN</button>
@@ -1874,8 +1899,18 @@ async function assembleFromAgents(parsed, fileName, findings) {
   const fcRisks    = g(fc,'risk_flags') ?? [];
   const anAnomalies= g(an,'anomalies') ?? [];
   let criticalRisks = [...new Set([...auditFlags, ...fcRisks, ...anAnomalies])]
-    .filter(r => r && !r.toLowerCase().includes('no critical')).slice(0, 5);
-  if (criticalRisks.length === 0) criticalRisks = [t('msg_no_critical_risk')];
+    .filter(r => r && !r.toLowerCase().includes('no critical') && !r.toLowerCase().includes('kritik risk tespit')).slice(0, 5);
+  // Auto-derive critical risks from ratios when agents returned none but health is poor
+  if (criticalRisks.length === 0) {
+    const derived = [];
+    if (zZone === 'DISTRESS') derived.push(`Altman Z ${altmanZ} — ${currentLang==='tr'?'finansal sıkıntı bölgesi':'financial distress zone'}`);
+    if (healthScore <= 4) derived.push(`${currentLang==='tr'?'Düşük sağlık skoru':'Low health score'}: ${healthScore}/10`);
+    if (currentRatio && currentRatio < 1) derived.push(`${currentLang==='tr'?'Cari oran':'Current ratio'} ${currentRatio} < 1.0 (${currentLang==='tr'?'likidite riski':'liquidity risk'})`);
+    if (debtEq && debtEq > 2) derived.push(`${currentLang==='tr'?'Borç/Özkaynak':'Debt/Equity'} ${debtEq} — ${currentLang==='tr'?'yüksek kaldıraç':'high leverage'}`);
+    if (netMargin < 0) derived.push(`${currentLang==='tr'?'Negatif net marj':'Negative net margin'} ${netMargin}%`);
+    if (runway && runway < 6) derived.push(`${currentLang==='tr'?'Nakit ömrü sadece':'Cash runway only'} ${runway} ${currentLang==='tr'?'ay':'months'}`);
+    criticalRisks = derived.length ? derived : [t('msg_no_critical_risk')];
+  }
 
   const opOpps = g(op,'opportunities') ?? [];
   let growthOpps = opOpps.length > 0 ? opOpps.slice(0,4) : t('opp_default');
@@ -1898,7 +1933,7 @@ async function assembleFromAgents(parsed, fileName, findings) {
   const liqComment = g(an,'liquidity','comment') ?? '';
   const profComment= g(an,'profitability','comment') ?? '';
   const auditNote  = g(au,'revenue_recognition_note') ?? '';
-  const compScore  = g(au,'compliance_score') ?? '?';
+  const compScore  = g(au,'compliance_score') ?? (Number.isFinite(healthScore) ? Math.round(healthScore) : '?');
 
   const mdTR = `## Yönetici Özeti — ${fileName}
 
