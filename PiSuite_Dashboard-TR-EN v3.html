@@ -946,6 +946,7 @@ const I = {
     msg_unknown_engine:'Bilinmeyen motor: ',
     msg_max_retries:'maks. deneme sayısı aşıldı',
     msg_no_critical_risk:'Kritik risk tespit edilmedi',
+    msg_low_health:'Finansal sağlık skoru eşiğin altında ({s}/10) — detaylı risk incelemesi önerilir',
     msg_zbb_default:'ZBB ile OPEX optimizasyonu önerilmektedir.',
     msg_weak_pillar:'Zayıf halka',
     msg_rows_sheets:'satır · {n} sayfa',
@@ -1057,6 +1058,7 @@ const I = {
     msg_unknown_engine:'Unknown engine: ',
     msg_max_retries:'max retries exceeded',
     msg_no_critical_risk:'No critical risks detected',
+    msg_low_health:'Financial health score below threshold ({s}/10) — detailed risk review recommended',
     msg_zbb_default:'ZBB implementation recommended to optimize OPEX.',
     msg_weak_pillar:'Weakest pillar',
     msg_rows_sheets:'rows · {n} sheets',
@@ -1875,6 +1877,9 @@ async function assembleFromAgents(parsed, fileName, findings) {
   const anAnomalies= g(an,'anomalies') ?? [];
   let criticalRisks = [...new Set([...auditFlags, ...fcRisks, ...anAnomalies])]
     .filter(r => r && !r.toLowerCase().includes('no critical')).slice(0, 5);
+  if (criticalRisks.length === 0 && healthScore < 7) {
+    criticalRisks = [t('msg_low_health').replace('{s}', healthScore)];
+  }
   if (criticalRisks.length === 0) criticalRisks = [t('msg_no_critical_risk')];
 
   const opOpps = g(op,'opportunities') ?? [];
