@@ -1,158 +1,49 @@
-**The Pi Suite AI Financial Analysis Engine for C-Level& Multi-Agent System**
+PiSuite — AI Financial Executive Summary Dashboard
+A standalone, browser-based AI-powered financial analysis engine that generates comprehensive executive summary reports from your balance sheet and income statement data. No server required — just open the HTML file in any modern browser.
 
-
-# PiSuite
-
-PiSuite is an advanced multi-agent AI financial analysis platform. It processes uploaded financial statements, extracts line items deterministically, computes accurate financial ratios via JavaScript, and delivers professional executive commentary using cloud or local LLMs.
-
-👉 **Ready to automate your financial workflows? [Purchase PiSuite Here](https://pi314.lemonsqueezy.com/checkout/buy/5b270c7f-84ea-4eb0-a55a-c0b5fe92dff3)**
-
+**Ready to automate your financial workflows? [Purchase PiSuite Here(https://pi314.lemonsqueezy.com/checkout/buy/5b270c7f-84ea-4eb0-a55a-c0b5fe92dff3)**
 ---
-
-## 🇬🇧 ENGLISH
-
-### 🤖 Multi-Engine AI Architecture
-PiSuite decouples the user interface from the LLM provider. Select your preferred backend directly on launch based on security, speed, and cost requirements:
-
-| Engine | Execution Environment | Primary Use Case |
-| :--- | :--- | :--- |
-| **Claude** | Anthropic Cloud | Production-grade reasoning and highest-quality financial synthesis. |
-| **Gemini** | Google Cloud | Low-latency processing with a generous free usage tier. |
-| **Ollama** | Local Machine | Enterprise-grade privacy. Zero data leaves your hardware. |
-
-#### Connection Protocols
-
-##### Cloud Provisioning (Claude / Gemini)
-1. Select the engine inside the interface.
-2. Provide your API key from the respective developer console ([Anthropic Console](https://console.anthropic.com) or [Google AI Studio](https://aistudio.google.com)).
-3. The platform validates the handshake automatically.
-
-##### Local Provisioning (Ollama)
-Compatible with macOS and Windows environments.
-
-| Step | macOS | Windows (PowerShell) |
-| :--- | :--- | :--- |
-| **1. Install** | `brew install ollama` or via [ollama.com](https://ollama.com/download/mac) | Download installer via [ollama.com](https://ollama.com/download/windows) |
-| **2. Fetch Model** | `ollama pull qwen3.5:4b` | `ollama pull qwen3.5:4b` |
-| **3. Configure CORS** | `launchctl setenv OLLAMA_ORIGINS "*"` | `[System.Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","*","User")` |
-| **4. Boot Server** | `ollama serve` | `ollama serve` |
-
-> ⚠️ **Critical Security Note:** Browser engines block local server communication by default. You must configure the `OLLAMA_ORIGINS` environment variable. Restart the Ollama background process completely after applying this setting.
-4. Input your local endpoint (`http://localhost:11434`) and model target (`qwen3.5:4b`) into the application interface to test connection stability.
-
+Features
+Dual Language Support — Full Turkish (TR) and English (EN) interface and report output.
+AI Agent Fleet — 5 specialized AI agents run in parallel for maximum speed:
+Analyst — Overall financial health assessment
+Auditor — Risk detection and anomaly identification
+Optimizer — Cost-cutting recommendations with concrete savings categories
+Forecaster — Trend projections and forward-looking insights
+DuPont — DuPont ROE decomposition analysis
+Multiple AI Providers — Choose between cloud (OpenAI, Anthropic Claude, Google Gemini) or local (Ollama) models.
+Rich Visualizations — Charts, scorecards, color-coded risk flags, and markdown-formatted insights.
+Data Import — Paste financial data directly or upload Excel/CSV files.
+Export Ready — Generate printable executive reports from the dashboard.
+Cross-Platform — Works on macOS, Windows, and Linux. Just a single HTML file — no installation needed.
 ---
-
-### 🔢 Deterministic Financial Ratio Engine
-*No more hallucinated financial metrics.* Older AI systems estimated numbers, resulting in critical mathematical errors. PiSuite uses a deterministic JavaScript parsing pipeline to guarantee exact figures.
-
-* **Layout Agnostic:** Parses tabular data accurately regardless of column placement or order in your Excel or CSV files. However the data file must be aligned with the sample files. We provide two sample files: a simple one and a complex financial one. Both function correctly.
-* **Localization Robustness:** Normalizes Turkish character variations automatically (case, ı/i, ş/s, ğ/g).
-* **Regex Label Matching:** Automatically detects numbered accounting rows, such as "1. Current Assets".
-* **Accounting Identity Fallbacks:** Reconstructs missing core data points using strict balance sheet identities, such as `Total Liabilities = Total Assets - Equity`.
-* **Separation of Concerns:** The AI agents only analyze the completed mathematical output. They cannot modify or corrupt the calculated financial figures.
-* 🔍 **Ratio Diagnostics Tool:** Analyze exact row parsing performance, identified labels, and unmapped fields directly in the diagnostics view.
-
+Quick Start
+Download `PiSuite_Dashboard-TR-EN.html`.
+Open it in any modern browser (Chrome, Firefox, Edge, Safari).
+Select your preferred AI engine on the onboarding screen.
+Enter your financial data (Balance Sheet + Income Statement).
+Click Generate Executive Summary.
 ---
-
-### 🔒 Security Hardening
-* **XSS Mitigation:** Input payloads and LLM markdown responses are fully sanitized using DOMPurify. Malicious spreadsheet cell injections cannot execute scripts.
-* **Stateless Key Management:** API tokens reside strictly within volatile application memory (RAM). They are never written to persistent disk storage, localStorage, or cookies. Closing the active browser tab purges all credentials instantly.
-* **Secure DOM Rendering:** Document metadata, AI reports, and error boundaries use native text content bindings to prevent markup manipulation.
-
+What's New
+v1.2 (Latest)
+Number Format Flexibility — Data input now accepts both Turkish (`.`-thousands, `,`-decimal: e.g. `1.234,56`) and English (`,`-thousands, `.`-decimal: e.g. `1,234.56`) number formats automatically. Currency symbols and percentages are also parsed correctly.
+Forecast Chart Fix — Resolved an issue where the Budget Simulations & Forecasts chart rendered empty. The forecaster agent output is now safely sanitized into numeric arrays before chart rendering, with deterministic fallback projections if needed.
+v1.1
+English Output Fixed — Resolved an issue where Turkish words leaked into English-mode AI agent responses. All agent prompts now enforce the correct language based on your selected UI language.
+Cost-Cutting Clarity — Replaced the generic Turkish placeholder word "Kalem" in cost-cutting recommendations with specific, meaningful categories: Personnel, Procurement, Logistics, IT & Software, Marketing, Travel, Facilities, and Outsourcing.
+Prompt Hardening — Added instructions preventing AI agents from using generic filler words like "item" or "line" in savings recommendations.
+Performance Verified — Confirmed that parallel agent execution preserves calculation correctness. All core financial ratios (Altman Z, DuPont, liquidity, etc.) are computed deterministically before AI analysis begins.
 ---
-
-### 🛠️ Core Performance Enhancements
-* **JSON Reconstruction:** Built-in auto-repair system structurally fixes truncated JSON arrays generated by smaller local models.
-* **Telemetry Engine:** Real-time progress trackers are now standardized across Claude, Gemini, and Ollama backends.
-* **Optimized Context Windows:** Extended input and output token capacities lower truncation rates during heavy local model execution.
-
+System Requirements
+A modern web browser with JavaScript enabled.
+An internet connection (if using cloud AI providers).
+For local AI: Ollama running locally with a compatible model.
 ---
-
-### ⚠️ Data Compliance Requirements
-To ensure parsing accuracy, financial statements must use standard accounting terminology, such as "Current Assets", "Equity", or "Net Sales". Highly customized corporate internal shorthand, non-standard acronyms, or proprietary billing codes will fail parsing routines.
-
-### ⚖️ Legal Disclaimer
-All automatically generated reports, computed financial metrics, and synthesized executive summaries are outputs of automated artificial intelligence workflows. This data does not constitute investment, tax, financial, or legal advice. Users must independently verify all analytical assets with a licensed Financial Advisor, Independent Auditor, or Certified Public Accountant before making strategic capital allocations.
-
+File Overview
+File	Description
+`PiSuite_Dashboard-TR-EN.html`	The complete standalone application. Contains all HTML, CSS, and JavaScript. No external dependencies required at runtime except CDN libraries and your chosen AI API.
 ---
-
-## 🇹🇷 TÜRKÇE
-
-### 🤖 Çoklu Yapay Zeka Motoru Mimarisi
-PiSuite, kullanıcı arayüzünü yapay zeka sağlayıcılarından bağımsız hale getirir. Güvenlik, hız ve maliyet ihtiyaçlarınıza göre kullanmak istediğiniz motoru uygulama açılışında seçebilirsiniz:
-
-| Yapay Zeka Motoru | Çalışma Ortamı | En Uygun Kullanım Senaryosu |
-| :--- | :--- | :--- |
-| **Claude** | Anthropic Bulutu | En yüksek muhakeme yeteneği ve üst düzey finansal rapor analizi. |
-| **Gemini** | Google Bulutu | Düşük gecikme süresi ve ücretsiz kota avantajı. |
-| **Ollama** | Yerel Bilgisayarınız | Maksimum veri güvenliği. Finansal verileriniz internete çıkmaz. |
-
-#### Bağlantı Protokolleri
-
-##### Bulut Altyapısı (Claude / Gemini)
-1. Uygulama arayüzünden ilgili motoru seçin.
-2. Sağlayıcının geliştirici konsolundan aldığınız API anahtarını girin ([Anthropic Console](https://console.anthropic.com) veya [Google AI Studio](https://aistudio.google.com)).
-3. Sistem bağlantıyı otomatik olarak doğrular.
-
-##### Yerel Altyapı (Ollama)
-macOS ve Windows işletim sistemleriyle tam uyumludur.
-
-| Aşama | macOS | Windows (PowerShell) |
-| :--- | :--- | :--- |
-| **1. Kurulum** | `brew install ollama` veya [ollama.com](https://ollama.com/download/mac) | Kurulum sihirbazı üzerinden [ollama.com](https://ollama.com/download/windows) |
-| **2. Model İndirme** | `ollama pull qwen3.5:4b` | `ollama pull qwen3.5:4b` |
-| **3. CORS İzni** | `launchctl setenv OLLAMA_ORIGINS "*"` | `[System.Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","*","User")` |
-| **4. Sunucu Başlatma** | `ollama serve` | `ollama serve` |
-
-> ⚠️ **Kritik Güvenlik Uyarısı:** Tarayıcı motorları güvenlik nedeniyle yerel sunucularla iletişimi varsayılan olarak engeller. Bu yüzden `OLLAMA_ORIGINS` ortam değişkenini tanımlamanız zorunludur. Bu ayarı uyguladıktan sonra Ollama uygulamasını arka planda tamamen kapatıp yeniden başlatın.
-4. Uygulama arayüzüne yerel adresinizi (`http://localhost:11434`) ve model adını (`qwen3.5:4b`) girerek bağlantıyı test edin.
-
----
-
-### 🔢 Deterministik Finansal Rasyo Motoru
-*Yapay zeka kaynaklı hatalı hesaplamalara son.* Eski sistemler finansal oranları yapay zekanın tahmin etmesine bırakıyordu, bu da matematiksel hatalara yol açıyordu. PiSuite, deterministik JavaScript matematik motoru kullanarak kesin sonuçlar üretir.
-
-* **Tablo Düzeninden Bağımsız:** Excel veya CSV dosyanızdaki sütun sıralaması nasıl olursa olsun verileri başarıyla analiz eder. Ancak veri dosyası, örnek dosyalar ile paralellik arz etmelidir.Biri basit, diğeri ise karmaşık finansal yapıya sahip iki örnek dosya sunuyoruz. İkisi de sorunsuz çalışıyor.
-* **Türkçe Karakter Standardizasyonu:** Türkçe karakter farklılıklarını (büyük/küçük harf, ı/i, ş/s, ğ/g) otomatik olarak algılar ve normalize eder.
-* **Gelişmiş Etiket Yakalama:** "1. Dönen Varlıklar" gibi numaralandırılmış muhasebe satırlarını doğrudan tanır.
-* **Muhasebe Eşitliği Desteği:** Dosyada doğrudan bulunamayan temel kalemleri, `Toplam Borç = Toplam Varlık - Özkaynak` gibi finansal eşitlikler üzerinden otomatik olarak türetir.
-* **Net Görev Ayrımı:** Yapay zeka ajanları sadece hesaplanmış kesin rasyolar üzerinden yorumlama yapar. Sayısal verilere müdahale edemez.
-* 🔍 **Rasyo Tanılama Paneli:** Hangi muhasebe kalemlerinin başarıyla eşleştiğini, hangilerinin bulunamadığını ve dosyanızdan okunan tüm satır etiketlerini doğrudan analiz edin.
-
----
-
-### 🔒 Geliştirilmiş Güvenlik Altyapısı
-* **XSS Koruması:** Kullanıcı girdileri ve yapay zeka çıktıları DOMPurify ile temizlenir. Zararlı spreadsheet hücre enjeksiyonları sistemde kod yürütemez.
-* **Geçici Bellek Yönetimi:** API anahtarlarınız sadece uçucu uygulama belleğinde (RAM) tutulur. Disk yüzeyine, localStorage mimarisine veya çerezlere yazılmaz. Sekme kapatıldığı an tüm veriler silinir.
-* **Güvenli DOM Çıktısı:** Dinamik dosya isimleri ve hata mesajları, güvenli metin bağlamları kullanılarak ekrana basılır.
-
----
-
-### 🛠️ Sistem ve Performans İyileştirmeleri
-* **Otomatik JSON Onarımı:** Yerel modellerde (Ollama) oluşan yarım kalmış veya kesintiye uğramış JSON çıktıları otomatik olarak tamir edilir.
-* **Canlı İlerleme Sayacı:** İşlem sürelerini gösteren sayaçlar Claude, Gemini ve Ollama motorlarının tamamında standart hale getirilmiştir.
-* **Genişletilmiş Bağlam Alanı:** Token bütçesi büyütülerek yerel modellerin büyük verileri işlerken yarıda kesilmesi engellenmiştir.
-
----
-
-### ⚠️ Veri Yapısı Standartları
-Rasyo motorunun kararlı çalışabilmesi için yüklenen dosyalardaki satır etiketlerinin "Dönen Varlıklar", "Özkaynak", "Net Satışlar" gibi genel kabul görmüş finansal terminolojiye uygun olması gerekir. Şirket içi özel kodlamalar veya standart dışı kısaltmalar sistem tarafından tanınmayacaktır.
-
-### ⚖️ Yasal Uyarı
-Bu yazılım ve entegre çoklu ajan sistemleri tarafından üretilen tüm raporlar, rasyolar ve özet veriler yapay zeka modelleri tarafından otomatik olarak oluşturulmaktadır. Burada sunulan hiçbir analiz yatırım, vergi, finans veya hukuk danışmanlığı niteliği taşımaz. Stratejik kararlar almadan önce raporların lisanslı bir Mali Müşavir, Bağımsız Denetçi veya Finansal Danışman tarafından onaylanması kullanıcının sorumluluğundadır.
-
----
-
-👉 **[Uygulamayı Satın Almak İçin Ödeme Sayfamızı Ziyaret Edin](https://pi314.lemonsqueezy.com/checkout/buy/5b270c7f-84ea-4eb0-a55a-c0b5fe92dff3)**
-
-<img width="1280" height="827" alt="PiSuıteLogin" src="https://github.com/user-attachments/assets/44877c15-b032-433f-8aa1-eac08a3df7d8" />
-
-<img width="692" height="741" alt="PıSuıte99" src="https://github.com/user-attachments/assets/0ef649d9-864c-4617-9048-a1f5762222dc" />
-
-<img width="1468" height="914" alt="PıSuıte6" src="https://github.com/user-attachments/assets/a2337e64-19d9-4d37-8a1e-0c4ab4088f11" />
-
-<img width="1237" height="913" alt="PıSuıte55" src="https://github.com/user-attachments/assets/257f51ba-528b-4f2a-b4c2-7430e9710188" />
-
-<img width="1217" height="927" alt="PıSuıte5" src="https://github.com/user-attachments/assets/566215af-f63f-444a-aa31-21c19230f6cd" />
-
-<img width="1854" height="628" alt="PıSuıte3" src="https://github.com/user-attachments/assets/9e5ea81d-a481-4087-8e70-6d320c41dcaa" />
+Privacy & Security
+Client-side only — Your financial data never leaves your machine except via your chosen AI provider's API.
+No telemetry — The application does not track usage or send analytics.
+API keys are optional — You can use local Ollama without any cloud API keys.
