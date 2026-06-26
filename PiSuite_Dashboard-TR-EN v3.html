@@ -1826,14 +1826,30 @@ async function assembleFromAgents(parsed, fileName, findings) {
     }
     return nums;
   };
-  let stdFc = _sanitize(g(fc,'forecast_std'));
-  let recFc = _sanitize(g(fc,'forecast_rec'));
+  // Bir tahmin dizisi "plausible" mi? AI bazen 1-10 arası placeholder sayılar
+  // döndürüyor; gerçek nakit akışıyla karşılaştırılınca yutucu olarak küçük
+  // kalıyor. Beklenen büyüklükle aynı mertebede değilse fallback'e geç.
   const _r = cr.raw || {};
   const fallbackBase =
     (_r.totalCurrentAssets != null && _r.totalCurrentLiabs != null) ? Math.max(_r.totalCurrentAssets - _r.totalCurrentLiabs, 50000) :
     (_r.netIncome != null && _r.netIncome > 0) ? _r.netIncome :
     (_r.revenue != null && _r.revenue > 0) ? _r.revenue * 0.05 :
     100000;
+  const _isPlausible = (nums) => {
+    if (!nums) return false;
+    const maxAbs = Math.max(...nums.map(n => Math.abs(n)));
+    // AI yalnızca 1-2 haneli sembolik sayılar döndürmüşse (örn. [3,3,3,...,4]),
+    // ve gerçek baz nakit akışı bunun en az 1000 katıysa, kabul etme.
+    if (maxAbs < 1000 && fallbackBase >= 10000) return false;
+    // Tamamen sabit (varyans=0) bir dizi anlamsız bir projeksiyondur.
+    const uniq = new Set(nums.map(n => Math.round(n))).size;
+    if (uniq <= 1) return false;
+    return true;
+  };
+  let stdFc = _sanitize(g(fc,'forecast_std'));
+  let recFc = _sanitize(g(fc,'forecast_rec'));
+  if (!_isPlausible(stdFc)) stdFc = null;
+  if (!_isPlausible(recFc)) recFc = null;
   if (!stdFc) {
     const base = _toNum(g(fc,'base_cf')) ?? fallbackBase;
     stdFc = Array.from({length:12}, (_,i) => Math.round(base * Math.pow(1.015, i+1)));
@@ -1842,6 +1858,7 @@ async function assembleFromAgents(parsed, fileName, findings) {
     const base = _toNum(g(fc,'base_cf')) ?? stdFc[0] ?? fallbackBase;
     recFc = Array.from({length:12}, (_,i) => Math.round(base * Math.pow(0.975, i+1)));
   }
+
 
   const rawSavings  = g(op,'savings') ?? {};
   const costSavings = Object.keys(rawSavings).length > 0 ? rawSavings : (() => {
@@ -1981,8 +1998,56 @@ function addHistory(name, seq) {
 // ─────────────────────────────────────────────────────────────────────────
 //  RENDER
 // ─────────────────────────────────────────────────────────────────────────
+function getLocalizedList(field) {
+  if (!dashboardData) return [];
+  const i18n = dashboardData.__i18n && dashboardData.__i18n[currentLang];
+  if (i18n && Array.isArray(i18n[field])) return i18n[field];
+  return dashboardData[field] || [];
+}
+
+async function ensureLangVersion(lang) {
+  if (!dashboardData) return;
+  dashboardData.__i18n = dashboardData.__i18n || {};
+  if (dashboardData.__i18n[lang]) return;
+  const src = {
+    critical_risks: dashboardData.critical_risks || [],
+    growth_opportunities: dashboardData.growth_opportunities || [],
+    strategic_action_plan: dashboardData.strategic_action_plan || []
+  };
+  const total = src.critical_risks.length + src.growth_opportunities.length + src.strategic_action_plan.length;
+  if (total === 0) { dashboardData.__i18n[lang] = src; return; }
+  const targetName = lang === 'en' ? 'English' : 'Turkish';
+  try {
+    const prompt = `Translate every string value in the following JSON into ${targetName}. Keep the same JSON shape, the same keys, and identical array order and length. Do NOT translate numbers or currency symbols. Output ONLY valid JSON, no markdown, no commentary.\n\n${JSON.stringify(src)}`;
+    const txt0 = await callEngine(prompt, 1200);
+    let txt = txt0.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if (a >= 0 && b > a) txt = txt.substring(a, b + 1);
+    const parsed = JSON.parse(txt);
+    dashboardData.__i18n[lang] = {
+      critical_risks: Array.isArray(parsed.critical_risks) ? parsed.critical_risks : src.critical_risks,
+      growth_opportunities: Array.isArray(parsed.growth_opportunities) ? parsed.growth_opportunities : src.growth_opportunities,
+      strategic_action_plan: Array.isArray(parsed.strategic_action_plan) ? parsed.strategic_action_plan : src.strategic_action_plan
+    };
+  } catch (e) {
+    console.warn('[i18n] translate failed:', e.message);
+  }
+}
+
 function renderAll() {
   const d = dashboardData;
+  // Seed i18n cache with the language the AI originally generated in,
+  // so we don't re-translate when staying in the same language.
+  d.__i18n = d.__i18n || {};
+  const _genLang = d.__genLang || currentLang;
+  d.__genLang = _genLang;
+  if (!d.__i18n[_genLang]) {
+    d.__i18n[_genLang] = {
+      critical_risks: d.critical_risks || [],
+      growth_opportunities: d.growth_opportunities || [],
+      strategic_action_plan: d.strategic_action_plan || []
+    };
+  }
   const m = d.EXECUTIVE_METRICS || {};
 
   const score = parseFloat(m.financial_health_score||0);
@@ -2008,9 +2073,9 @@ function renderAll() {
   fillGrid('dupontGrid', d.DUPONT_PILLARS||{});
   fillGrid('savingsGrid', (d.BUDGET_SIMULATIONS_FORECASTS||{}).cost_cutting_savings||{});
 
-  fillList('redFlags', d.critical_risks||[]);
-  fillList('greenFlags', d.growth_opportunities||[]);
-  fillList('actionPlan', d.strategic_action_plan||[]);
+  fillList('redFlags', getLocalizedList('critical_risks'));
+  fillList('greenFlags', getLocalizedList('growth_opportunities'));
+  fillList('actionPlan', getLocalizedList('strategic_action_plan'));
 
   renderCFChart(d.BUDGET_SIMULATIONS_FORECASTS||{});
   renderHistChart(d.historical_comparison||{});
@@ -2129,11 +2194,11 @@ function renderMcKinsey(d, m) {
     <div class="scenario-block best"><div class="scenario-header">${t('best')}</div>
       <p class="scenario-text">${isTr?`Kümülatif nakit değişim potansiyeli: ${gp}.`:`Cumulative cash change potential: ${gp}.`}</p>
       <div class="scenario-actions"><span class="action-label">${t('best_action')}:</span>
-        <ul>${(d.growth_opportunities||[]).slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>
+        <ul>${getLocalizedList('growth_opportunities').slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>
     <div class="scenario-block worst"><div class="scenario-header">${t('worst')}</div>
       <p class="scenario-text">${isTr?`Standart - Resesyon farkı (12. ay): ${sd}.`:`Standard − Recession gap (mo. 12): ${sd}.`}</p>
       <div class="scenario-actions"><span class="action-label">${t('worst_action')}:</span>
-        <ul>${(d.critical_risks||[]).slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>`;
+        <ul>${getLocalizedList('critical_risks').slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>`;
 }
 
 function renderEisenhower(m) {
@@ -2219,11 +2284,20 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   document.getElementById('themeToggle').textContent = bw ? '🌈 Renkli' : '⚫ B&W';
 });
 
-document.getElementById('langToggle').addEventListener('click', () => {
+document.getElementById('langToggle').addEventListener('click', async () => {
   currentLang = currentLang==='tr' ? 'en' : 'tr';
   applyLang();
   applyOnboardLang();
-  if (dashboardData) renderAll();
+  if (dashboardData) {
+    renderAll();
+    // If we haven't translated AI-generated lists into this language yet,
+    // translate once via a single LLM call and re-render with the cached result.
+    const needsXlate = !(dashboardData.__i18n && dashboardData.__i18n[currentLang]);
+    if (needsXlate) {
+      await ensureLangVersion(currentLang);
+      renderAll();
+    }
+  }
 });
 
 document.getElementById('onboardLangToggle').addEventListener('click', () => {
