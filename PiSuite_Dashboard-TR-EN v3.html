@@ -927,7 +927,50 @@ const I = {
     ollama_no_models:'Ollama çalışıyor ama hiç model yüklü değil.',
     ollama_no_models_hint:'Terminalde çalıştırın:',
     ollama_http_err:'Sunucu yanıt verdi ama hata döndürdü (HTTP STATUS). Ollama sürümünüzü kontrol edin.',
-    ollama_unexpected:'Beklenmeyen hata:'
+    ollama_unexpected:'Beklenmeyen hata:',
+    msg_need_key:'Lütfen önce API anahtarınızı girin.',
+    msg_reading:'Dosya okunuyor...',
+    msg_read_err:'Dosya okunamadı: ',
+    msg_building:'Dashboard hazırlanıyor...',
+    msg_running_analyst:'📊 Analyst Agent çalışıyor...',
+    msg_running_auditor:'🔍 Auditor Agent çalışıyor...',
+    msg_running_optimizer:'⚙️ Optimizer Agent çalışıyor...',
+    msg_running_forecaster:'📈 Forecaster Agent çalışıyor...',
+    msg_running_dupont:'🔬 DuPont Agent çalışıyor...',
+    msg_running_all:'⚡ 5 ajan paralel çalışıyor...',
+    msg_all_done:'✅ Tüm ajanlar tamamlandı',
+    msg_attempt:'deneme',
+    msg_generating:'yanıt üretiyor',
+    msg_cpu_slow:", CPU'da yavaş olabilir",
+    msg_seconds:'sn',
+    msg_unknown_engine:'Bilinmeyen motor: ',
+    msg_max_retries:'maks. deneme sayısı aşıldı',
+    msg_no_critical_risk:'Kritik risk tespit edilmedi',
+    msg_zbb_default:'ZBB ile OPEX optimizasyonu önerilmektedir.',
+    msg_weak_pillar:'Zayıf halka',
+    msg_rows_sheets:'satır · {n} sayfa',
+    badge_err:'⚠️ Hata',
+    badge_done:'✅ Tamamlandı',
+    cs_marketing:'Pazarlama Optimizasyonu',
+    cs_software:'Yazılım Konsolidasyonu',
+    cs_cloud:'Bulut Altyapısı Geçişi',
+    cs_zbb:'ZBB Tahmini',
+    cs_marketing_v:'Gelirin %1.5\'i kadar tasarruf',
+    cs_software_v:'Tahmini %0.8 OPEX azaltma',
+    cs_cloud_v:'%12-18 altyapı tasarrufu',
+    opp_default:[
+      'Maliyet optimizasyonu ile marj artışı',
+      'Bulut altyapısına geçiş ile %15 verimlilik',
+      'ZBB ile OPEX kontrolü',
+      'Varlık devir hızı optimizasyonu'
+    ],
+    act_default:[
+      'Kullanılmayan yazılım aboneliklerini iptal et',
+      'Top 5 tedarikçi sözleşmelerini yeniden müzakere et',
+      'Nakit akışı izleme sistemini devreye al',
+      'ZBB bütçeleme geçişini planla'
+    ],
+    hist_illustrative:'⚠️ Tarihsel karşılaştırma sadece tek dönem veriden türetilmiş illüstratif bir trenddir — gerçek geçmiş veri değildir.'
   },
   en: {
     brand_sub:'Tabula Rasa · 5-Agent AI Financial Analysis Engine',
@@ -995,7 +1038,50 @@ const I = {
     ollama_no_models:'Ollama is running but has no models installed.',
     ollama_no_models_hint:'Run in your terminal:',
     ollama_http_err:'The server responded but returned an error (HTTP STATUS). Check your Ollama version.',
-    ollama_unexpected:'Unexpected error:'
+    ollama_unexpected:'Unexpected error:',
+    msg_need_key:'Please enter your API key first.',
+    msg_reading:'Reading file...',
+    msg_read_err:'Could not read file: ',
+    msg_building:'Preparing dashboard...',
+    msg_running_analyst:'📊 Analyst Agent running...',
+    msg_running_auditor:'🔍 Auditor Agent running...',
+    msg_running_optimizer:'⚙️ Optimizer Agent running...',
+    msg_running_forecaster:'📈 Forecaster Agent running...',
+    msg_running_dupont:'🔬 DuPont Agent running...',
+    msg_running_all:'⚡ 5 agents running in parallel...',
+    msg_all_done:'✅ All agents finished',
+    msg_attempt:'attempt',
+    msg_generating:'generating response',
+    msg_cpu_slow:', may be slow on CPU',
+    msg_seconds:'s',
+    msg_unknown_engine:'Unknown engine: ',
+    msg_max_retries:'max retries exceeded',
+    msg_no_critical_risk:'No critical risks detected',
+    msg_zbb_default:'ZBB implementation recommended to optimize OPEX.',
+    msg_weak_pillar:'Weakest pillar',
+    msg_rows_sheets:'rows · {n} sheets',
+    badge_err:'⚠️ Error',
+    badge_done:'✅ Done',
+    cs_marketing:'Marketing Optimization',
+    cs_software:'Software Consolidation',
+    cs_cloud:'Cloud Infrastructure Migration',
+    cs_zbb:'ZBB Estimate',
+    cs_marketing_v:'Savings ≈ 1.5% of revenue',
+    cs_software_v:'Est. 0.8% OPEX reduction',
+    cs_cloud_v:'12–18% infrastructure savings',
+    opp_default:[
+      'Margin uplift via cost optimization',
+      '15% efficiency through cloud migration',
+      'OPEX control via Zero-Based Budgeting',
+      'Asset turnover optimization'
+    ],
+    act_default:[
+      'Cancel unused software subscriptions',
+      'Renegotiate top-5 supplier contracts',
+      'Roll out cash flow monitoring system',
+      'Plan transition to ZBB budgeting'
+    ],
+    hist_illustrative:'⚠️ Historical comparison is an illustrative trend derived from a single period — not real historical data.'
   }
 };
 const t = k => I[currentLang][k] || k;
@@ -1104,7 +1190,7 @@ function showStatus(msg, show) {
 async function handleFile(file) {
   if (!file) return;
   if (!API_KEY && SELECTED_ENGINE !== 'ollama') {
-    alert('Lütfen önce API anahtarınızı girin.');
+    alert(t('msg_need_key'));
     return;
   }
   uploadCount++;
@@ -1124,18 +1210,18 @@ async function handleFile(file) {
   addHistory(file.name, uploadCount);
   buildAgentChips();
   setAgentState('ceo', 'running');
-  showStatus('Dosya okunuyor...', true);
+  showStatus(t('msg_reading'), true);
 
   let parsed;
   try { parsed = await readFile(file); }
-  catch (e) { showStatus('Dosya okunamadı: ' + e.message, false); return; }
+  catch (e) { showStatus(t('msg_read_err') + e.message, false); return; }
 
   setAgentState('ceo', 'done');
 
   const findings = await runAgentPipeline(parsed, file.name);
 
   setAgentState('synthesis', 'running');
-  showStatus('Dashboard hazırlanıyor...', true);
+  showStatus(t('msg_building'), true);
   const finalData = await assembleFromAgents(parsed, file.name, findings);
   setAgentState('synthesis', 'done');
 
@@ -1272,7 +1358,7 @@ async function callEngine(promptText, maxTokens) {
       throw new Error('ollama_empty_response');
     }
 
-    throw new Error('Bilinmeyen motor: ' + SELECTED_ENGINE);
+    throw new Error(t('msg_unknown_engine') + SELECTED_ENGINE);
 
   } catch (e) {
     if (e.name === 'AbortError') {
@@ -1316,7 +1402,7 @@ async function agentCall(agentId, systemPrompt, userContent, retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       if (attempt > 1) {
-        showStatus(`${agentId} — ${attempt}. deneme...`, true);
+        showStatus(`${agentId} — ${attempt}. ${t('msg_attempt')}...`, true);
         await new Promise(r => setTimeout(r, attempt * 1500));
       }
 
@@ -1325,8 +1411,8 @@ async function agentCall(agentId, systemPrompt, userContent, retries = 3) {
       const engineLabel = SELECTED_ENGINE === 'ollama' ? (OLLAMA_MODEL || 'model') : SELECTED_ENGINE;
       const tickerId = setInterval(() => {
         const secs = Math.floor((Date.now() - startedAt) / 1000);
-        const extra = SELECTED_ENGINE === 'ollama' ? ", CPU'da yavaş olabilir" : '';
-        showStatus(`${agentId} — ${engineLabel} yanıt üretiyor... (${secs}sn${extra})`, true);
+        const extra = SELECTED_ENGINE === 'ollama' ? t('msg_cpu_slow') : '';
+        showStatus(`${agentId} — ${engineLabel} ${t('msg_generating')}... (${secs}${t('msg_seconds')}${extra})`, true);
       }, 1000);
 
       let txt0;
@@ -1355,7 +1441,7 @@ async function agentCall(agentId, systemPrompt, userContent, retries = 3) {
       return result;
 
     } catch (e) {
-      console.warn(`[${agentId}] deneme ${attempt} başarısız:`, e.message);
+      console.warn(`[${agentId}] ${t('msg_attempt')} ${attempt} failed:`, e.message);
       if (attempt === retries) {
         setAgentState(agentId, 'error');
         return { _error: e.message, _agent: agentId };
@@ -1364,7 +1450,7 @@ async function agentCall(agentId, systemPrompt, userContent, retries = 3) {
     }
   }
   setAgentState(agentId, 'error');
-  return { _error: 'max retries aşıldı', _agent: agentId };
+  return { _error: t('msg_max_retries'), _agent: agentId };
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -1375,11 +1461,32 @@ async function agentCall(agentId, systemPrompt, userContent, retries = 3) {
 function _toNum(v) {
   if (v == null || v === '') return null;
   if (typeof v === 'number') return isFinite(v) ? v : null;
-  const cleaned = String(v).trim().replace(/[₺$€£\s]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',', '.');
-  // Tüm string sayısal görünmeli (örn. "1. Dönen Varlıklar" gibi numaralı etiketler
-  // parseFloat'ın "1." kısmını sayı olarak yanlış algılamasını önler).
-  if (!/^-?\d+(\.\d+)?%?$/.test(cleaned)) return null;
-  const n = parseFloat(cleaned);
+  let s = String(v).trim().replace(/\b(TL|TRY|USD|EUR|GBP)\b/gi,'').replace(/[₺$€£\s%]/g,'');
+  if (!s) return null;
+  // İzin verilen: opsiyonel işaret + rakam/nokta/virgül
+  if (!/^-?[\d.,]+$/.test(s)) return null;
+  const hasDot = s.includes('.'), hasComma = s.includes(',');
+  if (hasDot && hasComma) {
+    // Hem . hem , varsa: en sondaki ondalık ayraçtır, diğeri binlik → silinir
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
+      s = s.replace(/\./g,'').replace(',', '.');
+    } else {
+      s = s.replace(/,/g,'');
+    }
+  } else if (hasComma) {
+    const parts = s.split(',');
+    // Birden fazla virgül → tamamı binlik ayraç
+    if (parts.length > 2) s = parts.join('');
+    // Tek virgül + sağda tam 3 hane → binlik ("1,234"); değilse ondalık ("1,5" / "12,34")
+    else s = (parts[1].length === 3) ? parts.join('') : parts.join('.');
+  } else if (hasDot) {
+    const parts = s.split('.');
+    // Birden fazla nokta → binlik ayraç
+    if (parts.length > 2) s = parts.join('');
+    // Tek nokta + sağda tam 3 hane + sol kısa → TR binlik ("1.234"); değilse ondalık ("1.5", "12.34")
+    else if (parts[1].length === 3 && parts[0].replace('-','').length <= 3 && parts[0].replace('-','').length >= 1) s = parts.join('');
+  }
+  const n = parseFloat(s);
   return isFinite(n) ? n : null;
 }
 
@@ -1465,6 +1572,10 @@ function calculateFinancialRatios(rawSheets) {
     /uzun vadeli yabanci kaynak/, /uzun vadeli borc/, /uzun vadeli yukumluluk/, /long.?term liabilit/
   ]);
   const totalEquity        = _matchSum(items, [/ozkaynak/, /equity/, /ozsermaye/]);
+  const retainedEarnings   = _matchSum(items, [
+    /gecmis (yil|yillar) kar/, /gecmis donem kar/, /birikmis kar/,
+    /retained earning/, /accumulated earning/, /gecmis yil kar.{0,5}zarar/
+  ]);
   const netIncome          = _matchSum(items, [
     /donem net kar/, /net kar.{0,3}zarar/, /net income/, /net profit/, /donem kari/, /net kar$/
   ]);
@@ -1499,11 +1610,16 @@ function calculateFinancialRatios(rawSheets) {
 
   let altman_z = null, altman_zone = null;
   if (totalAssets) {
+    // Altman Z' (private/non-listed firms):
+    //   Z' = 0.717·WC/TA + 0.847·RE/TA + 3.107·EBIT/TA + 0.420·BVE/TL + 0.998·Sales/TA
+    // Önceki sürümde 0.847·RE/TA terimi atlanmıştı; eklendi (RE bulunamazsa 0 kabul edilir).
+    // Eşikler: Z' >= 2.9 SAFE · 1.23 ≤ Z' < 2.9 GREY · Z' < 1.23 DISTRESS
     const wc_ta   = (totalCurrentAssets != null && totalCurrentLiabs != null) ? (totalCurrentAssets - totalCurrentLiabs) / totalAssets : 0;
-    const ebit_ta = (netIncome != null) ? netIncome / totalAssets : 0;
+    const re_ta   = (retainedEarnings != null) ? retainedEarnings / totalAssets : 0;
+    const ebit_ta = (netIncome != null) ? netIncome / totalAssets : 0;   // EBIT yoksa net kâr proxy
     const sales_ta= (revenue != null) ? revenue / totalAssets : 0;
     const eq_tl   = (totalEquity != null && totalLiabilities) ? totalEquity / totalLiabilities : 0;
-    altman_z = +(0.717*wc_ta + 3.107*ebit_ta + 0.420*eq_tl + 0.998*sales_ta).toFixed(2);
+    altman_z = +(0.717*wc_ta + 0.847*re_ta + 3.107*ebit_ta + 0.420*eq_tl + 0.998*sales_ta).toFixed(2);
     altman_zone = altman_z >= 2.9 ? 'SAFE' : altman_z >= 1.23 ? 'GREY' : 'DISTRESS';
   }
 
@@ -1514,6 +1630,7 @@ function calculateFinancialRatios(rawSheets) {
     'Toplam Varlıklar': totalAssets,
     'Toplam Yabancı Kaynaklar (Borç)': totalLiabilities,
     'Özkaynaklar': totalEquity,
+    'Geçmiş Yıllar Kârları (RE)': retainedEarnings,
     'Net Kâr': netIncome,
     'Net Satışlar / Hasılat': revenue,
   };
@@ -1559,22 +1676,23 @@ function renderRatioDiagnostics(cr) {
   el.innerHTML = `
     <button onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display==='none' ? 'block' : 'none'"
       style="font-size:.68rem;background:none;border:1px solid var(--bd);color:var(--t2);border-radius:6px;padding:.3rem .6rem;cursor:pointer;width:100%">
-      🔍 Rasyo Tanılama (${cr.coverage||0}/8 kalem bulundu) — Detayları Göster/Gizle
+      🔍 Rasyo Tanılama (${cr.coverage||0}/9 kalem bulundu) — Detayları Göster/Gizle
     </button>
     <div style="display:none;margin-top:.5rem;padding:.5rem;background:var(--bgca);border-radius:6px">
       <div style="font-size:.7rem;font-weight:700;color:var(--t1);margin-bottom:.3rem">Aranan Kalemler:</div>
       ${rows}
       <div style="font-size:.7rem;font-weight:700;color:var(--t1);margin-top:.5rem">Dosyada Bulunan Tüm Satırlar:</div>
       ${itemsHtml}
-      ${cr.coverage < 8 ? `<div style="margin-top:.5rem;font-size:.68rem;color:var(--wa)">⚠️ Bazı kalemler bulunamadı. Yukarıdaki "Dosyada Bulunan Tüm Satırlar" listesinden eşleşmeyen kalemin gerçek etiketini görüp bana bildirebilirsiniz, eşleştirme kurallarını buna göre güncelleyebilirim.</div>` : ''}
+      ${cr.coverage < 9 ? `<div style="margin-top:.5rem;font-size:.68rem;color:var(--wa)">⚠️ Bazı kalemler bulunamadı. Yukarıdaki "Dosyada Bulunan Tüm Satırlar" listesinden eşleşmeyen kalemin gerçek etiketini görüp bana bildirebilirsiniz, eşleştirme kurallarını buna göre güncelleyebilirim.</div>` : ''}
     </div>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-//  5 AJAN SIRALI PIPELINE
+//  5 AJAN — PARALEL PIPELINE (tüm ajanlar aynı anda çalışır)
+//  Rasyolar zaten JS'te deterministik hesaplandığı için ajanlar arasında
+//  veri bağımlılığı yok — Promise.all ile 5x daha hızlı.
 // ─────────────────────────────────────────────────────────────────────────
 async function runAgentPipeline(parsed, fileName) {
-  // Rasyoları AI'dan ÖNCE, kesin matematikle hesapla. AI'ya sadece yorum/anomali tespiti bırakılır.
   const computedRatios = calculateFinancialRatios(parsed.rawSheets);
   const dataStr = JSON.stringify({
     fileName, uploadSeq: uploadCount,
@@ -1584,64 +1702,58 @@ async function runAgentPipeline(parsed, fileName) {
     }]))
   }, null, 2);
 
+  const LANG_RULE = currentLang === 'en'
+    ? `6. LANGUAGE: ALL text values in the JSON output (comments, notes, flags, opportunities, quick_wins, medium_term, risk_flags, insights, anomalies, weakest_pillar, zbb_note, savings KEYS and VALUES, action items, etc.) MUST be written in ENGLISH. Do NOT use Turkish words under any circumstance.`
+    : `6. DİL: JSON çıktısındaki tüm metin alanları TÜRKÇE yazılmalı.`;
   const KURAL = `
 SEN BİR FINANSAL AJAN'SIN. MUTLAKA UYULACAK KURALLAR:
 1. TABULA RASA: Sadece şu an verilen veriyi kullan. Önceki analiz, hafıza veya varsayım YASAK.
 2. Statik/sabit değer kullanma — tüm sayılar veriden türetilmeli.
 3. Veri yoksa null veya 0 yaz, uydurma.
 4. Yanıtın YALNIZCA geçerli JSON olmalı. Markdown bloğu, açıklama, yorum YASAK.
-5. Şema dışına çıkma.`;
+5. Şema dışına çıkma.
+${LANG_RULE}`;
 
-  showStatus('📊 Analyst Agent çalışıyor...', true);
+  // Önceden hesaplanmış rasyo bağlamı (tüm ajanlara verilir — analyst'in dönmesini beklemeden)
   const ratiosCtx = `
 ÖNCEDEN HESAPLANMIŞ RASYOLAR (deterministik JS hesaplaması — bunları DEĞİŞTİRME, sadece yorumla):
 ${JSON.stringify({ liquidity: computedRatios.liquidity, solvency: computedRatios.solvency, profitability: computedRatios.profitability, altman_z_score: computedRatios.altman_z_score, altman_z_zone: computedRatios.altman_z_zone })}
-Not: değer null ise o kalem veride bulunamadı demektir; "veri bulunamadı" şeklinde belirt, sayı uydurma.`;
-  const analyst = await agentCall('analyst', `
+Not: değer null ise o kalem veride bulunamadı demektir; sayı uydurma.`;
+  const sharedCtx = `\nNet Margin: ${computedRatios.profitability.net_margin_pct}%, CR: ${computedRatios.liquidity.current_ratio}, AT: ${computedRatios.profitability.asset_turnover}x, Z: ${computedRatios.altman_z_score} (${computedRatios.altman_z_zone})`;
+  const dpVals = computedRatios.dupont;
+
+  showStatus(t('msg_running_all'), true);
+
+  const analystP = agentCall('analyst', `
 Sen Financial Analyst Agent'sın.
 ${KURAL}
-GÖREV: Sana verilen ÖNCEDEN HESAPLANMIŞ rasyoları olduğu gibi kullanarak HER rasyo için EN FAZLA 1 KISA CÜMLE yorum yaz (iyi/kötü, neden). Rasyoları yeniden hesaplama. cash_runway_months ve health_score (0-10) için kısa bir değerlendirme yap; varsa en fazla 3 anomali listele. Kısa ve öz ol, gereksiz açıklama yapma.
+GÖREV: Sana verilen ÖNCEDEN HESAPLANMIŞ rasyoları olduğu gibi kullanarak HER rasyo için EN FAZLA 1 KISA CÜMLE yorum yaz (iyi/kötü, neden). Rasyoları yeniden hesaplama. cash_runway_months ve health_score (0-10) için kısa bir değerlendirme yap; varsa en fazla 3 anomali listele.
 ${ratiosCtx}
-ÇIKTI ŞEMASI (sayısal alanlara yukarıdaki hesaplanmış değerleri AYNEN kopyala, sadece comment ve diğer metin alanlarını sen yaz):
+ÇIKTI ŞEMASI (sayısal alanlara yukarıdaki hesaplanmış değerleri AYNEN kopyala, sadece comment ve metin alanlarını sen yaz):
 {"liquidity":{"current_ratio":${JSON.stringify(computedRatios.liquidity.current_ratio)},"quick_ratio":${JSON.stringify(computedRatios.liquidity.quick_ratio)},"comment":""},"solvency":{"debt_to_equity":${JSON.stringify(computedRatios.solvency.debt_to_equity)},"comment":""},"profitability":{"net_margin_pct":${JSON.stringify(computedRatios.profitability.net_margin_pct)},"roe_pct":${JSON.stringify(computedRatios.profitability.roe_pct)},"asset_turnover":${JSON.stringify(computedRatios.profitability.asset_turnover)},"comment":""},"altman_z_score":${JSON.stringify(computedRatios.altman_z_score)},"altman_z_zone":${JSON.stringify(computedRatios.altman_z_zone)},"cash_runway_months":<sayı>,"anomalies":["..."],"health_score":<0-10>,"data_source_note":""}`, dataStr);
 
-  await new Promise(r => setTimeout(r, 600));
-
-  showStatus('🔍 Auditor Agent çalışıyor...', true);
-  const auditor = await agentCall('auditor', `
+  const auditorP = agentCall('auditor', `
 Sen Financial Auditor Agent'sın.
 ${KURAL}
 GÖREV: Veri tutarlılığı, trial balance dengesi, uyumluluk skoru (0-10), audit bayrakları.
 ÇIKTI ŞEMASI:
 {"compliance_score":<0-10>,"audit_flags":["..."],"trial_balance_check":"Passed|Failed|N/A","data_coverage":{"balance_sheet":<bool>,"income_statement":<bool>,"trial_balance":<bool>},"anomalies":["..."],"revenue_recognition_note":"","admin_expense_note":""}`, dataStr);
 
-  await new Promise(r => setTimeout(r, 600));
-
-  showStatus('⚙️ Optimizer Agent çalışıyor...', true);
-  const analystCtx = analyst._error ? '' : `\nAnalyst: Net Marj ${analyst?.profitability?.net_margin_pct}%, CR ${analyst?.liquidity?.current_ratio}, AT ${analyst?.profitability?.asset_turnover}x`;
-  const optimizer = await agentCall('optimizer', `
+  const optimizerP = agentCall('optimizer', `
 Sen Cost Optimizer Agent'sın.
 ${KURAL}
-GÖREV: Maliyet azaltma fırsatları, ZBB önerisi, hızlı kazanımlar.${analystCtx}
-ÇIKTI ŞEMASI:
-{"savings":{"<kalem>":"<değer>"},"opportunities":["..."],"quick_wins":["..."],"medium_term":["..."],"zbb_note":"","total_saving_pct":<sayı>}`, dataStr);
+GÖREV: Maliyet azaltma fırsatları, ZBB önerisi, hızlı kazanımlar.${sharedCtx}
+ÇIKTI ŞEMASI (savings anahtarları somut maliyet kategorisi adı olsun: ör. "Personnel", "Procurement", "Logistics", "IT & Software", "Marketing", "Travel", "Facilities", "Outsourcing". Anahtar olarak ASLA "kalem", "item", "line" gibi jenerik kelimeler kullanma. Use concrete cost category names as keys; never use generic words like "kalem"/"item"/"line".):
+{"savings":{"Personnel":"<değer>","Procurement":"<değer>"},"opportunities":["..."],"quick_wins":["..."],"medium_term":["..."],"zbb_note":"","total_saving_pct":<sayı>}`, dataStr);
 
-  await new Promise(r => setTimeout(r, 600));
-
-  showStatus('📈 Forecaster Agent çalışıyor...', true);
-  const fcCtx = analyst._error ? '' : `\nZ-Score: ${analyst?.altman_z_score} (${analyst?.altman_z_zone}), Runway: ${analyst?.cash_runway_months} ay`;
-  const forecaster = await agentCall('forecaster', `
+  const forecasterP = agentCall('forecaster', `
 Sen Forecaster & Risk Agent'sın.
 ${KURAL}
-GÖREV: 12 ay standart (+%1.5/ay) ve resesyon (-%2.5/ay) nakit projeksiyonu, Altman Z, risk bayrakları.${fcCtx}
+GÖREV: 12 ay standart (+%1.5/ay) ve resesyon (-%2.5/ay) nakit projeksiyonu, Altman Z, risk bayrakları.${sharedCtx}
 ÇIKTI ŞEMASI (forecast dizileri TAM 12 elemanlı):
 {"base_cf":<sayı>,"forecast_std":[12 sayı],"forecast_rec":[12 sayı],"altman_z":<sayı>,"z_zone":"SAFE|GREY|DISTRESS","cash_runway_months":<sayı>,"risk_flags":["..."],"stress_test_gap":""}`, dataStr);
 
-  await new Promise(r => setTimeout(r, 600));
-
-  showStatus('🔬 DuPont Agent çalışıyor...', true);
-  const dpVals = computedRatios.dupont;
-  const dupont = await agentCall('dupont', `
+  const dupontP = agentCall('dupont', `
 Sen DuPont Financial Analysis Agent'sın.
 ${KURAL}
 GÖREV: Sana verilen ÖNCEDEN HESAPLANMIŞ DuPont bileşenlerini (net_profit_margin, asset_turnover, equity_multiplier, roe_dupont_pct) AYNEN kullan, yeniden hesaplama. Sadece zayıf halkayı (weakest_pillar) tespit et ve kısa bir insight yaz.
@@ -1649,7 +1761,10 @@ Hesaplanmış değerler: ${JSON.stringify(dpVals)}
 ÇIKTI ŞEMASI (sayısal alanları yukarıdaki değerlerle AYNEN doldur):
 {"net_profit_margin":${JSON.stringify(dpVals.net_profit_margin)},"asset_turnover":${JSON.stringify(dpVals.asset_turnover)},"equity_multiplier":${JSON.stringify(dpVals.equity_multiplier)},"roe_dupont_pct":${JSON.stringify(dpVals.roe_dupont_pct)},"roe_direct_pct":${JSON.stringify(computedRatios.profitability.roe_pct)},"weakest_pillar":"Net Profit Margin|Asset Turnover|Equity Multiplier|Insufficient data","insight":"","benchmarks":{"net_profit_margin":"12-18%","asset_turnover":"0.8-1.2x","equity_multiplier":"1.5-2.5x","roe":"15-22%"}}`, dataStr);
 
-  showStatus('✅ Tüm ajanlar tamamlandı', true);
+  const [analyst, auditor, optimizer, forecaster, dupont] =
+    await Promise.all([analystP, auditorP, optimizerP, forecasterP, dupontP]);
+
+  showStatus(t('msg_all_done'), true);
   return { analyst, auditor, optimizer, forecaster, dupont, computedRatios };
 }
 
@@ -1687,45 +1802,88 @@ async function assembleFromAgents(parsed, fileName, findings) {
   const dpAT  = cr.dupont.asset_turnover    ?? g(dp,'asset_turnover') ?? 0;
   const dpEM  = cr.dupont.equity_multiplier ?? g(dp,'equity_multiplier') ?? 0;
 
-  let stdFc = g(fc,'forecast_std');
-  let recFc = g(fc,'forecast_rec');
-  if (!Array.isArray(stdFc) || stdFc.length < 12) {
-    const base = g(fc,'base_cf') ?? Math.max(netMargin > 0 ? netMargin * 1000 : 100000, 50000);
+  // Forecast fallback: önce gerçek nakit benzeri kalemleri kullan (Dönen Varlık - KV Borç),
+  // o yoksa net kâr, en son sabit. Önceki netMargin*1000 saçma ölçekte sayı üretiyordu.
+  // Forecast değerlerini sayıya zorla (model bazen "1.234,56", "$1,000" gibi string döndürüyor → grafik boş kalıyordu)
+  const _toNum = (v) => {
+    if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+    if (v && typeof v === 'object') v = v.value ?? v.cf ?? v.amount ?? v.cash_flow;
+    if (typeof v !== 'string') return null;
+    let s = v.replace(/[^\d,.\-]/g,'').trim();
+    if (!s) return null;
+    if (s.includes(',') && s.includes('.')) s = s.replace(/,/g,'');
+    else if (s.includes(',') && !s.includes('.')) s = s.replace(',', '.');
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : null;
+  };
+  const _sanitize = (arr) => {
+    if (!Array.isArray(arr) || arr.length < 1) return null;
+    const nums = arr.slice(0,12).map(_toNum);
+    if (nums.some(n => n == null)) return null;
+    if (nums.length < 12) {
+      const last = nums[nums.length-1];
+      while (nums.length < 12) nums.push(last);
+    }
+    return nums;
+  };
+  // Bir tahmin dizisi "plausible" mi? AI bazen 1-10 arası placeholder sayılar
+  // döndürüyor; gerçek nakit akışıyla karşılaştırılınca yutucu olarak küçük
+  // kalıyor. Beklenen büyüklükle aynı mertebede değilse fallback'e geç.
+  const _r = cr.raw || {};
+  const fallbackBase =
+    (_r.totalCurrentAssets != null && _r.totalCurrentLiabs != null) ? Math.max(_r.totalCurrentAssets - _r.totalCurrentLiabs, 50000) :
+    (_r.netIncome != null && _r.netIncome > 0) ? _r.netIncome :
+    (_r.revenue != null && _r.revenue > 0) ? _r.revenue * 0.05 :
+    100000;
+  const _isPlausible = (nums) => {
+    if (!nums) return false;
+    const maxAbs = Math.max(...nums.map(n => Math.abs(n)));
+    // AI yalnızca 1-2 haneli sembolik sayılar döndürmüşse (örn. [3,3,3,...,4]),
+    // ve gerçek baz nakit akışı bunun en az 1000 katıysa, kabul etme.
+    if (maxAbs < 1000 && fallbackBase >= 10000) return false;
+    // Tamamen sabit (varyans=0) bir dizi anlamsız bir projeksiyondur.
+    const uniq = new Set(nums.map(n => Math.round(n))).size;
+    if (uniq <= 1) return false;
+    return true;
+  };
+  let stdFc = _sanitize(g(fc,'forecast_std'));
+  let recFc = _sanitize(g(fc,'forecast_rec'));
+  if (!_isPlausible(stdFc)) stdFc = null;
+  if (!_isPlausible(recFc)) recFc = null;
+  if (!stdFc) {
+    const base = _toNum(g(fc,'base_cf')) ?? fallbackBase;
     stdFc = Array.from({length:12}, (_,i) => Math.round(base * Math.pow(1.015, i+1)));
   }
-  if (!Array.isArray(recFc) || recFc.length < 12) {
-    const base = g(fc,'base_cf') ?? stdFc[0] ?? 100000;
+  if (!recFc) {
+    const base = _toNum(g(fc,'base_cf')) ?? stdFc[0] ?? fallbackBase;
     recFc = Array.from({length:12}, (_,i) => Math.round(base * Math.pow(0.975, i+1)));
   }
 
+
   const rawSavings  = g(op,'savings') ?? {};
-  const costSavings = Object.keys(rawSavings).length > 0 ? rawSavings : {
-    'Marketing Optimizasyonu': 'Gelirin %1.5\'i kadar tasarruf',
-    'Yazılım Konsolidasyonu':  'Est. %0.8 OPEX azaltma',
-    'Bulut Altyapısı Geçişi':  '%12-18 altyapı tasarrufu',
-    'ZBB Tahmini': `~${g(op,'total_saving_pct') ?? 4}% OPEX azaltma`
-  };
+  const costSavings = Object.keys(rawSavings).length > 0 ? rawSavings : (() => {
+    const o={};
+    o[t('cs_marketing')] = t('cs_marketing_v');
+    o[t('cs_software')]  = t('cs_software_v');
+    o[t('cs_cloud')]     = t('cs_cloud_v');
+    o[t('cs_zbb')]       = `~${g(op,'total_saving_pct') ?? 4}% OPEX`;
+    return o;
+  })();
 
   const auditFlags = g(au,'audit_flags') ?? [];
   const fcRisks    = g(fc,'risk_flags') ?? [];
   const anAnomalies= g(an,'anomalies') ?? [];
   let criticalRisks = [...new Set([...auditFlags, ...fcRisks, ...anAnomalies])]
     .filter(r => r && !r.toLowerCase().includes('no critical')).slice(0, 5);
-  if (criticalRisks.length === 0) criticalRisks = ['Kritik risk tespit edilmedi'];
+  if (criticalRisks.length === 0) criticalRisks = [t('msg_no_critical_risk')];
 
   const opOpps = g(op,'opportunities') ?? [];
-  let growthOpps = opOpps.length > 0 ? opOpps.slice(0,4) : [
-    'Maliyet optimizasyonu ile marj artışı', 'Bulut altyapısına geçiş ile %15 verimlilik',
-    'ZBB ile OPEX kontrolü', 'Varlık devir hızı optimizasyonu'
-  ];
+  let growthOpps = opOpps.length > 0 ? opOpps.slice(0,4) : t('opp_default');
 
   const qwins = g(op,'quick_wins') ?? [];
   const mtms  = g(op,'medium_term') ?? [];
   let actionPlan = [...qwins, ...mtms].slice(0,5);
-  if (actionPlan.length === 0) actionPlan = [
-    'Kullanılmayan yazılım aboneliklerini iptal et', 'Top 5 tedarikçi sözleşmelerini yeniden müzakere et',
-    'Nakit akışı izleme sistemini devreye al', 'ZBB bütçeleme geçişini planla'
-  ];
+  if (actionPlan.length === 0) actionPlan = t('act_default');
 
   const quarters = ['Q1','Q2','Q3','Q4'];
   const baseH = Math.max(healthScore - 2, 1);
@@ -1758,7 +1916,7 @@ ROE = **${(dpNPM*100).toFixed(1)}%** × **${dpAT.toFixed(2)}x** × **${dpEM.toFi
 Zayıf halka: **${weakPillar}** ${dpInsight ? '— ' + dpInsight : ''}
 
 ### ⚙️ Maliyet Optimizasyonu
-${zbbNote || 'ZBB ile OPEX optimizasyonu önerilmektedir.'}
+${zbbNote || t('msg_zbb_default')}
 
 ### 🔍 Denetim & Uyumluluk
 Uyumluluk skoru: **${compScore}/10** ${auditNote ? '· ' + auditNote : ''}
@@ -1785,7 +1943,7 @@ Weakest pillar: **${weakPillar}** ${dpInsight ? '— ' + dpInsight : ''}
 ${zbbNote || 'ZBB implementation recommended to optimize OPEX.'}
 
 ### 🔍 Audit & Compliance
-Compliance score: **${compScore}/10**
+Compliance score: **${compScore}/10** ${auditNote ? '· ' + auditNote : ''}
 
 ### 📈 Cash Forecast
 Cash runway: **${runway} months** · Standard scenario monthly growth: **+1.5%**`;
@@ -1804,21 +1962,26 @@ Cash runway: **${runway} months** · Standard scenario monthly growth: **+1.5%**
       net_profit_margin_pct: netMargin !== 0 ? netMargin : 'N/A'
     },
     DUPONT_PILLARS: {
-      dupont_net_profit_margin: dpNPM !== 0 ? dpNPM.toFixed(3) : (assetTO !== 0 ? (netMargin/100).toFixed(3) : 'N/A'),
-      dupont_asset_turnover:    dpAT  !== 0 ? dpAT.toFixed(3)  : (assetTO !== 0 ? assetTO.toFixed(3) : 'N/A'),
-      dupont_equity_multiplier: dpEM  !== 0 ? dpEM.toFixed(3)  : 'N/A'
+      // NPM yüzde olarak gösterilir (örn. 12.3%); AT ve EM çarpan olarak (x).
+      dupont_net_profit_margin: dpNPM !== 0 ? (dpNPM*100).toFixed(2) + '%' : (assetTO !== 0 ? netMargin.toFixed(2) + '%' : 'N/A'),
+      dupont_asset_turnover:    dpAT  !== 0 ? dpAT.toFixed(2) + 'x' : (assetTO !== 0 ? assetTO.toFixed(2) + 'x' : 'N/A'),
+      dupont_equity_multiplier: dpEM  !== 0 ? dpEM.toFixed(2) + 'x' : 'N/A'
     },
     BUDGET_SIMULATIONS_FORECASTS: {
       forecasted_cash_flow_standard: stdFc, forecasted_cash_flow_recession: recFc, cost_cutting_savings: costSavings
     },
-    historical_comparison: { has_comparison: true, labels: quarters, health_history: histHealth, roe_history: histRoe },
+    historical_comparison: {
+      has_comparison: true, labels: quarters,
+      health_history: histHealth, roe_history: histRoe,
+      illustrative: true  // tek dönem veriden türetilen sentetik trend; chart altında not gösterilir
+    },
     critical_risks: criticalRisks, growth_opportunities: growthOpps, strategic_action_plan: actionPlan,
     confidentiality_rate_tr: '95% (Çok Gizli)', forecast_confidence_rate_tr: `${compScore}/10 Uyumluluk · 5 Ajan`,
     confidentiality_rate_en: '95% (Highly Restricted)', forecast_confidence_rate_en: `${compScore}/10 Compliance · 5 Agents`,
     data_quality_note: [
-      `${tr} satır · ${sn.length} sayfa`,
+      `${tr} ${t('msg_rows_sheets').replace('{n}', sn.length)}`,
       g(au,'trial_balance_check') ? `Trial Balance: ${g(au,'trial_balance_check')}` : null,
-      weakPillar !== 'N/A' ? `Zayıf halka: ${weakPillar}` : null
+      weakPillar !== 'N/A' ? `${t('msg_weak_pillar')}: ${weakPillar}` : null
     ].filter(Boolean).join(' · ')
   };
 }
@@ -1835,8 +1998,56 @@ function addHistory(name, seq) {
 // ─────────────────────────────────────────────────────────────────────────
 //  RENDER
 // ─────────────────────────────────────────────────────────────────────────
+function getLocalizedList(field) {
+  if (!dashboardData) return [];
+  const i18n = dashboardData.__i18n && dashboardData.__i18n[currentLang];
+  if (i18n && Array.isArray(i18n[field])) return i18n[field];
+  return dashboardData[field] || [];
+}
+
+async function ensureLangVersion(lang) {
+  if (!dashboardData) return;
+  dashboardData.__i18n = dashboardData.__i18n || {};
+  if (dashboardData.__i18n[lang]) return;
+  const src = {
+    critical_risks: dashboardData.critical_risks || [],
+    growth_opportunities: dashboardData.growth_opportunities || [],
+    strategic_action_plan: dashboardData.strategic_action_plan || []
+  };
+  const total = src.critical_risks.length + src.growth_opportunities.length + src.strategic_action_plan.length;
+  if (total === 0) { dashboardData.__i18n[lang] = src; return; }
+  const targetName = lang === 'en' ? 'English' : 'Turkish';
+  try {
+    const prompt = `Translate every string value in the following JSON into ${targetName}. Keep the same JSON shape, the same keys, and identical array order and length. Do NOT translate numbers or currency symbols. Output ONLY valid JSON, no markdown, no commentary.\n\n${JSON.stringify(src)}`;
+    const txt0 = await callEngine(prompt, 1200);
+    let txt = txt0.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if (a >= 0 && b > a) txt = txt.substring(a, b + 1);
+    const parsed = JSON.parse(txt);
+    dashboardData.__i18n[lang] = {
+      critical_risks: Array.isArray(parsed.critical_risks) ? parsed.critical_risks : src.critical_risks,
+      growth_opportunities: Array.isArray(parsed.growth_opportunities) ? parsed.growth_opportunities : src.growth_opportunities,
+      strategic_action_plan: Array.isArray(parsed.strategic_action_plan) ? parsed.strategic_action_plan : src.strategic_action_plan
+    };
+  } catch (e) {
+    console.warn('[i18n] translate failed:', e.message);
+  }
+}
+
 function renderAll() {
   const d = dashboardData;
+  // Seed i18n cache with the language the AI originally generated in,
+  // so we don't re-translate when staying in the same language.
+  d.__i18n = d.__i18n || {};
+  const _genLang = d.__genLang || currentLang;
+  d.__genLang = _genLang;
+  if (!d.__i18n[_genLang]) {
+    d.__i18n[_genLang] = {
+      critical_risks: d.critical_risks || [],
+      growth_opportunities: d.growth_opportunities || [],
+      strategic_action_plan: d.strategic_action_plan || []
+    };
+  }
   const m = d.EXECUTIVE_METRICS || {};
 
   const score = parseFloat(m.financial_health_score||0);
@@ -1862,9 +2073,9 @@ function renderAll() {
   fillGrid('dupontGrid', d.DUPONT_PILLARS||{});
   fillGrid('savingsGrid', (d.BUDGET_SIMULATIONS_FORECASTS||{}).cost_cutting_savings||{});
 
-  fillList('redFlags', d.critical_risks||[]);
-  fillList('greenFlags', d.growth_opportunities||[]);
-  fillList('actionPlan', d.strategic_action_plan||[]);
+  fillList('redFlags', getLocalizedList('critical_risks'));
+  fillList('greenFlags', getLocalizedList('growth_opportunities'));
+  fillList('actionPlan', getLocalizedList('strategic_action_plan'));
 
   renderCFChart(d.BUDGET_SIMULATIONS_FORECASTS||{});
   renderHistChart(d.historical_comparison||{});
@@ -1899,11 +2110,17 @@ function fillList(id, arr) {
 function renderCFChart(b) {
   const ctx = document.getElementById('cfChart'); if (!ctx) return;
   if (cfChartInst) { cfChartInst.destroy(); cfChartInst = null; }
-  const std = b.forecasted_cash_flow_standard||[];
-  const rec = b.forecasted_cash_flow_recession||[];
+  const _num = v => { const n = typeof v==='number'?v:parseFloat(String(v??'').replace(/[^\d.\-]/g,'')); return Number.isFinite(n)?n:0; };
+  let std = (b.forecasted_cash_flow_standard||[]).map(_num);
+  let rec = (b.forecasted_cash_flow_recession||[]).map(_num);
+  if (std.length === 0 && rec.length === 0) {
+    std = Array.from({length:12},(_,i)=>Math.round(100000*Math.pow(1.015,i+1)));
+    rec = Array.from({length:12},(_,i)=>Math.round(100000*Math.pow(0.975,i+1)));
+  }
+  const len = Math.max(std.length, rec.length, 12);
   cfChartInst = new Chart(ctx, {
     type:'line',
-    data:{ labels: Array.from({length:Math.max(std.length,12)},(_,i)=>currentLang==='tr'?`${i+1}. Ay`:`Mo ${i+1}`),
+    data:{ labels: Array.from({length:len},(_,i)=>currentLang==='tr'?`${i+1}. Ay`:`Mo ${i+1}`),
       datasets:[
         {label:t('chart_std'),data:std,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:.3},
         {label:t('chart_rec'),data:rec,borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',fill:true,tension:.3,borderDash:[5,4]}
@@ -1931,6 +2148,17 @@ function renderHistChart(hc) {
       scales:{y:{type:'linear',position:'left',ticks:{color:'#64748b'},grid:{color:'#1e293b'}},
               y1:{type:'linear',position:'right',ticks:{color:'#64748b'},grid:{drawOnChartArea:false}}}}
   });
+  // İllüstratif (tek dönem veriden türetilmiş) trend uyarısı
+  const parent = ctx.parentNode;
+  const prev = parent.querySelector('.hist-illustrative-note');
+  if (prev) prev.remove();
+  if (hc.illustrative) {
+    const note = document.createElement('div');
+    note.className = 'hist-illustrative-note';
+    note.style.cssText = 'margin-top:6px;font-size:.66rem;color:var(--wa);line-height:1.4';
+    note.textContent = t('hist_illustrative');
+    parent.appendChild(note);
+  }
 }
 
 function renderMcKinsey(d, m) {
@@ -1951,8 +2179,11 @@ function renderMcKinsey(d, m) {
   const b = d.BUDGET_SIMULATIONS_FORECASTS||{};
   const s = b.forecasted_cash_flow_standard||[];
   const rc = b.forecasted_cash_flow_recession||[];
-  const gp = s.length>1 ? Math.abs(s[s.length-1]-s[0]).toLocaleString() : '—';
-  const sd = s.length>1&&rc.length>1 ? Math.abs(s[s.length-1]-rc[rc.length-1]).toLocaleString() : '—';
+  const _gpRaw = s.length>1 ? (s[s.length-1]-s[0]) : null;
+  const _sdRaw = s.length>1&&rc.length>1 ? (s[s.length-1]-rc[rc.length-1]) : null;
+  const _fmtSigned = v => (v >= 0 ? '+' : '−') + Math.abs(Math.round(v)).toLocaleString();
+  const gp = _gpRaw != null ? _fmtSigned(_gpRaw) : '—';
+  const sd = _sdRaw != null ? _fmtSigned(_sdRaw) : '—';
   p.innerHTML = `
     <h3 class="panel-section-title">${t('mckinsey_title')}</h3>
     <div class="horizon-cards">
@@ -1961,13 +2192,13 @@ function renderMcKinsey(d, m) {
       <div class="horizon-card h3"><span class="horizon-badge">H3</span><div><div class="horizon-label">${t('h3_lbl')}</div><p class="horizon-text">${h3}</p></div></div>
     </div>
     <div class="scenario-block best"><div class="scenario-header">${t('best')}</div>
-      <p class="scenario-text">${isTr?`Kümülatif nakit büyüme potansiyeli: +${gp}.`:`Cumulative cash growth potential: +${gp}.`}</p>
+      <p class="scenario-text">${isTr?`Kümülatif nakit değişim potansiyeli: ${gp}.`:`Cumulative cash change potential: ${gp}.`}</p>
       <div class="scenario-actions"><span class="action-label">${t('best_action')}:</span>
-        <ul>${(d.growth_opportunities||[]).slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>
+        <ul>${getLocalizedList('growth_opportunities').slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>
     <div class="scenario-block worst"><div class="scenario-header">${t('worst')}</div>
-      <p class="scenario-text">${isTr?`Resesyon senaryosunda nakit kaybı riski: -${sd}.`:`Recession cash exposure: -${sd}.`}</p>
+      <p class="scenario-text">${isTr?`Standart - Resesyon farkı (12. ay): ${sd}.`:`Standard − Recession gap (mo. 12): ${sd}.`}</p>
       <div class="scenario-actions"><span class="action-label">${t('worst_action')}:</span>
-        <ul>${(d.critical_risks||[]).slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>`;
+        <ul>${getLocalizedList('critical_risks').slice(0,3).map(a=>`<li>${escapeText(a)}</li>`).join('')}</ul></div></div>`;
 }
 
 function renderEisenhower(m) {
@@ -2033,7 +2264,7 @@ function renderAgentFindings(findings) {
       <div class="finding-card">
         <div class="finding-hdr" onclick="toggleFinding(this)">
           <span class="finding-name">${a.icon} ${escapeText(a.name[currentLang])}</span>
-          <span class="finding-badge">${hasError?'⚠️ Hata':'✅ Tamamlandı'}</span>
+          <span class="finding-badge">${hasError?t('badge_err'):t('badge_done')}</span>
         </div>
         <div class="finding-body">${hasError?`<p style="color:var(--ri);font-size:.75rem">${escapeText(f._error)}</p>`:rows}</div>
       </div>`;
@@ -2053,11 +2284,20 @@ document.getElementById('themeToggle').addEventListener('click', () => {
   document.getElementById('themeToggle').textContent = bw ? '🌈 Renkli' : '⚫ B&W';
 });
 
-document.getElementById('langToggle').addEventListener('click', () => {
+document.getElementById('langToggle').addEventListener('click', async () => {
   currentLang = currentLang==='tr' ? 'en' : 'tr';
   applyLang();
   applyOnboardLang();
-  if (dashboardData) renderAll();
+  if (dashboardData) {
+    renderAll();
+    // If we haven't translated AI-generated lists into this language yet,
+    // translate once via a single LLM call and re-render with the cached result.
+    const needsXlate = !(dashboardData.__i18n && dashboardData.__i18n[currentLang]);
+    if (needsXlate) {
+      await ensureLangVersion(currentLang);
+      renderAll();
+    }
+  }
 });
 
 document.getElementById('onboardLangToggle').addEventListener('click', () => {
